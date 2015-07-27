@@ -3,13 +3,13 @@
 
 from . import PostProcessingPlugin
 from UM.i18n import i18nCatalog
-i18n_catalog = i18nCatalog("PrintCostCalculator")
+i18n_catalog = i18nCatalog("PostProcessingPlugin")
 def getMetaData():
     return {
         "type": "extension",
         "plugin": 
         {
-            "name": "G-Code post processing",
+            "name": "Post Processing",
             "author": "Ultimaker",
             "version": "15.06",
             "description": i18n_catalog.i18nc("Description of plugin","Extension that allows for user created scripts for post processing")
