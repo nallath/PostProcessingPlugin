@@ -9,11 +9,24 @@ class ExampleScript(Script):
     def getSettingData(self):
         return { 
             "label":"Example script",
+            "key": "ExampleScript",
             "settings": 
             {
                 "test": 
                 {
                     "label": "Test",
+                    "description": "None",
+                    "unit": "mm",
+                    "type": "float",
+                    "default": 0.5,
+                    "min_value": 0,
+                    "min_value_warning": 0.1,
+                    "max_value_warning": 1,
+                    "visible": True
+                },
+                "derp":
+                {
+                    "label": "zomg",
                     "description": "None",
                     "unit": "mm",
                     "type": "float",

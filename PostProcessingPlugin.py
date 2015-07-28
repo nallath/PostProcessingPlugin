@@ -37,7 +37,6 @@ class PostProcessingPlugin(QObject,  Extension):
                 # Import module
                 loaded_script = __import__("PostProcessingPlugin.scripts."+ script_name, fromlist = [script_name])
                 loaded_class = getattr(loaded_script, script_name)
-                
                 temp_object = loaded_class()
                 try: 
                     setting_data = temp_object.getSettingData()
