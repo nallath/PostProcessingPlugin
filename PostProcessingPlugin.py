@@ -8,6 +8,7 @@ from UM.PluginRegistry import PluginRegistry
 from UM.Application import Application
 from UM.Preferences import Preferences
 from UM.Extension import Extension
+from UM.Logger import Logger
 
 from pydoc import locate
 
@@ -26,6 +27,8 @@ class PostProcessingPlugin(QObject,  Extension):
         self.addMenuItem(i18n_catalog.i18n("Modify G-Code"), self.showPopup)
         self._view = None
         self._loaded_scripts = {}
+        self._script_labels = {}
+        
         
     def loadAllScripts(self, path):
         scripts = pkgutil.iter_modules(path = [path])
@@ -34,7 +37,30 @@ class PostProcessingPlugin(QObject,  Extension):
                 # Import module
                 loaded_script = __import__("PostProcessingPlugin.scripts."+ script_name, fromlist = [script_name])
                 loaded_class = getattr(loaded_script, script_name)
-                self._loaded_scripts[script_name] =  loaded_class
+                
+                temp_object = loaded_class()
+                try: 
+                    setting_data = temp_object.getSettingData()
+                    if "label" in setting_data:
+                        self._script_labels[script_name] = setting_data["label"]
+                    else:
+                        Logger.log("w", "Script %s.py has no label", script_name)
+                        self._script_labels[script_name] = script_name
+                    self._loaded_scripts[script_name] =  loaded_class
+                    self.scriptListChanged.emit()
+                except AttributeError:
+                    Logger.log("e", "Script %s.py is not a recognised script type. Ensure it inherits Script", script_name)
+                except NotImplementedError:
+                    Logger.log("e", "Script %s.py has no implemented settings",script_name)
+
+    scriptListChanged = pyqtSignal()
+    @pyqtProperty("QVariantList", notify = scriptListChanged)
+    def scriptList(self):
+        return list(self._loaded_scripts.keys())
+    
+    @pyqtSlot(str, result = str)
+    def getScriptLabelByKey(self, key):
+        return self._script_labels[key]
     
     ##  Creates the view used by show popup. The view is saved because of the fairly aggressive garbage collection.
     def _createView(self):

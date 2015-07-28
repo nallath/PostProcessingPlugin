@@ -7,8 +7,7 @@ class ExampleScript(Script):
         super().__init__()
         
     def getSettingData(self):
-        return 
-        { 
+        return { 
             "label":"Example script",
             "settings": 
             {
