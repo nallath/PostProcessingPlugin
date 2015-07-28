@@ -28,8 +28,25 @@ class PostProcessingPlugin(QObject,  Extension):
         self._view = None
         self._loaded_scripts = {}
         self._script_labels = {}
+        # List of scripts in the sequence that they need to be executed
+        self._script_list = []
+        self._selected_script_index = 0
         
-        
+    @pyqtSlot(int, result = "QVariant")
+    def getSettingModel(self, index):
+        return self._script_list[index].getSettingsModel()
+    selectedIndexChanged = pyqtSignal()
+    @pyqtProperty("QVariant", notify = selectedIndexChanged)
+    def selectedScriptSettingsModel(self):
+        return self._script_list[self._selected_script_index].getSettingsModel()
+    
+    @pyqtSlot(int)
+    def setSelectedScriptIndex(self, index):
+        self._selected_script_index = index
+        self.selectedIndexChanged.emit()
+    
+    
+    
     def loadAllScripts(self, path):
         scripts = pkgutil.iter_modules(path = [path])
         for loader, script_name, ispkg in scripts: 
@@ -45,7 +62,8 @@ class PostProcessingPlugin(QObject,  Extension):
                     else:
                         Logger.log("w", "Script %s.py has no label", script_name)
                         self._script_labels[script_name] = script_name
-                    self._loaded_scripts[script_name] =  loaded_class
+                    self._loaded_scripts[script_name] = loaded_class
+                    self._script_list.append(loaded_class())
                     self.scriptListChanged.emit()
                 except AttributeError:
                     Logger.log("e", "Script %s.py is not a recognised script type. Ensure it inherits Script", script_name)

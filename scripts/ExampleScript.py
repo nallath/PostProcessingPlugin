@@ -27,7 +27,7 @@ class ExampleScript(Script):
                 "derp":
                 {
                     "label": "zomg",
-                    "description": "None",
+                    "description": "afgasgfgasfgasf",
                     "unit": "mm",
                     "type": "float",
                     "default": 0.5,

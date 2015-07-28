@@ -2,6 +2,7 @@
 # The PostProcessingPlugin is released under the terms of the AGPLv3 or higher.
 from UM.Settings.SettingsCategory import SettingsCategory
 from UM.Logger import Logger
+from UM.Qt.Bindings.SettingsFromCategoryModel import SettingsFromCategoryModel
 
 from UM.i18n import i18nCatalog
 i18n_catalog = i18nCatalog("PostProcessingPlugin")
@@ -10,17 +11,18 @@ i18n_catalog = i18nCatalog("PostProcessingPlugin")
 class Script():
     def __init__(self):
         super().__init__()
-        self._settings = None 
+        self._settings = None
+        self._settings_model = None
         try:
             setting_data = self.getSettingData()
             if "key" in setting_data:
                 self._settings = SettingsCategory(setting_data["key"], i18n_catalog, self)
                 self._settings.fillByDict(self.getSettingData())
+                self._settings_model = SettingsFromCategoryModel(self._settings)
             else: 
                 Logger.log("e", "Script has no key in meta data. Unable to use.")
         except NotImplementedError:
-            pass
-            
+            pass 
     
     ##  Needs to return a dict that can be used to construct a settingcategory file. 
     #   See the example script for an example.
@@ -31,6 +33,9 @@ class Script():
     ##  Get the initialised settings 
     def getSettings(self):
         return self._settings
+    
+    def getSettingsModel(self):
+        return self._settings_model
     
     ##  Get setting by key. (convenience function)
     #   \param key Key to select setting by (string)
