@@ -26,10 +26,13 @@ class PostProcessingPlugin(QObject,  Extension):
         super().__init__(parent)
         self.addMenuItem(i18n_catalog.i18n("Modify G-Code"), self.showPopup)
         self._view = None
-        self._loaded_scripts = {}
+        
+        # Loaded scripts are all scripts that can be used
+        self._loaded_scripts = {} 
         self._script_labels = {}
-        # List of scripts in the sequence that they need to be executed
-        self._script_list = []
+        
+        # Script list contains instances of scripts in loaded_scripts. There can be duplicates and they will be executed in sequence.
+        self._script_list = [] 
         self._selected_script_index = 0
         
     @pyqtSlot(int, result = "QVariant")
@@ -71,6 +74,7 @@ class PostProcessingPlugin(QObject,  Extension):
             self.scriptListChanged.emit()
             self.selectedIndexChanged.emit() #Ensure that settings are updated
     
+    ##  Remove a script from the active script list by index.
     @pyqtSlot(int)
     def removeScriptByIndex(self, index):
         self._script_list.pop(index)
@@ -79,6 +83,7 @@ class PostProcessingPlugin(QObject,  Extension):
         self.scriptListChanged.emit()
         self.selectedIndexChanged.emit() #Ensure that settings are updated
     
+    ##  Load all scripts from provided path. This should probably only be done on init.
     def loadAllScripts(self, path):
         scripts = pkgutil.iter_modules(path = [path])
         for loader, script_name, ispkg in scripts: 
