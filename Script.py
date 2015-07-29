@@ -5,6 +5,7 @@ from UM.Logger import Logger
 from UM.Qt.Bindings.SettingsFromCategoryModel import SettingsFromCategoryModel
 
 from UM.i18n import i18nCatalog
+import re
 i18n_catalog = i18nCatalog("PostProcessingPlugin")
 
 ## Base class for scripts. All scripts should inherit the script class. 
@@ -36,6 +37,18 @@ class Script():
     
     def getSettingsModel(self):
         return self._settings_model
+    
+    def getValue(self, line, key, default = None):
+        if not key in line or (';' in line and line.find(key) > line.find(';')):
+            return default
+        sub_part = line[line.find(key) + 1:]
+        m = re.search('^[0-9]+\.?[0-9]*', sub_part)
+        if m is None:
+            return default
+        try:
+            return float(m.group(0))
+        except:
+            return default
     
     ##  Get setting by key. (convenience function)
     #   \param key Key to select setting by (string)

@@ -64,9 +64,10 @@ class PostProcessingPlugin(QObject,  Extension):
                 for script in self._script_list:
                     try:
                         gcode_list = script.execute(gcode_list)
-                    except:
+                    except Exception as e:
+                        print(e)
                         pass
-                setattr(scene,"gcode_list",gcode_list)
+                setattr(scene, "gcode_list", gcode_list)
 
     @pyqtSlot(int)
     def setSelectedScriptIndex(self, index):
