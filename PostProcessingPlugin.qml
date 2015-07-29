@@ -121,6 +121,7 @@ UM.Dialog
                         text: manager.getScriptLabelByKey(modelData.toString())
                         exclusiveGroup: selected_script_group
                         checkable: true
+                        checked: manager.selectedScriptIndex == index ? true : false
                         onClicked: manager.setSelectedScriptIndex(index)
                     }
                 }

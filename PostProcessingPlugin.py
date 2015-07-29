@@ -57,6 +57,10 @@ class PostProcessingPlugin(QObject,  Extension):
         self._selected_script_index = index
         self.selectedIndexChanged.emit()
     
+    @pyqtProperty(int, notify = selectedIndexChanged)
+    def selectedScriptIndex(self):
+        return self._selected_script_index
+    
     def loadAllScripts(self, path):
         scripts = pkgutil.iter_modules(path = [path])
         for loader, script_name, ispkg in scripts: 
