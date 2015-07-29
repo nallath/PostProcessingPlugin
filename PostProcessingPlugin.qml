@@ -54,7 +54,7 @@ UM.Dialog
                                 height:20
                                 Button
                                 {
-                                    id: script_button
+                                    id: loaded_script_button
                                     text: manager.getScriptLabelByKey(modelData.toString())
                                     exclusiveGroup: selected_loaded_script_group
                                     checkable: true
@@ -63,7 +63,7 @@ UM.Dialog
                                     {
                                         background:Rectangle 
                                         {
-                                            color: script_button.checked ? "blue":"white"
+                                            color: loaded_script_button.checked ? "blue":"white"
                                             implicitWidth: parent.width
                                             implicitHeight: parent.height
                                         }
@@ -85,18 +85,31 @@ UM.Dialog
                         }
                     }
                 }
-                Item 
+                Item //Spacer
                 {
                     width: UM.Theme.sizes.default_margin.width
                     height: UM.Theme.sizes.default_margin.height
                 }
+                
                 SingleCategorySettingPanel
                 {
-                    //Component.onCompleted: console.log(manager.getSettingModel(0))
                     setting_model: manager.selectedScriptSettingsModel  
                     width: 250
-                    height: 300
-                    //model:manager.getSettingModel(0)
+                    height: 320
+                }
+                
+                Item  //Spacer
+                {
+                    width: UM.Theme.sizes.default_margin.width
+                    height: UM.Theme.sizes.default_margin.height
+                }
+                
+                Button
+                {
+                    text:"Execute"
+                    width: 250
+                    height: 30
+                    onClicked:manager.execute()
                 }
             }
             Item 
@@ -110,23 +123,34 @@ UM.Dialog
             }
             Rectangle 
             {
-                width: 150
-                height: 500
+                width: 0.5 * parent.width - 2 * UM.Theme.sizes.default_margin.width
+                height: parent.height - 0.5 * UM.Theme.sizes.default_margin.height
                 ListView
                 {
                     anchors.fill:parent
                     model: manager.scriptList 
                     delegate: Rectangle 
                     {
-                        width: 150
-                        height:50
+                        width: parent.width
+                        height: 30
                         Button
                         {
+                            id: loaded_script_button
                             text: manager.getScriptLabelByKey(modelData.toString())
                             exclusiveGroup: selected_script_group
                             checkable: true
                             checked: manager.selectedScriptIndex == index ? true : false
                             onClicked: manager.setSelectedScriptIndex(index)
+                            width: parent.width
+                            style: ButtonStyle 
+                            {
+                                background: Rectangle 
+                                {
+                                    color: loaded_script_button.checked ? "blue":"white"
+                                    implicitWidth: parent.width
+                                    implicitHeight: parent.height
+                                }
+                            }
                         }
                         
                         Button
