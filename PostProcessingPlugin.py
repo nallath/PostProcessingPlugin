@@ -55,6 +55,15 @@ class PostProcessingPlugin(QObject,  Extension):
         except:
             return None
     
+    @pyqtSlot()
+    def execute(self):
+        gcodeData = None #TODO
+        for script in self._script_list:
+            try:
+                gcodeData = script.execute(gcodeData)
+            except:
+                pass
+
     @pyqtSlot(int)
     def setSelectedScriptIndex(self, index):
         self._selected_script_index = index
