@@ -128,11 +128,22 @@ UM.Dialog
                             checked: manager.selectedScriptIndex == index ? true : false
                             onClicked: manager.setSelectedScriptIndex(index)
                         }
+                        
+                        Button
+                        {
+                            id: remove_button
+                            text: "x"
+                            width: 20
+                            height:20
+                            anchors.right:parent.right
+                            onClicked: manager.removeScriptByIndex(index)
+                        }
+                        
                         Button
                         {
                             id: down_button
                             text: "-"
-                            anchors.right:parent.right
+                            anchors.right: remove_button.left
                             width: 20
                             height:20
                             onClicked: manager.moveScript(index,index+1)

@@ -71,6 +71,14 @@ class PostProcessingPlugin(QObject,  Extension):
             self.scriptListChanged.emit()
             self.selectedIndexChanged.emit() #Ensure that settings are updated
     
+    @pyqtSlot(int)
+    def removeScriptByIndex(self, index):
+        self._script_list.pop(index)
+        if len(self._script_list) - 1 < self._selected_script_index:
+            self._selected_script_index = len(self._script_list) - 1
+        self.scriptListChanged.emit()
+        self.selectedIndexChanged.emit() #Ensure that settings are updated
+    
     def loadAllScripts(self, path):
         scripts = pkgutil.iter_modules(path = [path])
         for loader, script_name, ispkg in scripts: 
