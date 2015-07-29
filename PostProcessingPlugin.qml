@@ -18,6 +18,10 @@ UM.Dialog
     {
         id: base
         anchors.fill: parent
+        ExclusiveGroup
+        {
+            id: selected_loaded_script_group
+        }
         Row 
         {
             Column
@@ -34,18 +38,49 @@ UM.Dialog
                         anchors.fill: parent
                         ListView
                         {
-                            anchors.fill: parent
-                            model: manager.scriptList 
+                            anchors.top: parent.top
+                            anchors.topMargin: 2
+                            anchors.left: parent.left
+                            anchors.leftMargin: 2
+                            anchors.right: parent.right
+                            anchors.rightMargin: 2
+                            anchors.bottom: parent.bottom
+                            anchors.bottomMargin: 2
+                            model: manager.loadedScriptList 
                             delegate: Rectangle 
                             {
-                                x:2
                                 color:"transparent"
-                                width:50
+                                width:parent.width
                                 height:20
-                                Text 
+                                Button
                                 {
+                                    id: script_button
                                     text: manager.getScriptLabelByKey(modelData.toString())
+                                    exclusiveGroup: selected_loaded_script_group
+                                    checkable: true
+                                    width: parent.width
+                                    style: ButtonStyle 
+                                    {
+                                        background:Rectangle 
+                                        {
+                                            color: script_button.checked ? "blue":"white"
+                                            implicitWidth: parent.width
+                                            implicitHeight: parent.height
+                                        }
+                                    }
+                                    Button
+                                    {
+                                        text: "+"
+                                        anchors.right: parent.right
+                                        width: 20
+                                        height: 20
+                                        onClicked: 
+                                        {
+                                            manager.addScriptToList(modelData.toString())
+                                        }
+                                    }
                                 }
+
                             }
                         }
                     }
@@ -58,7 +93,7 @@ UM.Dialog
                 SingleCategorySettingPanel
                 {
                     //Component.onCompleted: console.log(manager.getSettingModel(0))
-                    setting_model: manager.selectedScriptSettingsModel
+                    setting_model: manager.selectedScriptSettingsModel  
                     width: 250
                     height: 300
                     //model:manager.getSettingModel(0)
@@ -69,10 +104,26 @@ UM.Dialog
                 width: UM.Theme.sizes.default_margin.width
                 height: UM.Theme.sizes.default_margin.height
             }
+            ExclusiveGroup
+            {
+                id: selected_script_group
+            }
             Rectangle 
             {
                 width: 150
                 height: 500
+                ListView
+                {
+                    anchors.fill:parent
+                    model: manager.scriptList 
+                    delegate: Button
+                    {
+                        text: manager.getScriptLabelByKey(modelData.toString())
+                        exclusiveGroup: selected_script_group
+                        checkable: true
+                        onClicked: manager.setSelectedScriptIndex(index)
+                    }
+                }
             }
         }
         Tooltip

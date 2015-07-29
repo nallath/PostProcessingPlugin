@@ -97,7 +97,11 @@ Rectangle
 
                     style: UM.Theme.styles.setting_item;
 
-                    onItemValueChanged: background.setting_model.setSettingValue(index, model.key, value);
+                    onItemValueChanged: 
+                    { 
+                        //background.setting_model.setSettingValue(index, model.key, value);
+                        manager.setSettingValue(model.key,value)
+                    }
                     onContextMenuRequested: contextMenu.popup();
 
                     onShowTooltip: 
