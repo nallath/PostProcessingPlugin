@@ -116,13 +116,37 @@ UM.Dialog
                 {
                     anchors.fill:parent
                     model: manager.scriptList 
-                    delegate: Button
+                    delegate: Rectangle 
                     {
-                        text: manager.getScriptLabelByKey(modelData.toString())
-                        exclusiveGroup: selected_script_group
-                        checkable: true
-                        checked: manager.selectedScriptIndex == index ? true : false
-                        onClicked: manager.setSelectedScriptIndex(index)
+                        width: 150
+                        height:50
+                        Button
+                        {
+                            text: manager.getScriptLabelByKey(modelData.toString())
+                            exclusiveGroup: selected_script_group
+                            checkable: true
+                            checked: manager.selectedScriptIndex == index ? true : false
+                            onClicked: manager.setSelectedScriptIndex(index)
+                        }
+                        Button
+                        {
+                            id: down_button
+                            text: "-"
+                            anchors.right:parent.right
+                            width: 20
+                            height:20
+                            onClicked: manager.moveScript(index,index+1)
+                        }
+                        Button 
+                        {
+                            id: up_button
+                            text:"+"
+                            width: 20
+                            height: 20
+                            anchors.right: down_button.left
+                            onClicked: manager.moveScript(index,index-1)
+                        }
+                        
                     }
                 }
             }

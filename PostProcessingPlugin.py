@@ -61,6 +61,16 @@ class PostProcessingPlugin(QObject,  Extension):
     def selectedScriptIndex(self):
         return self._selected_script_index
     
+    @pyqtSlot(int, int)
+    def moveScript(self, index, new_index):
+        if new_index < 0 or new_index > len(self._script_list)-1:
+            return #nothing needs to be done
+        else:
+            # Magical switch code.
+            self._script_list[new_index], self._script_list[index] = self._script_list[index], self._script_list[new_index]
+            self.scriptListChanged.emit()
+            self.selectedIndexChanged.emit() #Ensure that settings are updated
+    
     def loadAllScripts(self, path):
         scripts = pkgutil.iter_modules(path = [path])
         for loader, script_name, ispkg in scripts: 
