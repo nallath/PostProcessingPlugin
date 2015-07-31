@@ -16,8 +16,6 @@ import os.path
 import pkgutil
 import sys
 
-from PostProcessingPlugin.scripts.Test import Test
-
 from UM.i18n import i18nCatalog
 i18n_catalog = i18nCatalog("PostProcessingPlugin")
 
