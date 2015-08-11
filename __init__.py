@@ -12,6 +12,7 @@ def getMetaData():
             "name": "Post Processing",
             "author": "Ultimaker",
             "version": "15.06",
+            "api": 2,
             "description": i18n_catalog.i18nc("Description of plugin","Extension that allows for user created scripts for post processing")
         }
     }
