@@ -20,6 +20,7 @@ class Script():
                 self._settings = SettingsCategory(setting_data["key"], i18n_catalog, self)
                 self._settings.fillByDict(self.getSettingData())
                 self._settings_model = SettingsFromCategoryModel(self._settings)
+                self._settings_model.sort(lambda t: t["name"])
             else: 
                 Logger.log("e", "Script has no key in meta data. Unable to use.")
         except NotImplementedError:
