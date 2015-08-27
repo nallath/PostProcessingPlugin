@@ -104,6 +104,7 @@ class PostProcessingPlugin(QObject,  Extension):
                 loaded_script = __import__("PostProcessingPlugin.scripts."+ script_name, fromlist = [script_name])
                 loaded_class = getattr(loaded_script, script_name)
                 temp_object = loaded_class()
+                Logger.log("d", "Begin loading of script: %s", script_name)
                 try: 
                     setting_data = temp_object.getSettingData()
                     if "label" in setting_data and "key" in setting_data:
@@ -137,12 +138,14 @@ class PostProcessingPlugin(QObject,  Extension):
     
     @pyqtSlot(str)
     def addScriptToList(self, key):
+        Logger.log("d", "Adding script %s to list.", key)
         self._script_list.append(self._loaded_scripts[key]())
         self.setSelectedScriptIndex(len(self._script_list) - 1)
         self.scriptListChanged.emit()
     
     ##  Creates the view used by show popup. The view is saved because of the fairly aggressive garbage collection.
     def _createView(self):
+        Logger.log("d", "Creating post processing plugin view.")
         ## Load all scripts in the scripts folder
         self.loadAllScripts(os.path.join(PluginRegistry.getInstance().getPluginPath("PostProcessingPlugin"), "scripts"))
         
