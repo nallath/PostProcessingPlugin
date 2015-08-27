@@ -3,13 +3,13 @@
 from UM.Settings.SettingsCategory import SettingsCategory
 from UM.Logger import Logger
 from UM.Qt.Bindings.SettingsFromCategoryModel import SettingsFromCategoryModel
-
+from UM.Signal import Signal, SignalEmitter
 from UM.i18n import i18nCatalog
 import re
 i18n_catalog = i18nCatalog("PostProcessingPlugin")
 
 ## Base class for scripts. All scripts should inherit the script class. 
-class Script():
+class Script(SignalEmitter):
     def __init__(self):
         super().__init__()
         self._settings = None
@@ -21,11 +21,14 @@ class Script():
                 self._settings.fillByDict(self.getSettingData())
                 self._settings_model = SettingsFromCategoryModel(self._settings)
                 self._settings_model.sort(lambda t: t["key"])
+                self.settingsLoaded.emit()
             else: 
                 Logger.log("e", "Script has no key in meta data. Unable to use.")
         except NotImplementedError:
             pass 
     
+    settingsLoaded = Signal()
+
     ##  Needs to return a dict that can be used to construct a settingcategory file. 
     #   See the example script for an example.
     #   It follows the same style / guides as the Uranium settings.
