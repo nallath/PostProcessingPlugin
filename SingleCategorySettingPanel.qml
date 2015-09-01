@@ -6,7 +6,7 @@ import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.1
 import QtQuick.Window 2.1
 
-import UM 1.0 as UM
+import UM 1.1 as UM
 Rectangle
 {
     Layout.maximumWidth: parent.width
@@ -16,6 +16,7 @@ Rectangle
     id: background
     property variant setting_model
     property variant base_item: base;
+    UM.I18nCatalog { id: catalog; name:"cura"}
     ScrollView 
     {
         id: scrollview_base;
@@ -117,13 +118,13 @@ Rectangle
                         MenuItem 
                         {
                             //: Settings context menu action
-                            text: qsTr("Hide this setting");
+                            text: catalog.i18nc("@action:menu","Hide this setting");
                             onTriggered: background.setting_model.hideSetting(model.key);
                         }
                         MenuItem 
                         {
                             //: Settings context menu action
-                            text: qsTr("Configure setting visiblity...");
+                            text: catalog.i18nc("@action:menu","Configure setting visiblity...");
                             onTriggered: if(base.configureSettings) base.configureSettings.trigger();
                         }
                     }
