@@ -5,6 +5,7 @@ from UM.Logger import Logger
 from UM.Qt.Bindings.SettingsFromCategoryModel import SettingsFromCategoryModel
 from UM.Signal import Signal, SignalEmitter
 from UM.i18n import i18nCatalog
+from UM.Application import Application
 import re
 i18n_catalog = i18nCatalog("PostProcessingPlugin")
 
@@ -17,7 +18,7 @@ class Script(SignalEmitter):
         try:
             setting_data = self.getSettingData()
             if "key" in setting_data:
-                self._settings = SettingsCategory(setting_data["key"], i18n_catalog, self)
+                self._settings = SettingsCategory(Application.getInstance().getMachineManager(), setting_data["key"], i18n_catalog, self)
                 self._settings.fillByDict(self.getSettingData())
                 self._settings_model = SettingsFromCategoryModel(self._settings)
                 self._settings_model.sort(lambda t: t["key"])
