@@ -64,7 +64,7 @@ class PostProcessingPlugin(QObject,  Extension):
                     try:
                         gcode_list = script.execute(gcode_list)
                     except Exception as e:
-                        Logger.log("Script raised the following exceiption %s",e)
+                        Logger.log("e","Script raised the following exception %s",e)
                 setattr(scene, "gcode_list", gcode_list)
 
     @pyqtSlot(int)
