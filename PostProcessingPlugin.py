@@ -40,9 +40,7 @@ class PostProcessingPlugin(QObject,  Extension):
     @pyqtSlot(str, "QVariant")
     ## Called when the setting is changed.
     def setSettingValue(self, key, value):
-        setting = self._script_list[self._selected_script_index].getSettings().getSettingByKey(key)
-        if setting:
-            setting.setValue(value)
+        setting = self._script_list[self._selected_script_index].getActiveProfile().setSettingValue(key,value)
         #self._script_list[self._selected_script_index].getSettings().setSettingValue
     
     selectedIndexChanged = pyqtSignal()

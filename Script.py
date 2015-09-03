@@ -6,6 +6,8 @@ from UM.Qt.Bindings.SettingsFromCategoryModel import SettingsFromCategoryModel
 from UM.Signal import Signal, SignalEmitter
 from UM.i18n import i18nCatalog
 from UM.Application import Application
+
+from . import ScriptProfile
 import re
 i18n_catalog = i18nCatalog("PostProcessingPlugin")
 
@@ -15,20 +17,27 @@ class Script(SignalEmitter):
         super().__init__()
         self._settings = None
         self._settings_model = None
+        self._profile = ScriptProfile.ScriptProfile(self)
         try:
             setting_data = self.getSettingData()
             if "key" in setting_data:
-                self._settings = SettingsCategory(Application.getInstance().getMachineManager(), setting_data["key"], i18n_catalog, self)
+                self._settings = SettingsCategory(self, setting_data["key"], i18n_catalog, self)
                 self._settings.fillByDict(self.getSettingData())
-                self._settings_model = SettingsFromCategoryModel(self._settings)
+                self._settings_model = SettingsFromCategoryModel(self._settings, machine_manager = self)
                 self._settings_model.sort(lambda t: t["key"])
                 self.settingsLoaded.emit()
             else: 
                 Logger.log("e", "Script has no key in meta data. Unable to use.")
         except NotImplementedError:
             pass 
-    
+
+
+
     settingsLoaded = Signal()
+    activeProfileChanged = Signal()
+
+    def getActiveProfile(self):
+        return self._profile
 
     ##  Needs to return a dict that can be used to construct a settingcategory file. 
     #   See the example script for an example.
@@ -59,13 +68,13 @@ class Script(SignalEmitter):
     #   \param key Key to select setting by (string)
     #   \return Setting or none if no setting was found.
     def getSettingByKey(self, key):
-        return self._settings.getSettingByKey(key)
+        return self._settings.getSetting(key)
     
     ##  Set the value of a setting by key.
     #   \param key Key of setting to change.
     #   \param value value to set.
     def setSettingValueByKey(self, key, value):
-        setting = self.getSettingByKey(key)
+        setting = self.getSetting(key)
         if setting is not None:
             setting.setValue(value)
     
@@ -73,7 +82,7 @@ class Script(SignalEmitter):
     #   \param key Key of the setting to get value from
     #   \return value (or none)
     def getSettingValueByKey(self, key):
-        setting = self.getSettingByKey(key)
+        setting = self.getSetting(key)
         if setting is not None:
             return setting.getValue()
         return None

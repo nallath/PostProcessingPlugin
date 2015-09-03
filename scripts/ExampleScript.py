@@ -19,9 +19,9 @@ class ExampleScript(Script):
                     "unit": "mm",
                     "type": "float",
                     "default": 0.5,
-                    "min_value": 0,
-                    "min_value_warning": 0.1,
-                    "max_value_warning": 1,
+                    "min_value": "0",
+                    "min_value_warning": "0.1",
+                    "max_value_warning": "1",
                     "visible": True
                 },
                 "derp":
@@ -31,9 +31,9 @@ class ExampleScript(Script):
                     "unit": "mm",
                     "type": "float",
                     "default": 0.5,
-                    "min_value": 0,
-                    "min_value_warning": 0.1,
-                    "max_value_warning": 1,
+                    "min_value": "0",
+                    "min_value_warning": "0.1",
+                    "max_value_warning": "1",
                     "visible": True
                 }
             }
