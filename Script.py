@@ -74,18 +74,13 @@ class Script(SignalEmitter):
     #   \param key Key of setting to change.
     #   \param value value to set.
     def setSettingValueByKey(self, key, value):
-        setting = self.getSetting(key)
-        if setting is not None:
-            setting.setValue(value)
-    
+        self._profile.setSettingValue(key,value)
+
     ##  Get the value of setting by key.
     #   \param key Key of the setting to get value from
     #   \return value (or none)
     def getSettingValueByKey(self, key):
-        setting = self.getSetting(key)
-        if setting is not None:
-            return setting.getValue()
-        return None
+        return self._profile.getSettingValue(key)
     
     ##  This is called when the script is executed. 
     #   It gets a list of g-code strings and needs to return a (modified) list.

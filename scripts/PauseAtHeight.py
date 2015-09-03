@@ -52,10 +52,10 @@ class PauseAtHeight(Script):
         x = 0.
         y = 0.
         current_z = 0.
-        pause_z = self._settings.getSettingByKey("pause_height").getValue()
-        retraction_ammount = self._settings.getSettingByKey("retraction_ammount").getValue()
-        park_x = self._settings.getSettingByKey("head_park_x").getValue()
-        park_y = self._settings.getSettingByKey("head_park_y").getValue()
+        pause_z = self.getSettingValueByKey("pause_height")
+        retraction_ammount = self.getSettingValueByKey("retraction_ammount")
+        park_x = self.getSettingValueByKey("head_park_x")
+        park_y = self.getSettingValueByKey("head_park_y")
         for layer in data: 
             lines = layer.split("\n")
             for line in lines:
