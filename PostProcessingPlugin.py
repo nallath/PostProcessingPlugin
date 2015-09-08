@@ -60,12 +60,17 @@ class PostProcessingPlugin(QObject,  Extension):
         if hasattr(scene, "gcode_list"):
             gcode_list = getattr(scene, "gcode_list")
             if gcode_list:
-                for script in self._script_list:
-                    try:
-                        gcode_list = script.execute(gcode_list)
-                    except Exception as e:
-                        Logger.log("e","Script raised the following exception %s",e)
-                setattr(scene, "gcode_list", gcode_list)
+                if ";POSTPROCESSED" not in gcode_list[0]:
+                    for script in self._script_list:
+                        try:
+                            gcode_list = script.execute(gcode_list)
+                        except Exception as e:
+                            Logger.log("e","Script raised the following exception %s",e)
+                    gcode_list[0] += ";POSTPROCESSED"
+                    setattr(scene, "gcode_list", gcode_list)
+                else:
+                    print("Already post processed")
+
 
     @pyqtSlot(int)
     def setSelectedScriptIndex(self, index):
