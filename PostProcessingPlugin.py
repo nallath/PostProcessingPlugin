@@ -43,9 +43,7 @@ class PostProcessingPlugin(QObject,  Extension):
     ## Called when the setting is changed.
     def setSettingValue(self, key, value):
         settings_model = self._script_list[self._selected_script_index].getSettingsModel()
-        index = settings_model.find("key", key)
-        if index != -1:
-            settings_model.setSettingValue(key,value)
+        settings_model.setSettingValue(key,value)
         #self._script_list[self._selected_script_index].getSettings().setSettingValue
     
     selectedIndexChanged = pyqtSignal()
