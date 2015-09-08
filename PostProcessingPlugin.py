@@ -32,6 +32,8 @@ class PostProcessingPlugin(QObject,  Extension):
         # Script list contains instances of scripts in loaded_scripts. There can be duplicates and they will be executed in sequence.
         self._script_list = [] 
         self._selected_script_index = 0
+
+        Application.getInstance().getOutputDeviceManager().writeStarted.connect(self.execute)
         
     @pyqtSlot(int, result = "QVariant")
     def getSettingModel(self, index):
@@ -43,7 +45,7 @@ class PostProcessingPlugin(QObject,  Extension):
         settings_model = self._script_list[self._selected_script_index].getSettingsModel()
         index = settings_model.find("key", key)
         if index != -1:
-            settings_model.setSettingValue(index,key,value)
+            settings_model.setSettingValue(key,value)
         #self._script_list[self._selected_script_index].getSettings().setSettingValue
     
     selectedIndexChanged = pyqtSignal()
@@ -54,8 +56,7 @@ class PostProcessingPlugin(QObject,  Extension):
         except:
             return None
     
-    @pyqtSlot()
-    def execute(self):
+    def execute(self, output_device):
         scene = Application.getInstance().getController().getScene()
         if hasattr(scene, "gcode_list"):
             gcode_list = getattr(scene, "gcode_list")

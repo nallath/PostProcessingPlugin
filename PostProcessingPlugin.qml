@@ -104,13 +104,13 @@ UM.Dialog
                     height: UM.Theme.sizes.default_margin.height
                 }
                 
-                Button
+                /*Button
                 {
                     text:"Execute"
                     width: 250
                     height: 30
                     onClicked:manager.execute()
-                }
+                }*/
             }
             Item 
             {
