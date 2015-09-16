@@ -24,6 +24,9 @@
 ##V4.0.1: Bugfix for doubled G1 commands
 ##V4.0.2: uses Cura progress bar instead of its own
 ##V4.0.3: Bugfix for cool head lift (contributed by luisonoff)
+##V4.9.91: First version for Cura 15.06.x and PostProcessingPlugin
+##V4.9.92: Modifications for Cura 15.10
+##V4.9.93: Minor bugfixes (input settings) / documentation
 
 ## Uses -
 ## M220 S<factor in percent> - set speed factor override percentage
@@ -39,13 +42,13 @@ from UM.Logger import Logger
 import re
 
 class TweakAtZ(Script):
-    version = "4.9.91"
+    version = "4.9.93"
     def __init__(self):
         super().__init__()
 
     def getSettingData(self):
         return {
-            "label":"TweakAtZ 4.9.92",
+            "label":"TweakAtZ " + self.version,
             "key": "TweakAtZ",
             "settings":
             {
@@ -81,7 +84,7 @@ class TweakAtZ(Script):
                     "min_value": "-100",
                     "min_value_warning": "-1",
                     "visible": True,
-                    "enabled": "a_trigger == 'Layer No.'"
+                    "enabled": "a_trigger == 'layer_no'"
                 },
                 "c_behavior":
                 {
