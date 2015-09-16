@@ -69,7 +69,7 @@ class TweakAtZ(Script):
                     "min_value_warning": "0.1",
                     "max_value_warning": "230",
                     "visible": True,
-                    "active_if": {"setting": "a_trigger", "value": "height"}
+                    "enabled": "a_trigger == 'height'"
                 },
                 "b_targetL":
                 {
@@ -81,7 +81,7 @@ class TweakAtZ(Script):
                     "min_value": "-100",
                     "min_value_warning": "-1",
                     "visible": True,
-                    "active_if": {"setting": "a_trigger", "value": "Layer No."}
+                    "enabled": "a_trigger == 'Layer No.'"
                 },
                 "c_behavior":
                 {
@@ -102,7 +102,7 @@ class TweakAtZ(Script):
                     "min_value": "1",
                     "max_value_warning": "50",
                     "visible": True,
-                    "active_if": {"setting": "c_behavior", "value": "keep_value"}
+                    "enabled": "c_behavior == 'keep_value'"
                 },
                 "e1_Tweak_speed":
                 {
@@ -123,7 +123,7 @@ class TweakAtZ(Script):
                     "min_value_warning": "10",
                     "max_value_warning": "200",
                     "visible": True,
-                    "active_if": {"setting": "e1_Tweak_speed", "value": True}
+                    "enabled": "e1_Tweak_speed"
                 },
                 "f1_Tweak_printspeed":
                 {
@@ -144,7 +144,7 @@ class TweakAtZ(Script):
                     "min_value_warning": "10",
                     "max_value_warning": "200",
                     "visible": True,
-                    "active_if": {"setting": "f1_Tweak_printspeed", "value": True}
+                    "enabled": "f1_Tweak_printspeed"
                 },
                 "g1_Tweak_flowrate":
                 {
@@ -165,7 +165,7 @@ class TweakAtZ(Script):
                     "min_value_warning": "10",
                     "max_value_warning": "200",
                     "visible": True,
-                    "active_if": {"setting": "g1_Tweak_flowrate", "value": True}
+                    "enabled": "g1_Tweak_flowrate"
                 },
                 "g3_Tweak_flowrateOne":
                 {
@@ -186,7 +186,7 @@ class TweakAtZ(Script):
                     "min_value_warning": "10",
                     "max_value_warning": "200",
                     "visible": True,
-                    "active_if": {"setting": "g3_Tweak_flowrateOne", "value": True}
+                    "enabled": "g3_Tweak_flowrateOne"
                 },
                 "g5_Tweak_flowrateTwo":
                 {
@@ -207,7 +207,7 @@ class TweakAtZ(Script):
                     "min_value_warning": "10",
                     "max_value_warning": "200",
                     "visible": True,
-                    "active_if": {"setting": "g5_Tweak_flowrateTwo", "value": True}
+                    "enabled": "g5_Tweak_flowrateTwo"
                 },
                 "h1_Tweak_bedTemp":
                 {
@@ -228,7 +228,7 @@ class TweakAtZ(Script):
                     "min_value_warning": "30",
                     "max_value_warning": "120",
                     "visible": True,
-                    "active_if": {"setting": "h1_Tweak_bedTemp", "value": True}
+                    "enabled": "h1_Tweak_bedTemp"
                 },
                 "i1_Tweak_extruderOne":
                 {
@@ -249,7 +249,7 @@ class TweakAtZ(Script):
                     "min_value_warning": "160",
                     "max_value_warning": "250",
                     "visible": True,
-                    "active_if": {"setting": "i1_Tweak_extruderOne", "value": True}
+                    "enabled": "i1_Tweak_extruderOne"
                 },
                 "i3_Tweak_extruderTwo":
                 {
@@ -270,7 +270,7 @@ class TweakAtZ(Script):
                     "min_value_warning": "160",
                     "max_value_warning": "250",
                     "visible": True,
-                    "active_if": {"setting": "i3_Tweak_extruderTwo", "value": True}
+                    "enabled": "i1_Tweak_extruderTwo"
                 },
                 "j1_Tweak_fanSpeed":
                 {
@@ -291,7 +291,7 @@ class TweakAtZ(Script):
                     "min_value_warning": "15",
                     "max_value": "255",
                     "visible": True,
-                    "active_if": {"setting": "j1_Tweak_fanSpeed", "value": True}
+                    "enabled": "j1_Tweak_fanSpeed"
                 }
             }
         }
