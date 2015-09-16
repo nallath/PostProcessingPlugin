@@ -31,6 +31,8 @@ class Script(SignalEmitter):
         except NotImplementedError:
             pass 
 
+        self.activeProfileChanged.emit()
+
 
 
     settingsLoaded = Signal()

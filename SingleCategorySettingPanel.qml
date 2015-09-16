@@ -78,12 +78,12 @@ Rectangle
                     id: item;
 
                     width: background.parent.width / 1.2;
-                    height: model.visible ? UM.Theme.sizes.setting.height : 0;
+                    height: model.visible && model.enabled ? UM.Theme.sizes.setting.height : 0;
                     Behavior on height { NumberAnimation { duration: 75; } }
                     //Component.onCompleted :{console.log(height)}
-                    opacity: model.visible ? 1 : 0;
+                    opacity: model.visible && model.enabled ? 1 : 0;
                     Behavior on opacity { NumberAnimation { duration: 75; } }
-                    enabled: model.visible;
+                    enabled: model.visible && model.enabled;
 
                     property bool settingVisible: model.visible;
 
