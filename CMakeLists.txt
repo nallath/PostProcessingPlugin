@@ -14,7 +14,7 @@ install(FILES
     Tooltip.qml
     LICENSE
     README.md
-    DESTINATION lib/cura/plugins/PostProcessing 
+    DESTINATION lib/cura/plugins/PostProcessingPlugin
 )
 
 install(DIRECTORY scripts DESTINATION lib/cura/plugins/PostProcessingPlugin)
