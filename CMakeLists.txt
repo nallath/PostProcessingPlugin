@@ -17,5 +17,5 @@ install(FILES
     DESTINATION lib/cura/plugins/PostProcessing 
 )
 
-install(DIRECTORY scripts DESTINATION lib/cura/plugins/PostProcessing)
+install(DIRECTORY scripts DESTINATION lib/cura/plugins/PostProcessingPlugin)
 
