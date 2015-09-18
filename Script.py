@@ -18,6 +18,7 @@ class Script(SignalEmitter):
         self._settings = None
         self._settings_model = None
         self._profile = ScriptProfile.ScriptProfile(self)
+        self.activeProfileChanged.emit()
         try:
             setting_data = self.getSettingData()
             if "key" in setting_data:
@@ -31,7 +32,7 @@ class Script(SignalEmitter):
         except NotImplementedError:
             pass 
 
-        self.activeProfileChanged.emit()
+
 
 
 
