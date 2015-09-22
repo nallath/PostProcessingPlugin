@@ -18,12 +18,13 @@ class Script(SignalEmitter):
         self._settings = None
         self._settings_model = None
         self._profile = ScriptProfile.ScriptProfile(self)
-        self.activeProfileChanged.emit()
+
         try:
             setting_data = self.getSettingData()
             if "key" in setting_data:
                 self._settings = SettingsCategory(self, setting_data["key"], i18n_catalog, self)
                 self._settings.fillByDict(self.getSettingData())
+                self.activeProfileChanged.emit() #Emit the event before the settings model is sorted, but after settings is created.
                 self._settings_model = SettingsFromCategoryModel(self._settings, machine_manager = self)
                 self._settings_model.sort(lambda t: t["key"])
                 self.settingsLoaded.emit()
@@ -31,10 +32,6 @@ class Script(SignalEmitter):
                 Logger.log("e", "Script has no key in meta data. Unable to use.")
         except NotImplementedError:
             pass 
-
-
-
-
 
     settingsLoaded = Signal()
     activeProfileChanged = Signal()
