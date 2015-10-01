@@ -27,6 +27,7 @@
 ##V4.9.91: First version for Cura 15.06.x and PostProcessingPlugin
 ##V4.9.92: Modifications for Cura 15.10
 ##V4.9.93: Minor bugfixes (input settings) / documentation
+##V4.9.94: Bugfix Combobox-selection; remove logger
 
 ## Uses -
 ## M220 S<factor in percent> - set speed factor override percentage
@@ -38,11 +39,11 @@
 ## M605/606 to save and recall material settings on the UM2
 
 from ..Script import Script
-from UM.Logger import Logger
+#from UM.Logger import Logger
 import re
 
 class TweakAtZ(Script):
-    version = "4.9.93"
+    version = "4.9.94"
     def __init__(self):
         super().__init__()
 
@@ -348,7 +349,7 @@ class TweakAtZ(Script):
         old = {"speed": -1, "flowrate": -1, "flowrateOne": -1, "flowrateTwo": -1, "platformTemp": -1, "extruderOne": -1,
             "extruderTwo": -1, "fanSpeed": -1, "state": -1}
         twLayers = self.getSettingValueByKey("d_twLayers")
-        if self.getSettingValueByKey("c_behavior") == "Single Layer":
+        if self.getSettingValueByKey("c_behavior") == "single_layer":
             behavior = 1
         else:
             behavior = 0
@@ -371,7 +372,7 @@ class TweakAtZ(Script):
         oldValueUnknown = False
         TWinstances = 0
 
-        if self.getSettingValueByKey("a_trigger") == "Layer No.":
+        if self.getSettingValueByKey("a_trigger") == "layer_no":
             targetL_i = int(self.getSettingValueByKey("b_targetL"))
             targetZ = 100000
         else:
@@ -453,7 +454,6 @@ class TweakAtZ(Script):
                         if z < targetZ and state == 1:
                             state = 2
                         if z >= targetZ and state == 2:
-                            Logger.log("d","Should tweak")
                             state = 3
                             done_layers = 0
                             for key in TweakProp:
@@ -467,19 +467,14 @@ class TweakAtZ(Script):
                                 twLayers = 1
                             if TweakPrintSpeed and behavior == 0:
                                 twLayers = done_layers + 1
-                        Logger.log("d",'punkt3')
                         if state==3:
                             if twLayers-done_layers>0: #still layers to go?
-                                Logger.log("d",'punkt3a')
                                 if targetL_i > -100000:
                                     modified_gcode += ";TweakAtZ V%s: executed at Layer %d\n" % (self.version,layer)
                                     modified_gcode += "M117 Printing... tw@L%4d\n" % layer
                                 else:
-                                    Logger.log("d",'punkt3b')
                                     modified_gcode += (";TweakAtZ V%s: executed at %1.2f mm\n" % (self.version,z))
-                                    Logger.log("d",'punkt3c')
                                     modified_gcode += "M117 Printing... tw@%5.1f\n" % z
-                                    Logger.log("d",'punkt3d')
                                 for key in TweakProp:
                                     if TweakProp[key]:
                                         modified_gcode += TweakStrings[key] % float(old[key]+(float(target_values[key])-float(old[key]))/float(twLayers)*float(done_layers+1))
@@ -498,7 +493,6 @@ class TweakAtZ(Script):
                                             if TweakProp[key]:
                                                 modified_gcode += TweakStrings[key] % float(old[key])
                         # re-activates the plugin if executed by pre-print G-command, resets settings:
-                        Logger.log("d",'punkt4')
                         if (z < targetZ or layer == 0) and state >= 3: #resets if below tweak level or at level 0
                             state = 2
                             done_layers = 0
@@ -512,9 +506,6 @@ class TweakAtZ(Script):
                                 for key in TweakProp:
                                     if TweakProp[key]:
                                         modified_gcode += TweakStrings[key] % float(old[key])
-                        Logger.log("d",'punkt5')
-#                index = data.index(active_layer)
- #               active_layer = modified_gcode
             data[index] = modified_gcode
             index += 1
         return data
