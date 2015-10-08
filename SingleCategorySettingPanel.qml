@@ -2,82 +2,64 @@
 // The PostProcessingPlugin is released under the terms of the AGPLv3 or higher.
 import QtQuick 2.2
 import QtQuick.Controls 1.1
-import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.1
 import QtQuick.Window 2.1
 
 import UM 1.1 as UM
 Rectangle
 {
-    Layout.maximumWidth: parent.width
-    Layout.minimumWidth: parent.width
-    color: "#D8DEE6"
-    height: 326
+    //color: "#D8DEE6"
+    color: "white"
     id: background
     property variant setting_model
     property variant base_item: base;
+    property int panelWidth
+    property int panelHeight
+    property int textMargin: UM.Theme.sizes.default_margin.height / 2
+
+    width: background.panelWidth
+    height: background.panelHeight
     UM.I18nCatalog { id: catalog; name:"cura"}
-    ScrollView 
+    ScrollView
     {
         id: scrollview_base;
 
         style: UM.Theme.styles.scrollview;
+        width: parent.width
+        height: background.panelHeight
 
         property Action configureSettings;
         //signal showTooltip(Item item, point location, string text);
         //signal hideTooltip();
-        
-        function showTooltip(item, position, text) 
+
+        function showTooltip(item, position, text)
         {
             tooltip.text = text;
             position = item.mapToItem(base_item, position.x, position.y);
             tooltip.show(position);
         }
 
-        function hideTooltip() 
+        function hideTooltip()
         {
             tooltip.hide();
         }
-        anchors.topMargin: 5
-        anchors.leftMargin: 5
-        anchors.bottomMargin: 5
-        anchors.rightMargin: 5
-        anchors.top: parent.top
-        anchors.left: parent.left
-        anchors.right: parent.right
-        anchors.bottom: parent.bottom
-        
         Column
         {
-            
-            property real childrenHeight: 
-            {
-                var h = 0.0;
-                for(var i in children) 
-                {
-                    var item = children[i];
-                    h += children[i].height;   
-                    if(item.settingVisible) 
-                    {
-                        if(i > 0) 
-                        {
-                            h += spacing;
-                        }
-                    }
-                }
-                return h;
-            }
-            height: childrenHeight;
+            anchors.top: parent.top
+            anchors.topMargin: background.textMargin
+            anchors.left: parent.left
+            anchors.leftMargin: background.textMargin
+            anchors.right: parent.right
+            anchors.rightMargin: background.textMargin
 
-            Repeater 
+            Repeater
             {
                 model: setting_model
 
-                delegate: UM.SettingItem 
+                delegate: UM.SettingItem
                 {
                     id: item;
-
-                    width: background.parent.width / 1.2;
+                    width: background.width - UM.Theme.sizes.default_margin.width
                     height: model.visible && model.enabled ? UM.Theme.sizes.setting.height : 0;
                     Behavior on height { NumberAnimation { duration: 75; } }
                     //Component.onCompleted :{console.log(height)}
@@ -86,6 +68,14 @@ Rectangle
                     enabled: model.visible && model.enabled;
 
                     property bool settingVisible: model.visible;
+
+                    Rectangle{
+                        anchors.verticalCenter: parent.verticalCenter
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        width: parent.width
+                        height: parent.height
+                        color: "transparent"
+                    }
 
                     name: model.name;
                     description: model.description;
@@ -96,32 +86,34 @@ Rectangle
                     options: model.type == "enum" ? model.options : null;
                     key: model.key;
 
+                    label.anchors.leftMargin: 0
+
                     style: UM.Theme.styles.setting_item;
 
-                    onItemValueChanged: 
-                    { 
+                    onItemValueChanged:
+                    {
                         //background.setting_model.setSettingValue(index, model.key, value);
                         manager.setSettingValue(model.key,value)
                     }
                     onContextMenuRequested: contextMenu.popup();
 
-                    onShowTooltip: 
+                    onShowTooltip:
                     {
                         position = Qt.point(0, item.height);
                         scrollview_base.showTooltip(item, position, model.description)
                     }
                     onHideTooltip: scrollview_base.hideTooltip()
-                    Menu 
+                    Menu
                     {
                         id: contextMenu;
 
-                        MenuItem 
+                        MenuItem
                         {
                             //: Settings context menu action
                             text: catalog.i18nc("@action:menu","Hide this setting");
                             onTriggered: background.setting_model.hideSetting(model.key);
                         }
-                        MenuItem 
+                        MenuItem
                         {
                             //: Settings context menu action
                             text: catalog.i18nc("@action:menu","Configure setting visiblity...");
@@ -129,7 +121,7 @@ Rectangle
                         }
                     }
                 }
-            }  
+            }
         }
     }
 }

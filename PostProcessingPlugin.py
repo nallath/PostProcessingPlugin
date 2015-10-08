@@ -53,8 +53,9 @@ class PostProcessingPlugin(QObject,  Extension):
             return self._script_list[self._selected_script_index].getSettingsModel()
         except:
             return None
-    
-    def execute(self, output_device):
+
+    @pyqtSlot()
+    def execute(self, device = None):
         scene = Application.getInstance().getController().getScene()
         if hasattr(scene, "gcode_list"):
             gcode_list = getattr(scene, "gcode_list")

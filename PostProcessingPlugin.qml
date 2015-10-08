@@ -12,177 +12,243 @@ import UM 1.0 as UM
 
 UM.Dialog
 {
-    width: 500 * Screen.devicePixelRatio;
+    id: dialog
+
+    width: 1000 * Screen.devicePixelRatio;
     height: 500 * Screen.devicePixelRatio;
+    minimumWidth: 500 * Screen.devicePixelRatio;
+    minimumHeight: 250 * Screen.devicePixelRatio;
+
     Item
     {
         id: base
+        property int widthUnity: (base.width / 3) - (UM.Theme.sizes.default_margin.width * 2) - (doneButton.width/3)
+        property int textMargin: UM.Theme.sizes.default_margin.height / 2
+        property int arrowMargin: UM.Theme.sizes.default_margin.width * 2
+        SystemPalette{ id: palette }
         anchors.fill: parent
         ExclusiveGroup
         {
             id: selected_loaded_script_group
         }
-        Row 
+        Rectangle
         {
-            Column
+            id: scripts
+            color: "white"
+            width: base.widthUnity
+            height: parent.height
+            anchors.left: parent.left
+            anchors.leftMargin: UM.Theme.sizes.default_margin.width
+            ScrollView
             {
-                Rectangle 
-                {
-                    color: "white"
-                    border.width: 1
-                    border.color: "black"
-                    width: 250
-                    height: 100
-                    ScrollView
-                    {
-                        anchors.fill: parent
-                        ListView
-                        {
-                            anchors.top: parent.top
-                            anchors.topMargin: 2
-                            anchors.left: parent.left
-                            anchors.leftMargin: 2
-                            anchors.right: parent.right
-                            anchors.rightMargin: 2
-                            anchors.bottom: parent.bottom
-                            anchors.bottomMargin: 2
-                            model: manager.loadedScriptList 
-                            delegate: Rectangle 
-                            {
-                                color:"transparent"
-                                width:parent.width
-                                height:20
-                                Button
-                                {
-                                    id: loaded_script_button
-                                    text: manager.getScriptLabelByKey(modelData.toString())
-                                    exclusiveGroup: selected_loaded_script_group
-                                    checkable: true
-                                    width: parent.width
-                                    style: ButtonStyle 
-                                    {
-                                        background:Rectangle 
-                                        {
-                                            color: loaded_script_button.checked ? "blue":"white"
-                                            implicitWidth: parent.width
-                                            implicitHeight: parent.height
-                                        }
-                                    }
-                                    Button
-                                    {
-                                        text: "+"
-                                        anchors.right: parent.right
-                                        width: 20
-                                        height: 20
-                                        onClicked: 
-                                        {
-                                            manager.addScriptToList(modelData.toString())
-                                        }
-                                    }
-                                }
-
-                            }
-                        }
-                    }
-                }
-                Item //Spacer
-                {
-                    width: UM.Theme.sizes.default_margin.width
-                    height: UM.Theme.sizes.default_margin.height
-                }
-                
-                SingleCategorySettingPanel
-                {
-                    setting_model: manager.selectedScriptSettingsModel  
-                    width: 250
-                    height: 320
-                }
-                
-                Item  //Spacer
-                {
-                    width: UM.Theme.sizes.default_margin.width
-                    height: UM.Theme.sizes.default_margin.height
-                }
-                
-                /*Button
-                {
-                    text:"Execute"
-                    width: 250
-                    height: 30
-                    onClicked:manager.execute()
-                }*/
-            }
-            Item 
-            {
-                width: UM.Theme.sizes.default_margin.width
-                height: UM.Theme.sizes.default_margin.height
-            }
-            ExclusiveGroup
-            {
-                id: selected_script_group
-            }
-            Rectangle 
-            {
-                width: 0.5 * parent.width - 2 * UM.Theme.sizes.default_margin.width
-                height: parent.height - 0.5 * UM.Theme.sizes.default_margin.height
+                anchors.fill: parent
                 ListView
                 {
-                    anchors.fill:parent
-                    model: manager.scriptList 
-                    delegate: Rectangle 
+                    anchors.top: parent.top
+                    anchors.topMargin: base.textMargin
+                    anchors.left: parent.left
+                    anchors.leftMargin: base.textMargin
+                    anchors.right: parent.right
+                    anchors.rightMargin: base.textMargin
+                    model: manager.loadedScriptList
+                    delegate: Rectangle
                     {
+                        color:"transparent"
                         width: parent.width
-                        height: 30
+                        height: loaded_script_button.height
                         Button
                         {
                             id: loaded_script_button
                             text: manager.getScriptLabelByKey(modelData.toString())
-                            exclusiveGroup: selected_script_group
+                            exclusiveGroup: selected_loaded_script_group
                             checkable: true
-                            checked: manager.selectedScriptIndex == index ? true : false
-                            onClicked: manager.setSelectedScriptIndex(index)
                             width: parent.width
-                            style: ButtonStyle 
+                            style: ButtonStyle
                             {
-                                background: Rectangle 
+                                background:Rectangle
                                 {
-                                    color: loaded_script_button.checked ? "blue":"white"
-                                    implicitWidth: parent.width
-                                    implicitHeight: parent.height
+                                    color: loaded_script_button.checked ? UM.Theme.colors.setting_category_active : "transparent"
+                                    width: parent.width
+                                    height: parent.height
+                                }
+                                label: Text
+                                {
+                                    wrapMode: Text.Wrap
+                                    text: control.text
+                                    color: UM.Theme.styles.setting_item.controlTextColor;
+                                    font: UM.Theme.styles.setting_item.labelFont;
+                                }
+                            }
+                            Button
+                            {
+                                text: "+"
+                                anchors.verticalCenter: parent.verticalCenter
+                                anchors.right: parent.right
+                                anchors.rightMargin: UM.Theme.sizes.default_margin.width/2
+                                width: 20
+                                height: 20
+                                onClicked:
+                                {
+                                    loaded_script_button.checked = true
+                                    manager.addScriptToList(modelData.toString())
                                 }
                             }
                         }
-                        
-                        Button
-                        {
-                            id: remove_button
-                            text: "x"
-                            width: 20
-                            height:20
-                            anchors.right:parent.right
-                            onClicked: manager.removeScriptByIndex(index)
-                        }
-                        
-                        Button
-                        {
-                            id: down_button
-                            text: "-"
-                            anchors.right: remove_button.left
-                            width: 20
-                            height:20
-                            onClicked: manager.moveScript(index,index+1)
-                        }
-                        Button 
-                        {
-                            id: up_button
-                            text:"+"
-                            width: 20
-                            height: 20
-                            anchors.right: down_button.left
-                            onClicked: manager.moveScript(index,index-1)
-                        }
-                        
+
                     }
+                }
+            }
+        }
+        /*Button
+        {
+            text:"Execute"
+            width: 250
+            height: 30
+            onClicked:manager.execute()
+        }*/
+        ExclusiveGroup
+        {
+            id: selected_script_group
+        }
+        Rectangle{
+            anchors.left: scripts.right
+            height: parent.height
+            width: base.arrowMargin
+            color: "transparent"
+            UM.RecolorImage {
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: parent.width/2
+                height: parent.width/2
+                sourceSize.width: width
+                sourceSize.height: width
+                color: palette.text
+                source: UM.Theme.icons.arrow_right
+            }
+        }
+        Rectangle
+        {
+            id: activeScripts
+            anchors.left: scripts.right
+            anchors.leftMargin: base.arrowMargin
+            width: base.widthUnity
+            height: parent.height
+            ListView
+            {
+                anchors.top: parent.top
+                anchors.topMargin: base.textMargin
+                anchors.left: parent.left
+                anchors.leftMargin: base.textMargin
+                anchors.right: parent.right
+                anchors.rightMargin: base.textMargin
+                anchors.bottom: parent.bottom
+                model: manager.scriptList
+                delegate: Rectangle
+                {
+                    width: parent.width
+                    height: active_script_button.height
+                    Button
+                    {
+                        id: active_script_button
+                        text: manager.getScriptLabelByKey(modelData.toString())
+                        exclusiveGroup: selected_script_group
+                        checkable: true
+                        checked: manager.selectedScriptIndex == index ? true : false
+                        onClicked: manager.setSelectedScriptIndex(index)
+                        width: parent.width
+                        style: ButtonStyle
+                        {
+                            background: Rectangle
+                            {
+                                color: active_script_button.checked ? UM.Theme.colors.setting_category_active : "transparent"
+                                width: parent.width
+                                height: parent.height
+                            }
+                            label: Text
+                            {
+                                wrapMode: Text.Wrap
+                                renderType: Text.NativeRendering
+                                text: control.text
+                                color: UM.Theme.styles.setting_item.controlTextColor;
+                                font: UM.Theme.styles.setting_item.labelFont;
+                            }
+                        }
+                    }
+                    Button
+                    {
+                        id: remove_button
+                        text: "x"
+                        width: 20
+                        height:20
+                        anchors.right:parent.right
+                        anchors.rightMargin: base.textMargin
+                        anchors.verticalCenter: parent.verticalCenter
+                        onClicked: manager.removeScriptByIndex(index)
+                    }
+                    Button
+                    {
+                        id: down_button
+                        text: "-"
+                        anchors.right: remove_button.left
+                        anchors.verticalCenter: parent.verticalCenter
+                        width: 20
+                        height:20
+                        onClicked: manager.moveScript(index,index+1)
+                    }
+                    Button
+                    {
+                        id: up_button
+                        text:"+"
+                        width: 20
+                        height: 20
+                        anchors.right: down_button.left
+                        anchors.verticalCenter: parent.verticalCenter
+                        onClicked: manager.moveScript(index,index-1)
+                    }
+                }
+            }
+        }
+        Rectangle{
+            anchors.left: activeScripts.right
+            height: parent.height
+            width: base.arrowMargin
+            color: "transparent"
+            UM.RecolorImage {
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.horizontalCenter: parent.horizontalCenter
+                width: parent.width/2
+                height: parent.width/2
+                sourceSize.width: width
+                sourceSize.height: width
+                color: palette.text
+                source: UM.Theme.icons.arrow_right
+            }
+        }
+        SingleCategorySettingPanel
+        {
+            id: settings
+            anchors.left: activeScripts.right
+            anchors.leftMargin: base.arrowMargin
+            setting_model: manager.selectedScriptSettingsModel
+            panelWidth: base.widthUnity
+            panelHeight: parent.height
+        }
+
+        Rectangle{
+            id: doneButtonId
+            anchors.left: settings.right
+            height: parent.height
+            width: doneButton.width + UM.Theme.sizes.default_margin.width
+            color: "transparent"
+            Button
+            {
+                id: doneButton
+                text:"Done!"
+                anchors.bottom: parent.bottom
+                anchors.right: parent.right
+                onClicked: {
+                    dialog.visible = false;
+                    manager.execute()
                 }
             }
         }

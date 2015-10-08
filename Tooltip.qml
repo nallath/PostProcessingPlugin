@@ -12,7 +12,7 @@ Rectangle
     id: base;
     width: UM.Theme.sizes.tooltip.width;
     height: label.height + UM.Theme.sizes.tooltip_margins.height * 2;
-    color: UM.Theme.colors.tooltip_background;
+    color: UM.Theme.colors.tooltip
 
     opacity: 0;
     Behavior on opacity { NumberAnimation { duration: 100; } }
