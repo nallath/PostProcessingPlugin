@@ -241,6 +241,8 @@ UM.Dialog
                         text: ""
                         anchors.right: remove_button.left
                         anchors.verticalCenter: parent.verticalCenter
+                        enabled: index != manager.scriptList.length-1
+                        opacity: enabled ? 1.0 : 0.3
                         width: 20
                         height:20
                         onClicked: {
@@ -258,7 +260,7 @@ UM.Dialog
                                     height: control.height/2.5
                                     sourceSize.width: width
                                     sourceSize.height: width
-                                    color: UM.Theme.styles.setting_item.controlTextColor;
+                                    color: UM.Theme.styles.setting_item.controlTextColor
                                     source: UM.Theme.icons.arrow_bottom
                                 }
                             }
@@ -268,6 +270,8 @@ UM.Dialog
                     {
                         id: up_button
                         text:""
+                        enabled: index != 0
+                        opacity: enabled ? 1.0 : 0.3
                         width: 20
                         height: 20
                         anchors.right: down_button.left
