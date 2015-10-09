@@ -13,6 +13,7 @@ Rectangle
     id: background
     property variant setting_model
     property variant base_item: base;
+    property string activeScriptName
     property int panelWidth
     property int panelHeight
     property int textMargin: UM.Theme.sizes.default_margin.height / 2
@@ -20,9 +21,30 @@ Rectangle
     width: background.panelWidth
     height: background.panelHeight
     UM.I18nCatalog { id: catalog; name:"cura"}
+    Label
+    {
+        id: scriptSpecsHeader
+        visible: manager.selectedScriptIndex != -1
+        text: manager.selectedScriptIndex == -1 ? '' : background.activeScriptName
+        anchors.top: parent.top
+        anchors.topMargin: base.textMargin + 6
+        anchors.left: parent.left
+        anchors.leftMargin: base.textMargin + 6
+        anchors.right: parent.right
+        anchors.rightMargin: base.textMargin
+        height: 20
+        color: UM.Theme.styles.setting_item.controlTextColor;
+        font: UM.Theme.fonts.default_header
+    }
     ScrollView
     {
         id: scrollview_base;
+        anchors.top: scriptSpecsHeader.bottom
+        anchors.topMargin: background.textMargin
+        anchors.left: parent.left
+        anchors.leftMargin: background.textMargin
+        anchors.right: parent.right
+        anchors.rightMargin: UM.Theme.sizes.default_margin.width
 
         style: UM.Theme.styles.scrollview;
         width: parent.width
@@ -45,13 +67,7 @@ Rectangle
         }
         Column
         {
-            anchors.top: parent.top
-            anchors.topMargin: background.textMargin
-            anchors.left: parent.left
-            anchors.leftMargin: background.textMargin
-            anchors.right: parent.right
-            anchors.rightMargin: background.textMargin
-
+            spacing: 1
             Repeater
             {
                 model: setting_model
@@ -59,7 +75,7 @@ Rectangle
                 delegate: UM.SettingItem
                 {
                     id: item;
-                    width: background.width - UM.Theme.sizes.default_margin.width
+                    width: background.width - UM.Theme.sizes.default_margin.width * 2
                     height: model.visible && model.enabled ? UM.Theme.sizes.setting.height : 0;
                     Behavior on height { NumberAnimation { duration: 75; } }
                     //Component.onCompleted :{console.log(height)}
@@ -68,14 +84,6 @@ Rectangle
                     enabled: model.visible && model.enabled;
 
                     property bool settingVisible: model.visible;
-
-                    Rectangle{
-                        anchors.verticalCenter: parent.verticalCenter
-                        anchors.horizontalCenter: parent.horizontalCenter
-                        width: parent.width
-                        height: parent.height
-                        color: "transparent"
-                    }
 
                     name: model.name;
                     description: model.description;
@@ -86,7 +94,7 @@ Rectangle
                     options: model.type == "enum" ? model.options : null;
                     key: model.key;
 
-                    label.anchors.leftMargin: 0
+                    label.anchors.leftMargin: UM.Theme.sizes.default_margin.width
 
                     style: UM.Theme.styles.setting_item;
 

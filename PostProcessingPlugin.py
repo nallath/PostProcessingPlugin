@@ -54,8 +54,7 @@ class PostProcessingPlugin(QObject,  Extension):
         except:
             return None
 
-    @pyqtSlot()
-    def execute(self, device = None):
+    def execute(self, output_device):
         scene = Application.getInstance().getController().getScene()
         if hasattr(scene, "gcode_list"):
             gcode_list = getattr(scene, "gcode_list")
