@@ -42,9 +42,8 @@ Rectangle
         anchors.top: scriptSpecsHeader.bottom
         anchors.topMargin: background.textMargin
         anchors.left: parent.left
-        anchors.leftMargin: background.textMargin
         anchors.right: parent.right
-        anchors.rightMargin: UM.Theme.sizes.default_margin.width
+        anchors.rightMargin: background.textMargin
 
         style: UM.Theme.styles.scrollview;
         width: parent.width
@@ -75,7 +74,7 @@ Rectangle
                 delegate: UM.SettingItem
                 {
                     id: item;
-                    width: background.width - UM.Theme.sizes.default_margin.width * 2
+                    width: background.width - UM.Theme.sizes.default_margin.width * 1.5
                     height: model.visible && model.enabled ? UM.Theme.sizes.setting.height : 0;
                     Behavior on height { NumberAnimation { duration: 75; } }
                     //Component.onCompleted :{console.log(height)}
@@ -93,8 +92,6 @@ Rectangle
                     type: model.type;
                     options: model.type == "enum" ? model.options : null;
                     key: model.key;
-
-                    label.anchors.leftMargin: UM.Theme.sizes.default_margin.width
 
                     style: UM.Theme.styles.setting_item;
 
