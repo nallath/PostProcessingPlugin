@@ -34,7 +34,7 @@ class BQ_PauseAtHeight(Script):
                     if current_z != None:
                         if current_z >= pause_z:
                             prepend_gcode = ";TYPE:CUSTOM\n"
-                            prepend_gcode = "; -- Pause at height (%.2f mm) --\n" % pause_z
+                            prepend_gcode += "; -- Pause at height (%.2f mm) --\n" % pause_z
 
                             # Insert Pause gcode
                             prepend_gcode += "M25        ; Pauses the print and waits for the user to resume it\n"
