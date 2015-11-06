@@ -56,9 +56,17 @@ class PauseAtHeight(Script):
         retraction_ammount = self.getSettingValueByKey("retraction_ammount")
         park_x = self.getSettingValueByKey("head_park_x")
         park_y = self.getSettingValueByKey("head_park_y")
+        layers_started = False
         for layer in data: 
             lines = layer.split("\n")
             for line in lines:
+                if ";LAYER:0" in line:
+                    layers_started = True
+                    continue
+
+                if not layers_started:
+                    continue
+
                 if self.getValue(line, 'G') == 1 or self.getValue(line, 'G') == 0:
                     current_z = self.getValue(line, 'Z')
                     x = self.getValue(line, 'X', x)
@@ -79,7 +87,7 @@ class PauseAtHeight(Script):
                             #Disable the E steppers
                             prepend_gcode += "M84 E0\n"
                             #Wait till the user continues printing
-                            prepend_gcode += "@pause ;M0\n"
+                            prepend_gcode += "M0 ;Do the actual pause\n"
                             
                             #Push the filament back, and retract again, the properly primes the nozzle when changing filament.
                             prepend_gcode += "G1 E%f F6000\n" % (retraction_ammount)
