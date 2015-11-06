@@ -17,5 +17,5 @@ install(FILES
     DESTINATION lib/cura/plugins/PostProcessingPlugin
 )
 
-install(DIRECTORY scripts DESTINATION lib/cura/plugins/PostProcessingPlugin)
+install(DIRECTORY scripts DESTINATION lib/cura/plugins/PostProcessingPlugin PATTERN "ExampleScript.py" EXCLUDE)
 
