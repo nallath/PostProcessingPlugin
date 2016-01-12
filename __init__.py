@@ -3,17 +3,17 @@
 
 from . import PostProcessingPlugin
 from UM.i18n import i18nCatalog
-i18n_catalog = i18nCatalog("PostProcessingPlugin")
+catalog = i18nCatalog("cura")
 def getMetaData():
     return {
         "type": "extension",
         "plugin": 
         {
-            "name": "Post Processing",
+            "name": catalog.i18nc("@label", "Post Processing"),
             "author": "Ultimaker",
             "version": "15.06",
             "api": 2,
-            "description": i18n_catalog.i18nc("Description of plugin","Extension that allows for user created scripts for post processing")
+            "description": catalog.i18nc("Description of plugin","Extension that allows for user created scripts for post processing")
         }
     }
         
