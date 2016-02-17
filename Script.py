@@ -39,6 +39,9 @@ class Script(SignalEmitter):
     def getActiveProfile(self):
         return self._profile
 
+    def getWorkingProfile(self):
+        return self._profile
+
     ##  Needs to return a dict that can be used to construct a settingcategory file. 
     #   See the example script for an example.
     #   It follows the same style / guides as the Uranium settings.

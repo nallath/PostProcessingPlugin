@@ -22,7 +22,7 @@ class ScriptProfile(SignalEmitter):
     def isReadOnly(self):
         return False
 
-    def hasSettingValue(self, key):
+    def hasSettingValue(self, key, filter_defaults = True):
         return key in self._changed_settings
 
     def getSettingValue(self, key):
