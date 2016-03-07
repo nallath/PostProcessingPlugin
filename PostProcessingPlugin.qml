@@ -8,13 +8,13 @@ import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.1
 import QtQuick.Window 2.2
 
-import UM 1.0 as UM
+import UM 1.1 as UM
 
 UM.Dialog
 {
     id: dialog
-    title: "Post Processing Plugin"
 
+    title: catalog.i18nc("@title:window", "Post Processing Plugin")
     width: 1000 * Screen.devicePixelRatio;
     height: 500 * Screen.devicePixelRatio;
     minimumWidth: 500 * Screen.devicePixelRatio;
@@ -22,6 +22,7 @@ UM.Dialog
 
     Item
     {
+        UM.I18nCatalog{id: catalog; name:"cura"}
         id: base
         property int widthUnity: (base.width / 3) - (UM.Theme.sizes.default_margin.width * 2) - (doneButton.width/3)
         property int textMargin: UM.Theme.sizes.default_margin.width / 2
@@ -44,7 +45,7 @@ UM.Dialog
             Label
             {
                 id: scriptsHeader
-                text: "Scripts"
+                text: catalog.i18nc("@label", "Scripts")
                 anchors.top: parent.top
                 anchors.topMargin: base.textMargin + 6
                 anchors.left: parent.left
@@ -148,7 +149,7 @@ UM.Dialog
             Label
             {
                 id: activeScriptsHeader
-                text: "Active Scripts"
+                text: catalog.i18nc("@label", "Active Scripts")
                 anchors.top: parent.top
                 anchors.topMargin: base.textMargin + 6
                 anchors.left: parent.left
@@ -336,7 +337,7 @@ UM.Dialog
             Button
             {
                 id: doneButton
-                text:"Done!"
+                text:catalog.i18nc("@label", "Done")
                 anchors.bottom: parent.bottom
                 anchors.right: parent.right
                 onClicked: {
