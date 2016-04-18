@@ -38,3 +38,6 @@ class ScriptProfile(SignalEmitter):
 
     def checkValueUnused(self, setting):
         return False
+
+    def updateUnusedValues(self, setting):
+        return
