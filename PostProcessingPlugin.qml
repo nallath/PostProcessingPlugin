@@ -24,9 +24,9 @@ UM.Dialog
     {
         UM.I18nCatalog{id: catalog; name:"PostProcessingPlugin"}
         id: base
-        property int widthUnity: (base.width / 3) - (UM.Theme.sizes.default_margin.width * 2) - (doneButton.width/3)
-        property int textMargin: UM.Theme.sizes.default_margin.width / 2
-        property int arrowMargin: UM.Theme.sizes.default_margin.width * 2
+        property int widthUnity: (base.width / 3) - (UM.Theme.getSize("default_margin").width * 2) - (doneButton.width/3)
+        property int textMargin: UM.Theme.getSize("default_margin").width / 2
+        property int arrowMargin: UM.Theme.getSize("default_margin").width * 2
         property string activeScript
         SystemPalette{ id: palette }
         anchors.fill: parent
@@ -41,7 +41,7 @@ UM.Dialog
             width: base.widthUnity
             height: parent.height
             anchors.left: parent.left
-            anchors.leftMargin: UM.Theme.sizes.default_margin.width
+            anchors.leftMargin: UM.Theme.getSize("default_margin").width
             Label
             {
                 id: scriptsHeader
@@ -53,14 +53,14 @@ UM.Dialog
                 anchors.right: parent.right
                 anchors.rightMargin: base.textMargin
                 color: UM.Theme.styles.setting_item.controlTextColor;
-                font: UM.Theme.fonts.default_header
+                font: UM.Theme.getFont("default_bold")
             }
             ListView
             {
                 anchors.top: scriptsHeader.bottom
                 anchors.topMargin: base.textMargin
                 anchors.left: parent.left
-                anchors.leftMargin: UM.Theme.sizes.default_margin.width
+                anchors.leftMargin: UM.Theme.getSize("default_margin").width
                 anchors.right: parent.right
                 anchors.rightMargin: base.textMargin
                 anchors.bottom: parent.bottom
@@ -77,12 +77,12 @@ UM.Dialog
                         exclusiveGroup: selected_loaded_script_group
                         checkable: true
                         width: parent.width
-                        height: UM.Theme.sizes.setting.height
+                        height: UM.Theme.getSize("setting").height
                         style: ButtonStyle
                         {
                             background:Rectangle
                             {
-                                color: loaded_script_button.checked ? UM.Theme.colors.setting_category_active : "transparent"
+                                color: loaded_script_button.checked ? UM.Theme.getColor("setting_category_active") : "transparent"
                                 width: parent.width
                                 height: parent.height
                             }
@@ -99,7 +99,7 @@ UM.Dialog
                             text: "+"
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.right: parent.right
-                            anchors.rightMargin: UM.Theme.sizes.default_margin.width/2
+                            anchors.rightMargin: UM.Theme.getSize("default_margin").width/2
                             width: 20
                             height: 20
                             onClicked:
@@ -136,7 +136,7 @@ UM.Dialog
                 sourceSize.width: width
                 sourceSize.height: width
                 color: palette.text
-                source: UM.Theme.icons.arrow_right
+                source: UM.Theme.getIcon("arrow_right")
             }
         }
         Rectangle
@@ -157,14 +157,14 @@ UM.Dialog
                 anchors.right: parent.right
                 anchors.rightMargin: base.textMargin
                 color: UM.Theme.styles.setting_item.controlTextColor;
-                font: UM.Theme.fonts.default_header
+                font: UM.Theme.getFont("default_bold")
             }
             ListView
             {
                 anchors.top: activeScriptsHeader.bottom
                 anchors.topMargin: base.textMargin
                 anchors.left: parent.left
-                anchors.leftMargin: UM.Theme.sizes.default_margin.width
+                anchors.leftMargin: UM.Theme.getSize("default_margin").width
                 anchors.right: parent.right
                 anchors.rightMargin: base.textMargin
                 anchors.bottom: parent.bottom
@@ -193,12 +193,12 @@ UM.Dialog
                             base.activeScript = manager.getScriptLabelByKey(modelData.toString())
                         }
                         width: parent.width
-                        height: UM.Theme.sizes.setting.height
+                        height: UM.Theme.getSize("setting").height
                         style: ButtonStyle
                         {
                             background: Rectangle
                             {
-                                color: active_script_button.checked ? UM.Theme.colors.setting_category_active : "transparent"
+                                color: active_script_button.checked ? UM.Theme.getColor("setting_category_active") : "transparent"
                                 width: parent.width
                                 height: parent.height
                             }
@@ -231,7 +231,7 @@ UM.Dialog
                                     sourceSize.width: width
                                     sourceSize.height: width
                                     color: UM.Theme.styles.setting_item.controlTextColor;
-                                    source: UM.Theme.icons.cross1
+                                    source: UM.Theme.getIcon("cross1")
                                 }
                             }
                         }
@@ -262,7 +262,7 @@ UM.Dialog
                                     sourceSize.width: width
                                     sourceSize.height: width
                                     color: UM.Theme.styles.setting_item.controlTextColor
-                                    source: UM.Theme.icons.arrow_bottom
+                                    source: UM.Theme.getIcon("arrow_bottom")
                                 }
                             }
                         }
@@ -293,7 +293,7 @@ UM.Dialog
                                     sourceSize.width: width
                                     sourceSize.height: width
                                     color: UM.Theme.styles.setting_item.controlTextColor;
-                                    source: UM.Theme.icons.arrow_top
+                                    source: UM.Theme.getIcon("arrow_top")
                                 }
                             }
                         }
@@ -314,7 +314,7 @@ UM.Dialog
                 sourceSize.width: width
                 sourceSize.height: width
                 color: palette.text
-                source: UM.Theme.icons.arrow_right
+                source: UM.Theme.getIcon("arrow_right")
             }
         }
         SingleCategorySettingPanel
@@ -332,7 +332,7 @@ UM.Dialog
             id: doneButtonId
             anchors.left: settings.right
             height: parent.height
-            width: doneButton.width + UM.Theme.sizes.default_margin.width
+            width: doneButton.width + UM.Theme.getSize("default_margin").width
             color: "transparent"
             Button
             {

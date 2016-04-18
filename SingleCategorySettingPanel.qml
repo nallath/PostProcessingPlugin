@@ -16,7 +16,7 @@ Rectangle
     property string activeScriptName
     property int panelWidth
     property int panelHeight
-    property int textMargin: UM.Theme.sizes.default_margin.height / 2
+    property int textMargin: UM.Theme.getSize("default_margin").height / 2
 
     width: background.panelWidth
     height: background.panelHeight
@@ -34,7 +34,7 @@ Rectangle
         anchors.rightMargin: base.textMargin
         height: 20
         color: UM.Theme.styles.setting_item.controlTextColor;
-        font: UM.Theme.fonts.default_header
+        font: UM.Theme.getFont("default_bold")
     }
     ScrollView
     {
@@ -74,8 +74,8 @@ Rectangle
                 delegate: UM.SettingItem
                 {
                     id: item;
-                    width: background.width - UM.Theme.sizes.default_margin.width * 1.5
-                    height: model.visible && model.enabled ? UM.Theme.sizes.setting.height : 0;
+                    width: background.width - UM.Theme.getSize("default_margin").width * 1.5
+                    height: model.visible && model.enabled ? UM.Theme.getSize("setting").height : 0;
                     Behavior on height { NumberAnimation { duration: 75; } }
                     //Component.onCompleted :{console.log(height)}
                     opacity: model.visible && model.enabled ? 1 : 0;

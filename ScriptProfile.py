@@ -33,3 +33,11 @@ class ScriptProfile(SignalEmitter):
         if key in self._changed_settings:
             return setting.parseValue(self._changed_settings[key])
         return setting.getDefaultValue()
+
+    settingValueUnusedChanged = Signal()
+
+    def checkValueUnused(self, setting):
+        return False
+
+    def updateUnusedValues(self, setting):
+        return
