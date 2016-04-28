@@ -5,11 +5,11 @@ from UM.Logger import Logger
 from UM.Qt.Bindings.SettingsFromCategoryModel import SettingsFromCategoryModel
 from UM.Signal import Signal, SignalEmitter
 from UM.i18n import i18nCatalog
-from UM.Application import Application
 
 from . import ScriptProfile
 import re
 i18n_catalog = i18nCatalog("PostProcessingPlugin")
+
 
 ## Base class for scripts. All scripts should inherit the script class. 
 class Script(SignalEmitter):
@@ -24,7 +24,8 @@ class Script(SignalEmitter):
             if "key" in setting_data:
                 self._settings = SettingsCategory(self, setting_data["key"], i18n_catalog, self)
                 self._settings.fillByDict(self.getSettingData())
-                self.activeProfileChanged.emit() #Emit the event before the settings model is sorted, but after settings is created.
+                # Emit the event before the settings model is sorted, but after settings is created.
+                self.activeProfileChanged.emit()
                 self._settings_model = SettingsFromCategoryModel(self._settings, machine_manager = self)
                 self._settings_model.sort(lambda t: t["key"])
                 self.settingsLoaded.emit()
