@@ -1,16 +1,12 @@
 # Copyright (c) 2015 Jaime van Kessel, Ultimaker B.V.
 # The PostProcessingPlugin is released under the terms of the AGPLv3 or higher.
-from PyQt5.QtCore import  QObject, QUrl, pyqtProperty, pyqtSignal, pyqtSlot
-from PyQt5.QtQuick import QQuickView
+from PyQt5.QtCore import QObject, QUrl, pyqtProperty, pyqtSignal, pyqtSlot
 from PyQt5.QtQml import QQmlComponent, QQmlContext
 
 from UM.PluginRegistry import PluginRegistry
 from UM.Application import Application
-from UM.Preferences import Preferences
 from UM.Extension import Extension
 from UM.Logger import Logger
-
-from pydoc import locate
 
 import os.path
 import pkgutil
@@ -19,7 +15,10 @@ import sys
 from UM.i18n import i18nCatalog
 i18n_catalog = i18nCatalog("PostProcessingPlugin")
 
-class PostProcessingPlugin(QObject,  Extension):
+
+##  The post processing plugin is an Extension type plugin that enables pre-written scripts to post process generated
+#   g-code files.
+class PostProcessingPlugin(QObject, Extension):
     def __init__(self, parent = None):
         super().__init__(parent)
         self.addMenuItem(i18n_catalog.i18n("Modify G-Code"), self.showPopup)
@@ -29,7 +28,8 @@ class PostProcessingPlugin(QObject,  Extension):
         self._loaded_scripts = {} 
         self._script_labels = {}
         
-        # Script list contains instances of scripts in loaded_scripts. There can be duplicates and they will be executed in sequence.
+        # Script list contains instances of scripts in loaded_scripts.
+        # There can be duplicates, which will be executed in sequence.
         self._script_list = [] 
         self._selected_script_index = 0
 
@@ -55,6 +55,7 @@ class PostProcessingPlugin(QObject,  Extension):
         except:
             return None
 
+    ##  Execute all post-processing scripts on the gcode.
     def execute(self, output_device):
         scene = Application.getInstance().getController().getScene()
         if hasattr(scene, "gcode_list"):
@@ -65,12 +66,12 @@ class PostProcessingPlugin(QObject,  Extension):
                         try:
                             gcode_list = script.execute(gcode_list)
                         except Exception as e:
-                            Logger.log("e","Script raised the following exception %s",e)
-                    if len(self._script_list): # Add comment to g-code if any changes were made.
+                            Logger.log("e", "Script raised the following exception %s", str(e))
+                    if len(self._script_list):  # Add comment to g-code if any changes were made.
                         gcode_list[0] += ";POSTPROCESSED\n"
                     setattr(scene, "gcode_list", gcode_list)
                 else:
-                    print("Already post processed")
+                    Logger.log("e", "Already post processed")
 
 
     @pyqtSlot(int)
@@ -84,8 +85,8 @@ class PostProcessingPlugin(QObject,  Extension):
     
     @pyqtSlot(int, int)
     def moveScript(self, index, new_index):
-        if new_index < 0 or new_index > len(self._script_list)-1:
-            return #nothing needs to be done
+        if new_index < 0 or new_index > len(self._script_list) - 1:
+            return  # nothing needs to be done
         else:
             # Magical switch code.
             self._script_list[new_index], self._script_list[index] = self._script_list[index], self._script_list[new_index]
@@ -99,12 +100,15 @@ class PostProcessingPlugin(QObject,  Extension):
         if len(self._script_list) - 1 < self._selected_script_index:
             self._selected_script_index = len(self._script_list) - 1
         self.scriptListChanged.emit()
-        self.selectedIndexChanged.emit() #Ensure that settings are updated
+        self.selectedIndexChanged.emit()  # Ensure that settings are updated
     
-    ##  Load all scripts from provided path. This should probably only be done on init.
+    ##  Load all scripts from provided path.
+    #   This should probably only be done on init.
+    #   \param path Path to check for scripts.
     def loadAllScripts(self, path):
         scripts = pkgutil.iter_modules(path = [path])
-        for loader, script_name, ispkg in scripts: 
+        for loader, script_name, ispkg in scripts:
+            # Iterate over all scripts.
             if script_name not in sys.modules:
                 # Import module
                 loaded_script = __import__("PostProcessingPlugin.scripts."+ script_name, fromlist = [script_name])
@@ -120,12 +124,11 @@ class PostProcessingPlugin(QObject,  Extension):
                         Logger.log("w", "Script %s.py has no label or key", script_name)
                         self._script_labels[script_name] = script_name
                         self._loaded_scripts[script_name] = loaded_class
-                    #self._script_list.append(loaded_class())
                     self.loadedScriptListChanged.emit()
                 except AttributeError:
                     Logger.log("e", "Script %s.py is not a recognised script type. Ensure it inherits Script", script_name)
                 except NotImplementedError:
-                    Logger.log("e", "Script %s.py has no implemented settings",script_name)
+                    Logger.log("e", "Script %s.py has no implemented settings", script_name)
 
     loadedScriptListChanged = pyqtSignal()
     @pyqtProperty("QVariantList", notify = loadedScriptListChanged)
@@ -152,12 +155,14 @@ class PostProcessingPlugin(QObject,  Extension):
     ##  Creates the view used by show popup. The view is saved because of the fairly aggressive garbage collection.
     def _createView(self):
         Logger.log("d", "Creating post processing plugin view.")
+
         ## Load all scripts in the scripts folder
         self.loadAllScripts(os.path.join(PluginRegistry.getInstance().getPluginPath("PostProcessingPlugin"), "scripts"))
         
         path = QUrl.fromLocalFile(os.path.join(PluginRegistry.getInstance().getPluginPath("PostProcessingPlugin"), "PostProcessingPlugin.qml"))
         self._component = QQmlComponent(Application.getInstance()._engine, path)
 
+        # We need access to engine (although technically we can't)
         self._context = QQmlContext(Application.getInstance()._engine.rootContext())
         self._context.setContextProperty("manager", self)
         self._view = self._component.create(self._context)
