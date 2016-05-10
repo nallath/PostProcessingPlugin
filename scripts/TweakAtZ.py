@@ -28,6 +28,7 @@
 ##V4.9.92: Modifications for Cura 15.10
 ##V4.9.93: Minor bugfixes (input settings) / documentation
 ##V4.9.94: Bugfix Combobox-selection; remove logger
+##V5.0:   Bugfix for fall back after one layer and doubled G0 commands when using print speed tweak, Initial version for Cura 2.x
 
 ## Uses -
 ## M220 S<factor in percent> - set speed factor override percentage
@@ -43,7 +44,7 @@ from ..Script import Script
 import re
 
 class TweakAtZ(Script):
-    version = "4.9.94"
+    version = "5.0"
     def __init__(self):
         super().__init__()
 
@@ -386,7 +387,7 @@ class TweakAtZ(Script):
                 if ";Generated with Cura_SteamEngine" in line:
                     TWinstances += 1
                     modified_gcode += ";TweakAtZ instances: %d\n" % TWinstances
-                if not ("M84" in line or "M25" in line or ("G1" in line and TweakPrintSpeed and state==3) or
+                if not ("M84" in line or "M25" in line or ("G1" in line and TweakPrintSpeed and (state==3 or state==4)) or
                                 ";TweakAtZ instances:" in line):
                     modified_gcode += line + "\n"
                 IsUM2 = ("FLAVOR:UltiGCode" in line) or IsUM2 #Flavor is UltiGCode!
@@ -441,9 +442,9 @@ class TweakAtZ(Script):
                     y = self.getValue(line, "Y", None)
                     e = self.getValue(line, "E", None)
                     f = self.getValue(line, "F", None)
-                    if TweakPrintSpeed and state==3:
+                    if 'G1' in line and TweakPrintSpeed and (state==3 or state==4):
                         # check for pure print movement in target range:
-                        if "G1" in line and x != None and y != None and f != None and e != None and newZ==z:
+                        if x != None and y != None and f != None and e != None and newZ==z:
                             modified_gcode += "G1 F%d X%1.3f Y%1.3f E%1.5f\n" % (int(f/100.0*float(printspeed)),self.getValue(line,"X"),
                                                                           self.getValue(line,"Y"),self.getValue(line,"E"))
                         else: #G1 command but not a print movement
