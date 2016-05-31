@@ -49,9 +49,9 @@ class PostProcessingPlugin(QObject, Extension):
 
     selectedIndexChanged = pyqtSignal()
     @pyqtProperty("QVariant", notify = selectedIndexChanged)
-    def selectedScriptSettingsModel(self):
+    def selectedScriptDefinitionId(self):
         try:
-            return self._script_list[self._selected_script_index].getSettingsModel()
+            return self._script_list[self._selected_script_index].getDefinitionId()
         except:
             return None
 
@@ -72,7 +72,6 @@ class PostProcessingPlugin(QObject, Extension):
                     setattr(scene, "gcode_list", gcode_list)
                 else:
                     Logger.log("e", "Already post processed")
-
 
     @pyqtSlot(int)
     def setSelectedScriptIndex(self, index):
@@ -117,18 +116,18 @@ class PostProcessingPlugin(QObject, Extension):
                 Logger.log("d", "Begin loading of script: %s", script_name)
                 try: 
                     setting_data = temp_object.getSettingData()
-                    if "label" in setting_data and "key" in setting_data:
-                        self._script_labels[setting_data["key"]] = setting_data["label"]
+                    if "name" in setting_data and "key" in setting_data:
+                        self._script_labels[setting_data["key"]] = setting_data["name"]
                         self._loaded_scripts[setting_data["key"]] = loaded_class
                     else:
-                        Logger.log("w", "Script %s.py has no label or key", script_name)
+                        Logger.log("w", "Script %s.py has no name or key", script_name)
                         self._script_labels[script_name] = script_name
                         self._loaded_scripts[script_name] = loaded_class
-                    self.loadedScriptListChanged.emit()
                 except AttributeError:
                     Logger.log("e", "Script %s.py is not a recognised script type. Ensure it inherits Script", script_name)
                 except NotImplementedError:
                     Logger.log("e", "Script %s.py has no implemented settings", script_name)
+        self.loadedScriptListChanged.emit()
 
     loadedScriptListChanged = pyqtSignal()
     @pyqtProperty("QVariantList", notify = loadedScriptListChanged)
