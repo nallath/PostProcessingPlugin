@@ -3,7 +3,7 @@
 from UM.Settings.SettingsCategory import SettingsCategory
 from UM.Logger import Logger
 from UM.Qt.Bindings.SettingsFromCategoryModel import SettingsFromCategoryModel
-from UM.Signal import Signal, SignalEmitter
+from UM.Signal import Signal, signalemitter
 from UM.i18n import i18nCatalog
 
 from . import ScriptProfile
@@ -11,8 +11,9 @@ import re
 i18n_catalog = i18nCatalog("PostProcessingPlugin")
 
 
-## Base class for scripts. All scripts should inherit the script class. 
-class Script(SignalEmitter):
+## Base class for scripts. All scripts should inherit the script class.
+@signalemitter
+class Script():
     def __init__(self):
         super().__init__()
         self._settings = None

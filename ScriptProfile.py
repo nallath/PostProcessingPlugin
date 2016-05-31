@@ -1,9 +1,10 @@
 # Copyright (c) 2015 Jaime van Kessel, Ultimaker B.V.
 # The PostProcessingPlugin is released under the terms of the AGPLv3 or higher.
 
-from UM.Signal import Signal, SignalEmitter
+from UM.Signal import Signal, signalemitter
 
-class ScriptProfile(SignalEmitter):
+@signalemitter
+class ScriptProfile():
     def __init__(self, script):
         super().__init__()
         self._changed_settings = {}
