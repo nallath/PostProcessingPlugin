@@ -10,10 +10,9 @@ import UM 1.0 as UM
 Rectangle
 {
     id: base;
-    width: UM.Theme.sizes.tooltip.width;
-    height: label.height + UM.Theme.sizes.tooltip_margins.height * 2;
-    color: UM.Theme.colors.tooltip
-
+    width: UM.Theme.getSize("tooltip").width;
+    height: label.height + UM.Theme.getSize("tooltip_margins").height * 2;
+    color: UM.Theme.getColor("tooltip")
     opacity: 0;
     Behavior on opacity { NumberAnimation { duration: 100; } }
 
@@ -44,13 +43,14 @@ Rectangle
         anchors 
         {
             top: parent.top;
-            topMargin: UM.Theme.sizes.tooltip_margins.height;
+            topMargin: UM.Theme.getSize("tooltip_margins").height;
             left: parent.left;
-            leftMargin: UM.Theme.sizes.tooltip_margins.width;
+            leftMargin: UM.Theme.getSize("tooltip_margins").width;
             right: parent.right;
-            rightMargin: UM.Theme.sizes.tooltip_margins.width;
+            rightMargin: UM.Theme.getSize("tooltip_margins").width;
         }
         wrapMode: Text.Wrap;
-        font: UM.Theme.fonts.default;
+        font: UM.Theme.getFont("default");
+        color: UM.Theme.getColor("tooltip_text");
     }
 }
