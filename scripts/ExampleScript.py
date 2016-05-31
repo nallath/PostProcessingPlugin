@@ -8,8 +8,10 @@ class ExampleScript(Script):
         
     def getSettingData(self):
         return { 
-            "label":"Example script",
+            "name":"Example script",
             "key": "ExampleScript",
+            "metadata": {},
+            "version": 2,
             "settings": 
             {
                 "test": 
@@ -18,11 +20,10 @@ class ExampleScript(Script):
                     "description": "None",
                     "unit": "mm",
                     "type": "float",
-                    "default": 0.5,
-                    "min_value": "0",
-                    "min_value_warning": "0.1",
-                    "max_value_warning": "1",
-                    "visible": True
+                    "default_value": 0.5,
+                    "minimum_value": "0",
+                    "minimum_value_warning": "0.1",
+                    "maximum_value_warning": "1"
                 },
                 "derp":
                 {
@@ -30,11 +31,10 @@ class ExampleScript(Script):
                     "description": "afgasgfgasfgasf",
                     "unit": "mm",
                     "type": "float",
-                    "default": 0.5,
-                    "min_value": "0",
-                    "min_value_warning": "0.1",
-                    "max_value_warning": "1",
-                    "visible": True
+                    "default_value": 0.5,
+                    "minimum_value": "0",
+                    "minimum_value_warning": "0.1",
+                    "maximum_value_warning": "1"
                 }
             }
         }

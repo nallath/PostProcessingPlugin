@@ -5,8 +5,10 @@ class PauseAtHeight(Script):
         
     def getSettingData(self):
         return { 
-            "label":"Pause at height",
+            "name":"Pause at height",
             "key": "PauseAtHeight",
+            "metadata": {},
+            "version": 2,
             "settings": 
             {
                 "pause_height": 
@@ -15,8 +17,7 @@ class PauseAtHeight(Script):
                     "description": "At what height should the pause occur",
                     "unit": "mm",
                     "type": "float",
-                    "default": 5.0,
-                    "visible": True
+                    "default_value": 5.0
                 },
                 "head_park_x":
                 {
@@ -24,8 +25,7 @@ class PauseAtHeight(Script):
                     "description": "What x location does the head move to when pausing.",
                     "unit": "mm",
                     "type": "float",
-                    "default": 190,
-                    "visible": True
+                    "default_value": 190
                 },
                 "head_park_y":
                 {
@@ -33,8 +33,7 @@ class PauseAtHeight(Script):
                     "description": "What y location does the head move to when pausing.",
                     "unit": "mm",
                     "type": "float",
-                    "default": 190,
-                    "visible": True
+                    "default_value": 190
                 },
                 "retraction_ammount":
                 {
@@ -42,8 +41,7 @@ class PauseAtHeight(Script):
                     "description": "How much fillament must be retracted at pause.",
                     "unit": "mm",
                     "type": "float",
-                    "default": 0,
-                    "visible": True
+                    "default_value": 0
                 }
             }
         }

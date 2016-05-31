@@ -5,8 +5,10 @@ class BQ_PauseAtHeight(Script):
         
     def getSettingData(self):
         return { 
-            "label":"Pause at height (BQ Printers)",
+            "name":"Pause at height (BQ Printers)",
             "key": "BQ_PauseAtHeight",
+            "metadata":{},
+            "version": 2,
             "settings": 
             {
                 "pause_height": 
@@ -15,8 +17,7 @@ class BQ_PauseAtHeight(Script):
                     "description": "At what height should the pause occur",
                     "unit": "mm",
                     "type": "float",
-                    "default": 5.0,
-                    "visible": True
+                    "default_value": 5.0
                 }
             }
         }
