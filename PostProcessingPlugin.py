@@ -55,6 +55,13 @@ class PostProcessingPlugin(QObject, Extension):
         except:
             return None
 
+    @pyqtProperty("QVariant", notify=selectedIndexChanged)
+    def selectedScriptStackId(self):
+        try:
+            return self._script_list[self._selected_script_index].getStackId()
+        except:
+            return None
+
     ##  Execute all post-processing scripts on the gcode.
     def execute(self, output_device):
         scene = Application.getInstance().getController().getScene()
@@ -156,8 +163,11 @@ class PostProcessingPlugin(QObject, Extension):
         Logger.log("d", "Creating post processing plugin view.")
 
         ## Load all scripts in the scripts folder
-        self.loadAllScripts(os.path.join(PluginRegistry.getInstance().getPluginPath("PostProcessingPlugin"), "scripts"))
-        
+        try:
+            self.loadAllScripts(os.path.join(PluginRegistry.getInstance().getPluginPath("PostProcessingPlugin"), "scripts"))
+        except Exception as e:
+            print("Exception occured", e)  # TODO: Debug code (far to general catch. Remove this once done testing)
+
         path = QUrl.fromLocalFile(os.path.join(PluginRegistry.getInstance().getPluginPath("PostProcessingPlugin"), "PostProcessingPlugin.qml"))
         self._component = QQmlComponent(Application.getInstance()._engine, path)
 
@@ -165,6 +175,7 @@ class PostProcessingPlugin(QObject, Extension):
         self._context = QQmlContext(Application.getInstance()._engine.rootContext())
         self._context.setContextProperty("manager", self)
         self._view = self._component.create(self._context)
+        Logger.log("d", "Post processing view created.")
     
     ##  Show the (GUI) popup of the post processing plugin.
     def showPopup(self):

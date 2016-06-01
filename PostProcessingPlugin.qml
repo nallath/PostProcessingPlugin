@@ -8,7 +8,7 @@ import QtQuick.Layouts 1.1
 import QtQuick.Dialogs 1.1
 import QtQuick.Window 2.2
 
-import UM 1.1 as UM
+import UM 1.2 as UM
 
 UM.Dialog
 {
@@ -53,7 +53,7 @@ UM.Dialog
                 anchors.right: parent.right
                 anchors.rightMargin: base.textMargin
                 color: UM.Theme.styles.setting_item.controlTextColor;
-                font: UM.Theme.getFont("default_bold")
+                font: UM.Theme.fonts.default_header
             }
             ListView
             {
@@ -82,7 +82,7 @@ UM.Dialog
                         {
                             background:Rectangle
                             {
-                                color: loaded_script_button.checked ? UM.Theme.getColor("setting_category_active") : "transparent"
+                                color: loaded_script_button.checked ? UM.Theme.colors.setting_category_active : "transparent"
                                 width: parent.width
                                 height: parent.height
                             }
@@ -136,7 +136,7 @@ UM.Dialog
                 sourceSize.width: width
                 sourceSize.height: width
                 color: palette.text
-                source: UM.Theme.getIcon("arrow_right")
+                source: UM.Theme.icons.arrow_right
             }
         }
         Rectangle
@@ -157,7 +157,7 @@ UM.Dialog
                 anchors.right: parent.right
                 anchors.rightMargin: base.textMargin
                 color: UM.Theme.styles.setting_item.controlTextColor;
-                font: UM.Theme.getFont("default_bold")
+                font: UM.Theme.fonts.default_header
             }
             ListView
             {
@@ -193,12 +193,12 @@ UM.Dialog
                             base.activeScript = manager.getScriptLabelByKey(modelData.toString())
                         }
                         width: parent.width
-                        height: UM.Theme.getSize("setting").height
+                        height: UM.Theme.getSizes("setting").height
                         style: ButtonStyle
                         {
                             background: Rectangle
                             {
-                                color: active_script_button.checked ? UM.Theme.getColor("setting_category_active") : "transparent"
+                                color: active_script_button.checked ? UM.Theme.colors.setting_category_active : "transparent"
                                 width: parent.width
                                 height: parent.height
                             }
@@ -231,7 +231,7 @@ UM.Dialog
                                     sourceSize.width: width
                                     sourceSize.height: width
                                     color: UM.Theme.styles.setting_item.controlTextColor;
-                                    source: UM.Theme.getIcon("cross1")
+                                    source: UM.Theme.icons.cross1
                                 }
                             }
                         }
@@ -262,7 +262,7 @@ UM.Dialog
                                     sourceSize.width: width
                                     sourceSize.height: width
                                     color: UM.Theme.styles.setting_item.controlTextColor
-                                    source: UM.Theme.getIcon("arrow_bottom")
+                                    source: UM.Theme.icons.arrow_bottom
                                 }
                             }
                         }
@@ -293,7 +293,7 @@ UM.Dialog
                                     sourceSize.width: width
                                     sourceSize.height: width
                                     color: UM.Theme.styles.setting_item.controlTextColor;
-                                    source: UM.Theme.getIcon("arrow_top")
+                                    source: UM.Theme.icons.arrow_top
                                 }
                             }
                         }
@@ -314,18 +314,97 @@ UM.Dialog
                 sourceSize.width: width
                 sourceSize.height: width
                 color: palette.text
-                source: UM.Theme.getIcon("arrow_right")
+                source: UM.Theme.icons.arrow_right
             }
         }
-        SingleCategorySettingPanel
+        Rectangle
         {
-            id: settings
+            color: "white"
             anchors.left: activeScripts.right
             anchors.leftMargin: base.arrowMargin
-            setting_model: manager.selectedScriptSettingsModel
-            panelWidth: base.widthUnity
-            panelHeight: parent.height
-            activeScriptName: base.activeScript
+            width: base.widthUnity
+            height: parent.height
+            id:background
+
+            Label
+            {
+                id: scriptSpecsHeader
+                visible: manager.selectedScriptIndex != -1
+                text: manager.selectedScriptIndex == -1 ? '' : background.activeScriptName
+                anchors.top: parent.top
+                anchors.topMargin: base.textMargin + 6
+                anchors.left: parent.left
+                anchors.leftMargin: base.textMargin + 6
+                anchors.right: parent.right
+                anchors.rightMargin: base.textMargin
+                height: 20
+                color: UM.Theme.styles.setting_item.controlTextColor;
+                font: UM.Theme.getFont("default_bold")
+            }
+
+            ScrollView
+            {
+                id: scrollView
+                anchors.top: scriptSpecsHeader.bottom
+                anchors.topMargin: background.textMargin
+                anchors.left: parent.left
+                anchors.right: parent.right
+                anchors.rightMargin: background.textMargin
+
+                ListView
+                {
+                    id: listview
+                    model: UM.SettingDefinitionsModel
+                    {
+                        id: definitionsModel;
+                        containerId: manager.selectedScriptDefinitionId
+                        showAll: true
+                    }
+                    delegate:Loader
+                    {
+                        id: loader
+
+                        width: parent.width
+                        height: model.type != undefined ? UM.Theme.getSize("section").height : 0;
+
+                        property var definition: model
+                        property var settingDefinitionsModel: definitionsModel
+                        property var propertyProvider: provider
+
+                        asynchronous: true
+                        source:
+                        {
+                            switch(model.type) // TODO: This needs to be fixed properly. Got frustrated with it not working, so this is the patch job!
+                            {
+                                case "int":
+                                    return "../../resources/qml/Settings/SettingTextField.qml"
+                                case "float":
+                                    return "../../resources/qml/Settings/SettingTextField.qml"
+                                case "enum":
+                                    return "../../resources/qml/Settings/SettingComboBox.qml"
+                                case "bool":
+                                    return "../../resources/qml/Settings/SettingCheckBox.qml"
+                                case "str":
+                                    return "../../resources/qml/Settings/SettingTextField.qml"
+                                case "category":
+                                    return "../../resources/qml/Settings/SettingCategory.qml"
+                                default:
+                                    return "../../resources/qml/Settings/SettingUnknown.qml"
+                            }
+                        }
+
+                        UM.SettingPropertyProvider
+                        {
+                            id: provider
+
+                            containerStackId: manager.selectedScriptStackId
+                            key: model.key
+                            watchedProperties: [ "value", "enabled", "state", "validationState" ]
+                            storeIndex: 0
+                        }
+                    }
+                }
+            }
         }
 
         Rectangle{
