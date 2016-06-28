@@ -82,7 +82,7 @@ UM.Dialog
                         {
                             background:Rectangle
                             {
-                                color: loaded_script_button.checked ? UM.Theme.colors.setting_category_active : "transparent"
+                                color: loaded_script_button.checked ? UM.Theme.getColor("setting_category_active") : "transparent"
                                 width: parent.width
                                 height: parent.height
                             }
@@ -193,12 +193,12 @@ UM.Dialog
                             base.activeScript = manager.getScriptLabelByKey(modelData.toString())
                         }
                         width: parent.width
-                        height: UM.Theme.getSizes("setting").height
+                        height: UM.Theme.getSize("setting").height
                         style: ButtonStyle
                         {
                             background: Rectangle
                             {
-                                color: active_script_button.checked ? UM.Theme.colors.setting_category_active : "transparent"
+                                color: active_script_button.checked ? UM.Theme.getColor("setting_category_active") : "transparent"
                                 width: parent.width
                                 height: parent.height
                             }
@@ -231,7 +231,7 @@ UM.Dialog
                                     sourceSize.width: width
                                     sourceSize.height: width
                                     color: UM.Theme.styles.setting_item.controlTextColor;
-                                    source: UM.Theme.icons.cross1
+                                    source: UM.Theme.getIcon("cross1")
                                 }
                             }
                         }
@@ -262,7 +262,7 @@ UM.Dialog
                                     sourceSize.width: width
                                     sourceSize.height: width
                                     color: UM.Theme.styles.setting_item.controlTextColor
-                                    source: UM.Theme.icons.arrow_bottom
+                                    source: UM.Theme.getIcon("arrow_bottom")
                                 }
                             }
                         }
@@ -293,7 +293,7 @@ UM.Dialog
                                     sourceSize.width: width
                                     sourceSize.height: width
                                     color: UM.Theme.styles.setting_item.controlTextColor;
-                                    source: UM.Theme.icons.arrow_top
+                                    source: UM.Theme.getIcon("arrow_top")
                                 }
                             }
                         }
@@ -314,7 +314,7 @@ UM.Dialog
                 sourceSize.width: width
                 sourceSize.height: width
                 color: palette.text
-                source: UM.Theme.icons.arrow_right
+                source: UM.Theme.getIcon("arrow_right")
             }
         }
         Rectangle
