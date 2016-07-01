@@ -36,13 +36,6 @@ class PostProcessingPlugin(QObject, Extension):
         Application.getInstance().getOutputDeviceManager().writeStarted.connect(self.execute)
         self.scriptListChanged.connect(Application.getInstance().getBackend().forceSlice)
 
-    @pyqtSlot(str, "QVariant")
-    ## Called when the setting is changed.
-    def setSettingValue(self, key, value):
-        settings_model = self._script_list[self._selected_script_index].getSettingsModel()
-        settings_model.setSettingValue(key,value)
-        Application.getInstance().getBackend().forceSlice()
-
     selectedIndexChanged = pyqtSignal()
     @pyqtProperty("QVariant", notify = selectedIndexChanged)
     def selectedScriptDefinitionId(self):
