@@ -112,13 +112,7 @@ UM.Dialog
                 }
             }
         }
-        /*Button
-        {
-            text:"Execute"
-            width: 250
-            height: 30
-            onClicked:manager.execute()
-        }*/
+
         ExclusiveGroup
         {
             id: selected_script_group
@@ -180,15 +174,19 @@ UM.Dialog
                         exclusiveGroup: selected_script_group
                         checkable: true
                         checked: {
-                            if (manager.selectedScriptIndex == index){
+                            if (manager.selectedScriptIndex == index)
+                            {
                                 base.activeScript = manager.getScriptLabelByKey(modelData.toString())
                                 return true
                             }
-                            else {
+                            else
+                            {
                                 return false
                             }
                         }
-                        onClicked: {
+                        onClicked:
+                        {
+                            forceActiveFocus()
                             manager.setSelectedScriptIndex(index)
                             base.activeScript = manager.getScriptLabelByKey(modelData.toString())
                         }
@@ -221,9 +219,12 @@ UM.Dialog
                         anchors.rightMargin: base.textMargin
                         anchors.verticalCenter: parent.verticalCenter
                         onClicked: manager.removeScriptByIndex(index)
-                        style: ButtonStyle {
-                            label: Item {
-                                UM.RecolorImage {
+                        style: ButtonStyle
+                        {
+                            label: Item
+                            {
+                                UM.RecolorImage
+                                {
                                     anchors.verticalCenter: parent.verticalCenter
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     width: control.width/2.7
@@ -246,15 +247,20 @@ UM.Dialog
                         opacity: enabled ? 1.0 : 0.3
                         width: 20
                         height:20
-                        onClicked: {
-                            if (manager.selectedScriptIndex == index){
+                        onClicked:
+                        {
+                            if (manager.selectedScriptIndex == index)
+                            {
                                 manager.setSelectedScriptIndex(index+1)
                             }
                             return manager.moveScript(index,index+1)
                         }
-                        style: ButtonStyle {
-                            label: Item {
-                                UM.RecolorImage {
+                        style: ButtonStyle
+                        {
+                            label: Item
+                            {
+                                UM.RecolorImage
+                                {
                                     anchors.verticalCenter: parent.verticalCenter
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     width: control.width/2.5
@@ -277,15 +283,20 @@ UM.Dialog
                         height: 20
                         anchors.right: down_button.left
                         anchors.verticalCenter: parent.verticalCenter
-                        onClicked: {
-                            if (manager.selectedScriptIndex == index){
+                        onClicked:
+                        {
+                            if (manager.selectedScriptIndex == index)
+                            {
                                 manager.setSelectedScriptIndex(index-1)
                             }
                             return manager.moveScript(index,index-1)
                         }
-                        style: ButtonStyle {
-                            label: Item {
-                                UM.RecolorImage {
+                        style: ButtonStyle
+                        {
+                            label: Item
+                             {
+                                UM.RecolorImage
+                                {
                                     anchors.verticalCenter: parent.verticalCenter
                                     anchors.horizontalCenter: parent.horizontalCenter
                                     width: control.width/2.5
@@ -301,12 +312,14 @@ UM.Dialog
                 }
             }
         }
-        Rectangle{
+        Rectangle
+        {
             anchors.left: activeScripts.right
             height: parent.height
             width: base.arrowMargin
             color: "transparent"
-            UM.RecolorImage {
+            UM.RecolorImage
+            {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
                 width: parent.width/2
@@ -330,7 +343,7 @@ UM.Dialog
             {
                 id: scriptSpecsHeader
                 visible: manager.selectedScriptIndex != -1
-                text: manager.selectedScriptIndex == -1 ? '' : background.activeScriptName
+                text: manager.selectedScriptIndex == -1 ? "" : background.activeScriptName
                 anchors.top: parent.top
                 anchors.topMargin: base.textMargin + 6
                 anchors.left: parent.left
@@ -396,9 +409,8 @@ UM.Dialog
                         UM.SettingPropertyProvider
                         {
                             id: provider
-
                             containerStackId: manager.selectedScriptStackId
-                            key: model.key
+                            key: model.key ? model.key : "None"
                             watchedProperties: [ "value", "enabled", "state", "validationState" ]
                             storeIndex: 0
                         }
@@ -407,7 +419,8 @@ UM.Dialog
             }
         }
 
-        Rectangle{
+        Rectangle
+        {
             id: doneButtonId
             anchors.left: settings.right
             height: parent.height
