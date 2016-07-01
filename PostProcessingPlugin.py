@@ -42,14 +42,14 @@ class PostProcessingPlugin(QObject, Extension):
         try:
             return self._script_list[self._selected_script_index].getDefinitionId()
         except:
-            return None
+            return ""
 
     @pyqtProperty("QVariant", notify=selectedIndexChanged)
     def selectedScriptStackId(self):
         try:
             return self._script_list[self._selected_script_index].getStackId()
         except:
-            return None
+            return ""
 
     ##  Execute all post-processing scripts on the gcode.
     def execute(self, output_device):

@@ -364,6 +364,7 @@ UM.Dialog
                 anchors.right: parent.right
                 anchors.rightMargin: background.textMargin
                 anchors.bottom: parent.bottom
+                visible: manager.selectedScriptDefinitionId != ""
 
                 ListView
                 {
