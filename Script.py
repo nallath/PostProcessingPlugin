@@ -60,10 +60,6 @@ class Script:
     def getStackId(self):
         if self._stack:
             return self._stack.getId()
-
-    ##  Get the initialised settings 
-    def getSettings(self):
-        return self._settings
     
     def getValue(self, line, key, default = None):
         if not key in line or (';' in line and line.find(key) > line.find(';')):
@@ -76,24 +72,6 @@ class Script:
             return float(m.group(0))
         except:
             return default
-    
-    ##  Get setting by key. (convenience function)
-    #   \param key Key to select setting by (string)
-    #   \return Setting or none if no setting was found.
-    def getSettingByKey(self, key):
-        return self._settings.getSetting(key)
-    
-    ##  Set the value of a setting by key.
-    #   \param key Key of setting to change.
-    #   \param value value to set.
-    def setSettingValueByKey(self, key, value):
-        pass
-
-    ##  Get the value of setting by key.
-    #   \param key Key of the setting to get value from
-    #   \return value (or none)
-    def getSettingValueByKey(self, key):
-        pass
 
     ##  This is called when the script is executed. 
     #   It gets a list of g-code strings and needs to return a (modified) list.
