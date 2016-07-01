@@ -9,8 +9,6 @@ install(FILES
     PostProcessingPlugin.py
     PostProcessingPlugin.qml
     Script.py
-    ScriptProfile.py
-    SingleCategorySettingPanel.qml
     Tooltip.qml
     LICENSE
     README.md
