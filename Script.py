@@ -63,7 +63,7 @@ class Script:
 
     ##  Convenience function that retrieves value of a setting from the stack.
     def getSettingValueByKey(self, key):
-        return self._stack.getProperty("value", key)
+        return self._stack.getProperty(key, "value")
 
     ##  Convenience function that finds the value in a line of g-code.
     #   When requesting key = x from line "G1 X100" the value 100 is returned.
