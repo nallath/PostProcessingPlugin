@@ -60,7 +60,13 @@ class Script:
     def getStackId(self):
         if self._stack:
             return self._stack.getId()
-    
+
+    ##  Convenience function that retrieves value of a setting from the stack.
+    def getSettingValueByKey(self, key):
+        return self._stack.getProperty("value", key)
+
+    ##  Convenience function that finds the value in a line of g-code.
+    #   When requesting key = x from line "G1 X100" the value 100 is returned.
     def getValue(self, line, key, default = None):
         if not key in line or (';' in line and line.find(key) > line.find(';')):
             return default
