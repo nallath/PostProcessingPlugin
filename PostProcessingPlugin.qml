@@ -343,7 +343,7 @@ UM.Dialog
             {
                 id: scriptSpecsHeader
                 visible: manager.selectedScriptIndex != -1
-                text: manager.selectedScriptIndex == -1 ? "" : background.activeScriptName
+                text: manager.selectedScriptIndex == -1 ? "" : base.activeScriptName
                 anchors.top: parent.top
                 anchors.topMargin: base.textMargin + 6
                 anchors.left: parent.left
@@ -363,6 +363,7 @@ UM.Dialog
                 anchors.left: parent.left
                 anchors.right: parent.right
                 anchors.rightMargin: background.textMargin
+                anchors.bottom: parent.bottom
 
                 ListView
                 {
