@@ -143,7 +143,9 @@ class PostProcessingPlugin(QObject, Extension):
     @pyqtSlot(str)
     def addScriptToList(self, key):
         Logger.log("d", "Adding script %s to list.", key)
-        self._script_list.append(self._loaded_scripts[key]())
+        new_script = self._loaded_scripts[key]()
+        new_script.valueChanged.connect(Application.getInstance().getBackend().forceSlice)
+        self._script_list.append(new_script)
         self.setSelectedScriptIndex(len(self._script_list) - 1)
         self.scriptListChanged.emit()
     

@@ -42,10 +42,16 @@ class Script:
         self._instance = InstanceContainer(container_id="ScriptInstanceContainer")
         self._instance.setDefinition(self._definition)
         self._stack.addContainer(self._instance)
+        self._stack.propertyChanged.connect(self._onPropertyChanged)
 
         ContainerRegistry.getInstance().addContainer(self._stack)
 
     settingsLoaded = Signal()
+    valueChanged = Signal()  # Signal emitted whenever a value of a setting is changed
+
+    def _onPropertyChanged(self, key, property_name):
+        if property_name == "value":
+            self.valueChanged.emit()
 
     ##  Needs to return a dict that can be used to construct a settingcategory file. 
     #   See the example script for an example.
