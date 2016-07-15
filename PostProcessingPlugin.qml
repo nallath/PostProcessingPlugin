@@ -22,7 +22,7 @@ UM.Dialog
 
     Item
     {
-        UM.I18nCatalog{id: catalog; name:"PostProcessingPlugin"}
+        UM.I18nCatalog{id: catalog; name:"cura"}
         id: base
         property int widthUnity: (base.width / 3) - (UM.Theme.getSize("default_margin").width * 2) - (doneButton.width/3)
         property int textMargin: UM.Theme.getSize("default_margin").width / 2

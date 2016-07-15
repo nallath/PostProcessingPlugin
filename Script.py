@@ -12,7 +12,7 @@ from UM.Settings.ContainerRegistry import ContainerRegistry
 
 import re
 import json
-i18n_catalog = i18nCatalog("PostProcessingPlugin")
+i18n_catalog = i18nCatalog("cura")
 
 
 ## Base class for scripts. All scripts should inherit the script class.

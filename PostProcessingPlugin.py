@@ -13,7 +13,7 @@ import pkgutil
 import sys
 
 from UM.i18n import i18nCatalog
-i18n_catalog = i18nCatalog("PostProcessingPlugin")
+i18n_catalog = i18nCatalog("cura")
 
 
 ##  The post processing plugin is an Extension type plugin that enables pre-written scripts to post process generated
