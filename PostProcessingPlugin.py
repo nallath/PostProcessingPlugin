@@ -31,7 +31,7 @@ class PostProcessingPlugin(QObject, Extension):
         # Script list contains instances of scripts in loaded_scripts.
         # There can be duplicates, which will be executed in sequence.
         self._script_list = [] 
-        self._selected_script_index = 0
+        self._selected_script_index = -1
 
         Application.getInstance().getOutputDeviceManager().writeStarted.connect(self.execute)
         self.scriptListChanged.connect(Application.getInstance().getBackend().forceSlice)
@@ -128,7 +128,7 @@ class PostProcessingPlugin(QObject, Extension):
     loadedScriptListChanged = pyqtSignal()
     @pyqtProperty("QVariantList", notify = loadedScriptListChanged)
     def loadedScriptList(self):
-        return list(self._loaded_scripts.keys())
+        return sorted(list(self._loaded_scripts.keys()))
     
     @pyqtSlot(str, result = str)
     def getScriptLabelByKey(self, key):
