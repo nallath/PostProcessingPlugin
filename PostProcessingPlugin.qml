@@ -45,7 +45,7 @@ UM.Dialog
             Label
             {
                 id: activeScriptsHeader
-                text: catalog.i18nc("@label", "Active Scripts")
+                text: catalog.i18nc("@label", "Post Processing Scripts")
                 anchors.top: parent.top
                 anchors.topMargin: base.textMargin
                 anchors.left: parent.left
@@ -260,7 +260,7 @@ UM.Dialog
             Label
             {
                 id: scriptSpecsHeader
-                text: manager.selectedScriptIndex == -1 ? "Settings" : base.activeScriptName
+                text: manager.selectedScriptIndex == -1 ? catalog.i18nc("@label", "Settings") : base.activeScriptName
                 anchors.top: parent.top
                 anchors.topMargin: base.textMargin
                 anchors.left: parent.left
@@ -269,6 +269,7 @@ UM.Dialog
                 anchors.rightMargin: base.textMargin
                 height: 20
                 font: UM.Theme.getFont("large")
+                color: UM.Theme.getColor("text")
             }
 
             ScrollView
