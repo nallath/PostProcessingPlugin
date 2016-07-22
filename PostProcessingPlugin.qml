@@ -90,7 +90,7 @@ UM.Dialog
                             {
                                 wrapMode: Text.Wrap
                                 text: control.text
-                                color: palette.Text
+                                color: palette.text
                             }
                         }
                         Button
@@ -105,6 +105,23 @@ UM.Dialog
                             {
                                 loaded_script_button.checked = true
                                 manager.addScriptToList(modelData.toString())
+                            }
+                            style: ButtonStyle
+                            {
+                                label: Item
+                                {
+                                    UM.RecolorImage
+                                    {
+                                        anchors.verticalCenter: parent.verticalCenter
+                                        anchors.horizontalCenter: parent.horizontalCenter
+                                        width: control.width / 2.5
+                                        height: control.height / 2.5
+                                        sourceSize.width: width
+                                        sourceSize.height: width
+                                        color: palette.text
+                                        source: UM.Theme.getIcon("plus")
+                                    }
+                                }
                             }
                         }
                     }
@@ -129,7 +146,7 @@ UM.Dialog
                 sourceSize.width: width
                 sourceSize.height: width
                 color: palette.text
-                source: UM.Theme.icons.arrow_right
+                source: UM.Theme.getIcon("arrow_right")
             }
         }
         Rectangle
@@ -421,5 +438,11 @@ UM.Dialog
         {
             id:tooltip
         }
+    }
+    rightButtons: Button
+    {
+        text: catalog.i18nc("@action:button", "Close")
+        iconName: "dialog-close"
+        onClicked: dialog.accept()
     }
 }
