@@ -24,11 +24,12 @@ UM.Dialog
     {
         UM.I18nCatalog{id: catalog; name:"cura"}
         id: base
-        property int widthUnity: (base.width / 3) - (UM.Theme.getSize("default_margin").width * 2) - (doneButton.width/3)
+        property int widthUnity: (base.width / 3) - (UM.Theme.getSize("default_margin").width * 2)
         property int textMargin: UM.Theme.getSize("default_margin").width / 2
         property int arrowMargin: UM.Theme.getSize("default_margin").width * 2
-        property string activeScript
+        property string activeScriptName
         SystemPalette{ id: palette }
+        SystemPalette{ id: disabledPalette; colorGroup: SystemPalette.Disabled }
         anchors.fill: parent
         ExclusiveGroup
         {
@@ -37,7 +38,7 @@ UM.Dialog
         Rectangle
         {
             id: scripts
-            color: "white"
+            color: "transparent"
             width: base.widthUnity
             height: parent.height
             anchors.left: parent.left
@@ -52,8 +53,7 @@ UM.Dialog
                 anchors.leftMargin: base.textMargin + 6
                 anchors.right: parent.right
                 anchors.rightMargin: base.textMargin
-                color: UM.Theme.styles.setting_item.controlTextColor;
-                font: UM.Theme.fonts.default_header
+                font: UM.Theme.getFont("large")
             }
             ListView
             {
@@ -82,16 +82,15 @@ UM.Dialog
                         {
                             background:Rectangle
                             {
-                                color: loaded_script_button.checked ? UM.Theme.getColor("setting_category_active") : "transparent"
+                                color: "transparent"
                                 width: parent.width
                                 height: parent.height
                             }
-                            label: Text
+                            label: Label
                             {
                                 wrapMode: Text.Wrap
                                 text: control.text
-                                color: UM.Theme.styles.setting_item.controlTextColor;
-                                font: UM.Theme.styles.setting_item.controlFont;
+                                color: palette.Text
                             }
                         }
                         Button
@@ -99,7 +98,7 @@ UM.Dialog
                             text: "+"
                             anchors.verticalCenter: parent.verticalCenter
                             anchors.right: parent.right
-                            anchors.rightMargin: UM.Theme.getSize("default_margin").width/2
+                            anchors.rightMargin: UM.Theme.getSize("default_margin").width / 2
                             width: 20
                             height: 20
                             onClicked:
@@ -125,8 +124,8 @@ UM.Dialog
             UM.RecolorImage {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-                width: parent.width/2
-                height: parent.width/2
+                width: parent.width / 2
+                height: parent.width / 2
                 sourceSize.width: width
                 sourceSize.height: width
                 color: palette.text
@@ -140,6 +139,7 @@ UM.Dialog
             anchors.leftMargin: base.arrowMargin
             width: base.widthUnity
             height: parent.height
+            color: "transparent"
             Label
             {
                 id: activeScriptsHeader
@@ -150,8 +150,7 @@ UM.Dialog
                 anchors.leftMargin: base.textMargin + 6
                 anchors.right: parent.right
                 anchors.rightMargin: base.textMargin
-                color: UM.Theme.styles.setting_item.controlTextColor;
-                font: UM.Theme.fonts.default_header
+                font: UM.Theme.getFont("large")
             }
             ListView
             {
@@ -167,6 +166,7 @@ UM.Dialog
                 {
                     width: parent.width
                     height: active_script_button.height
+                    color: "transparent"
                     Button
                     {
                         id: active_script_button
@@ -176,7 +176,7 @@ UM.Dialog
                         checked: {
                             if (manager.selectedScriptIndex == index)
                             {
-                                base.activeScript = manager.getScriptLabelByKey(modelData.toString())
+                                base.activeScriptName = manager.getScriptLabelByKey(modelData.toString())
                                 return true
                             }
                             else
@@ -188,7 +188,7 @@ UM.Dialog
                         {
                             forceActiveFocus()
                             manager.setSelectedScriptIndex(index)
-                            base.activeScript = manager.getScriptLabelByKey(modelData.toString())
+                            base.activeScriptName = manager.getScriptLabelByKey(modelData.toString())
                         }
                         width: parent.width
                         height: UM.Theme.getSize("setting").height
@@ -196,16 +196,15 @@ UM.Dialog
                         {
                             background: Rectangle
                             {
-                                color: active_script_button.checked ? UM.Theme.getColor("setting_category_active") : "transparent"
+                                color: active_script_button.checked ? palette.highlight : "transparent"
                                 width: parent.width
                                 height: parent.height
                             }
-                            label: Text
+                            label: Label
                             {
                                 wrapMode: Text.Wrap
                                 text: control.text
-                                color: UM.Theme.styles.setting_item.controlTextColor;
-                                font: UM.Theme.styles.setting_item.controlFont;
+                                color: active_script_button.checked ? palette.highlightedText : palette.text
                             }
                         }
                     }
@@ -214,7 +213,7 @@ UM.Dialog
                         id: remove_button
                         text: "x"
                         width: 20
-                        height:20
+                        height: 20
                         anchors.right:parent.right
                         anchors.rightMargin: base.textMargin
                         anchors.verticalCenter: parent.verticalCenter
@@ -227,11 +226,11 @@ UM.Dialog
                                 {
                                     anchors.verticalCenter: parent.verticalCenter
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    width: control.width/2.7
-                                    height: control.height/2.7
+                                    width: control.width / 2.7
+                                    height: control.height / 2.7
                                     sourceSize.width: width
                                     sourceSize.height: width
-                                    color: UM.Theme.styles.setting_item.controlTextColor;
+                                    color: palette.text
                                     source: UM.Theme.getIcon("cross1")
                                 }
                             }
@@ -243,17 +242,16 @@ UM.Dialog
                         text: ""
                         anchors.right: remove_button.left
                         anchors.verticalCenter: parent.verticalCenter
-                        enabled: index != manager.scriptList.length-1
-                        opacity: enabled ? 1.0 : 0.3
+                        enabled: index != manager.scriptList.length - 1
                         width: 20
-                        height:20
+                        height: 20
                         onClicked:
                         {
                             if (manager.selectedScriptIndex == index)
                             {
-                                manager.setSelectedScriptIndex(index+1)
+                                manager.setSelectedScriptIndex(index + 1)
                             }
-                            return manager.moveScript(index,index+1)
+                            return manager.moveScript(index, index + 1)
                         }
                         style: ButtonStyle
                         {
@@ -263,11 +261,11 @@ UM.Dialog
                                 {
                                     anchors.verticalCenter: parent.verticalCenter
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    width: control.width/2.5
-                                    height: control.height/2.5
+                                    width: control.width / 2.5
+                                    height: control.height / 2.5
                                     sourceSize.width: width
                                     sourceSize.height: width
-                                    color: UM.Theme.styles.setting_item.controlTextColor
+                                    color: control.enabled ? palette.text : disabledPalette.text
                                     source: UM.Theme.getIcon("arrow_bottom")
                                 }
                             }
@@ -276,9 +274,8 @@ UM.Dialog
                     Button
                     {
                         id: up_button
-                        text:""
+                        text: ""
                         enabled: index != 0
-                        opacity: enabled ? 1.0 : 0.3
                         width: 20
                         height: 20
                         anchors.right: down_button.left
@@ -287,9 +284,9 @@ UM.Dialog
                         {
                             if (manager.selectedScriptIndex == index)
                             {
-                                manager.setSelectedScriptIndex(index-1)
+                                manager.setSelectedScriptIndex(index - 1)
                             }
-                            return manager.moveScript(index,index-1)
+                            return manager.moveScript(index, index - 1)
                         }
                         style: ButtonStyle
                         {
@@ -299,11 +296,11 @@ UM.Dialog
                                 {
                                     anchors.verticalCenter: parent.verticalCenter
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    width: control.width/2.5
-                                    height: control.height/2.5
+                                    width: control.width / 2.5
+                                    height: control.height / 2.5
                                     sourceSize.width: width
                                     sourceSize.height: width
-                                    color: UM.Theme.styles.setting_item.controlTextColor;
+                                    color: control.enabled ? palette.text : disabledPalette.text
                                     source: UM.Theme.getIcon("arrow_top")
                                 }
                             }
@@ -322,8 +319,8 @@ UM.Dialog
             {
                 anchors.verticalCenter: parent.verticalCenter
                 anchors.horizontalCenter: parent.horizontalCenter
-                width: parent.width/2
-                height: parent.width/2
+                width: parent.width / 2
+                height: parent.width / 2
                 sourceSize.width: width
                 sourceSize.height: width
                 color: palette.text
@@ -332,7 +329,7 @@ UM.Dialog
         }
         Rectangle
         {
-            color: "white"
+            color: UM.Theme.getColor("sidebar")
             anchors.left: activeScripts.right
             anchors.leftMargin: base.arrowMargin
             width: base.widthUnity
@@ -342,8 +339,7 @@ UM.Dialog
             Label
             {
                 id: scriptSpecsHeader
-                visible: manager.selectedScriptIndex != -1
-                text: manager.selectedScriptIndex == -1 ? "" : base.activeScriptName
+                text: manager.selectedScriptIndex == -1 ? "Settings" : base.activeScriptName
                 anchors.top: parent.top
                 anchors.topMargin: base.textMargin + 6
                 anchors.left: parent.left
@@ -351,8 +347,7 @@ UM.Dialog
                 anchors.right: parent.right
                 anchors.rightMargin: base.textMargin
                 height: 20
-                color: UM.Theme.styles.setting_item.controlTextColor;
-                font: UM.Theme.getFont("default_bold")
+                font: UM.Theme.getFont("large")
             }
 
             ScrollView
@@ -369,6 +364,7 @@ UM.Dialog
                 ListView
                 {
                     id: listview
+                    spacing: UM.Theme.getSize("default_lining").height
                     model: UM.SettingDefinitionsModel
                     {
                         id: definitionsModel;
@@ -421,24 +417,6 @@ UM.Dialog
             }
         }
 
-        Rectangle
-        {
-            id: doneButtonId
-            anchors.left: settings.right
-            height: parent.height
-            width: doneButton.width + UM.Theme.getSize("default_margin").width
-            color: "transparent"
-            Button
-            {
-                id: doneButton
-                text:catalog.i18nc("@label", "Done")
-                anchors.bottom: parent.bottom
-                anchors.right: parent.right
-                onClicked: {
-                    dialog.visible = false;
-                }
-            }
-        }
         Tooltip
         {
             id:tooltip
