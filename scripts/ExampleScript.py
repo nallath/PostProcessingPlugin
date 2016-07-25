@@ -5,16 +5,16 @@ from ..Script import Script
 class ExampleScript(Script):
     def __init__(self):
         super().__init__()
-        
-    def getSettingData(self):
-        return { 
+
+    def getSettingDataString(self):
+        return """{
             "name":"Example script",
             "key": "ExampleScript",
             "metadata": {},
             "version": 2,
-            "settings": 
+            "settings":
             {
-                "test": 
+                "test":
                 {
                     "label": "Test",
                     "description": "None",
@@ -37,7 +37,7 @@ class ExampleScript(Script):
                     "maximum_value_warning": "1"
                 }
             }
-        }
-    
+        }"""
+
     def execute(self, data):
         return data
