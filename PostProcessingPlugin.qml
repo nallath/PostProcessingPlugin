@@ -295,7 +295,7 @@ UM.Dialog
                     }
                     delegate:Loader
                     {
-                        id: loader
+                        id: settingLoader
 
                         width: parent.width
                         height: model.type != undefined ? UM.Theme.getSize("section").height : 0;
@@ -304,7 +304,19 @@ UM.Dialog
                         property var settingDefinitionsModel: definitionsModel
                         property var propertyProvider: provider
 
-                        asynchronous: true
+                        //Qt5.4.2 and earlier has a bug where this causes a crash: https://bugreports.qt.io/browse/QTBUG-35989
+                        //In addition, while it works for 5.5 and higher, the ordering of the actual combo box drop down changes,
+                        //causing nasty issues when selecting different options. So disable asynchronous loading of enum type completely.
+                        asynchronous: model.type != "enum" && model.type != "extruder"
+
+                        onLoaded: {
+                            settingLoader.item.showRevertButton = true
+                            settingLoader.item.showInheritButton = false
+                            settingLoader.item.showLinkedSettingIcon = false
+                            settingLoader.item.doDepthIndentation = true
+                            settingLoader.item.doQualityUserSettingEmphasis = false
+                        }
+
                         source:
                         {
                             switch(model.type) // TODO: This needs to be fixed properly. Got frustrated with it not working, so this is the patch job!
