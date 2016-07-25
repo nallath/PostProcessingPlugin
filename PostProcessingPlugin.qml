@@ -9,6 +9,7 @@ import QtQuick.Dialogs 1.1
 import QtQuick.Window 2.2
 
 import UM 1.2 as UM
+import Cura 1.0 as Cura
 
 UM.Dialog
 {
@@ -317,24 +318,26 @@ UM.Dialog
                             settingLoader.item.doQualityUserSettingEmphasis = false
                         }
 
-                        source:
+                        sourceComponent:
                         {
-                            switch(model.type) // TODO: This needs to be fixed properly. Got frustrated with it not working, so this is the patch job!
+                            switch(model.type)
                             {
                                 case "int":
-                                    return "../../resources/qml/Settings/SettingTextField.qml"
+                                    return settingTextField
                                 case "float":
-                                    return "../../resources/qml/Settings/SettingTextField.qml"
+                                    return settingTextField
                                 case "enum":
-                                    return "../../resources/qml/Settings/SettingComboBox.qml"
+                                    return settingComboBox
+                                case "extruder":
+                                    return settingExtruder
                                 case "bool":
-                                    return "../../resources/qml/Settings/SettingCheckBox.qml"
+                                    return settingCheckBox
                                 case "str":
-                                    return "../../resources/qml/Settings/SettingTextField.qml"
+                                    return settingTextField
                                 case "category":
-                                    return "../../resources/qml/Settings/SettingCategory.qml"
+                                    return settingCategory
                                 default:
-                                    return "../../resources/qml/Settings/SettingUnknown.qml"
+                                    return settingUnknown
                             }
                         }
 
@@ -355,6 +358,49 @@ UM.Dialog
         {
             id:tooltip
         }
+
+        Component
+        {
+            id: settingTextField;
+
+            Cura.SettingTextField { }
+        }
+
+        Component
+        {
+            id: settingComboBox;
+
+            Cura.SettingComboBox { }
+        }
+
+        Component
+        {
+            id: settingExtruder;
+
+            Cura.SettingExtruder { }
+        }
+
+        Component
+        {
+            id: settingCheckBox;
+
+            Cura.SettingCheckBox { }
+        }
+
+        Component
+        {
+            id: settingCategory;
+
+            Cura.SettingCategory { }
+        }
+
+        Component
+        {
+            id: settingUnknown;
+
+            Cura.SettingUnknown { }
+        }
+
     }
     rightButtons: Button
     {
