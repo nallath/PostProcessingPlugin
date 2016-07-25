@@ -254,9 +254,9 @@ UM.Dialog
             color: UM.Theme.getColor("sidebar")
             anchors.left: activeScripts.right
             anchors.leftMargin: UM.Theme.getSize("default_margin").width
-            width: base.columnWidth
+            anchors.right: parent.right
             height: parent.height
-            id:background
+            id: settingsPanel
 
             Label
             {
@@ -277,12 +277,12 @@ UM.Dialog
             {
                 id: scrollView
                 anchors.top: scriptSpecsHeader.bottom
-                anchors.topMargin: background.textMargin
+                anchors.topMargin: settingsPanel.textMargin
                 anchors.left: parent.left
                 anchors.right: parent.right
-                anchors.rightMargin: background.textMargin
                 anchors.bottom: parent.bottom
                 visible: manager.selectedScriptDefinitionId != ""
+                style: UM.Theme.styles.scrollview;
 
                 ListView
                 {
@@ -349,14 +349,33 @@ UM.Dialog
                             watchedProperties: [ "value", "enabled", "state", "validationState" ]
                             storeIndex: 0
                         }
+
+                        Connections
+                        {
+                            target: item
+
+                            onShowTooltip:
+                            {
+                                tooltip.text = text;
+                                var position = settingLoader.mapToItem(settingsPanel, settingsPanel.x, 0);
+                                tooltip.show(position);
+                                tooltip.target.x = position.x + 1
+                            }
+
+                            onHideTooltip:
+                            {
+                                tooltip.hide();
+                            }
+                        }
+
                     }
                 }
             }
         }
 
-        Tooltip
+        Cura.SidebarTooltip
         {
-            id:tooltip
+            id: tooltip
         }
 
         Component
@@ -400,7 +419,6 @@ UM.Dialog
 
             Cura.SettingUnknown { }
         }
-
     }
     rightButtons: Button
     {
