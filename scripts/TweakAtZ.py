@@ -255,7 +255,7 @@ class TweakAtZ(Script):
                     "minimum_value": "0",
                     "minimum_value_warning": "160",
                     "maximum_value_warning": "250",
-                    "enabled": "i1_Tweak_extruderTwo"
+                    "enabled": "i3_Tweak_extruderTwo"
                 },
                 "j1_Tweak_fanSpeed":
                 {
