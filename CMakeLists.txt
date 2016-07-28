@@ -9,7 +9,6 @@ install(FILES
     PostProcessingPlugin.py
     PostProcessingPlugin.qml
     Script.py
-    Tooltip.qml
     LICENSE
     README.md
     DESTINATION lib/cura/plugins/PostProcessingPlugin
