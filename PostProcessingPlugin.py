@@ -167,7 +167,9 @@ class PostProcessingPlugin(QObject, Extension):
         self._context.setContextProperty("manager", self)
         self._view = self._component.create(self._context)
         Logger.log("d", "Post processing view created.")
-    
+
+        Application.getInstance().addAdditionalComponent("saveButton", self._view.findChild(QObject, "postProcessingSaveAreaButton"))
+
     ##  Show the (GUI) popup of the post processing plugin.
     def showPopup(self):
         if self._view is None:
