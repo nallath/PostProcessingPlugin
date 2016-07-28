@@ -215,7 +215,7 @@ UM.Dialog
             Button
             {
                 id: addButton
-                text: "Add a script"
+                text: catalog.i18nc("@action", "Add a script")
                 anchors.left: parent.left
                 anchors.leftMargin: base.textMargin
                 anchors.top: activeScriptsList.bottom
