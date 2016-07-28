@@ -12,6 +12,7 @@ from UM.Settings.ContainerRegistry import ContainerRegistry
 
 import re
 import json
+import collections
 i18n_catalog = i18nCatalog("cura")
 
 
@@ -53,10 +54,19 @@ class Script:
         if property_name == "value":
             self.valueChanged.emit()
 
-    ##  Needs to return a dict that can be used to construct a settingcategory file. 
+    ##  Needs to return a dict that can be used to construct a settingcategory file.
     #   See the example script for an example.
     #   It follows the same style / guides as the Uranium settings.
+    #   Scripts can either override getSettingData directly, or use getSettingDataString
+    #   to return a string that will be parsed as json. The latter has the benefit over
+    #   returning a dict in that the order of settings is maintained.
     def getSettingData(self):
+        setting_data = self.getSettingDataString()
+        if type(setting_data) == str:
+            setting_data = json.loads(setting_data, object_pairs_hook = collections.OrderedDict)
+        return setting_data
+
+    def getSettingDataString(self):
         raise NotImplementedError()
 
     def getDefinitionId(self):

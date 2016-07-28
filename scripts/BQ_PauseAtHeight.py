@@ -2,16 +2,16 @@ from ..Script import Script
 class BQ_PauseAtHeight(Script):
     def __init__(self):
         super().__init__()
-        
-    def getSettingData(self):
-        return { 
+
+    def getSettingDataString(self):
+        return """{
             "name":"Pause at height (BQ Printers)",
             "key": "BQ_PauseAtHeight",
             "metadata":{},
             "version": 2,
-            "settings": 
+            "settings":
             {
-                "pause_height": 
+                "pause_height":
                 {
                     "label": "Pause height",
                     "description": "At what height should the pause occur",
@@ -20,8 +20,8 @@ class BQ_PauseAtHeight(Script):
                     "default_value": 5.0
                 }
             }
-        }
-    
+        }"""
+
     def execute(self, data):
         x = 0.
         y = 0.

@@ -50,9 +50,9 @@ class TweakAtZ(Script):
     def __init__(self):
         super().__init__()
 
-    def getSettingData(self):
-        return {
-            "name":"TweakAtZ " + self.version,
+    def getSettingDataString(self):
+        return """{
+            "name":"TweakAtZ """ + self.version + """",
             "key":"TweakAtZ",
             "metadata": {},
             "version": 2,
@@ -95,7 +95,7 @@ class TweakAtZ(Script):
                     "description": "Select behavior: Tweak value and keep it for the rest, Tweak value for single layer only",
                     "type": "enum",
                     "options": {"keep_value":"Keep value","single_layer":"Single Layer"},
-                    "default_value": "keep_value",
+                    "default_value": "keep_value"
                 },
                 "d_twLayers":
                 {
@@ -113,7 +113,7 @@ class TweakAtZ(Script):
                     "label": "Tw. Speed",
                     "description": "Select if total speed (print and travel) has to be tweaked",
                     "type": "bool",
-                    "default_value": False
+                    "default_value": false
                 },
                 "e2_speed":
                 {
@@ -132,7 +132,7 @@ class TweakAtZ(Script):
                     "label": "Tw. Print Speed",
                     "description": "Select if print speed has to be tweaked",
                     "type": "bool",
-                    "default_value": False
+                    "default_value": false
                 },
                 "f2_printspeed":
                 {
@@ -151,7 +151,7 @@ class TweakAtZ(Script):
                     "label": "Tw. Flow Rate",
                     "description": "Select if flow rate has to be tweaked",
                     "type": "bool",
-                    "default_value": False
+                    "default_value": false
                 },
                 "g2_flowrate":
                 {
@@ -170,7 +170,7 @@ class TweakAtZ(Script):
                     "label": "Tw. Fl. Rate1",
                     "description": "Select if first extruder flow rate has to be tweaked",
                     "type": "bool",
-                    "default_value": False
+                    "default_value": false
                 },
                 "g4_flowrateOne":
                 {
@@ -189,7 +189,7 @@ class TweakAtZ(Script):
                     "label": "Tw. Fl. Rate2",
                     "description": "Select if second extruder flow rate has to be tweaked",
                     "type": "bool",
-                    "default_value": False
+                    "default_value": false
                 },
                 "g6_flowrateTwo":
                 {
@@ -208,7 +208,7 @@ class TweakAtZ(Script):
                     "label": "Tw. Bed Temp",
                     "description": "Select if Bed Temperature has to be tweaked",
                     "type": "bool",
-                    "default_value": False
+                    "default_value": false
                 },
                 "h2_bedTemp":
                 {
@@ -227,7 +227,7 @@ class TweakAtZ(Script):
                     "label": "Tw. Ex.1 Temp",
                     "description": "Select if First Extruder Temperature has to be tweaked",
                     "type": "bool",
-                    "default_value": False
+                    "default_value": false
                 },
                 "i2_extruderOne":
                 {
@@ -246,7 +246,7 @@ class TweakAtZ(Script):
                     "label": "Tw. Ex.2 Temp",
                     "description": "Select if Second Extruder Temperature has to be tweaked",
                     "type": "bool",
-                    "default_value": False
+                    "default_value": false
                 },
                 "i4_extruderTwo":
                 {
@@ -265,7 +265,7 @@ class TweakAtZ(Script):
                     "label": "Tw. Fan Speed",
                     "description": "Select if Fan Speed has to be tweaked",
                     "type": "bool",
-                    "default_value": False
+                    "default_value": false
                 },
                 "j2_fanSpeed":
                 {
@@ -280,7 +280,7 @@ class TweakAtZ(Script):
                     "enabled": "j1_Tweak_fanSpeed"
                 }
             }
-        }
+        }"""
 
     def getValue(self, line, key, default = None): #replace default getvalue due to comment-reading feature
         if not key in line or (";" in line and line.find(key) > line.find(";") and
