@@ -72,12 +72,17 @@ class PauseAtHeight(Script):
                     if current_z != None:
                         if current_z >= pause_z:
                             prepend_gcode = ";TYPE:CUSTOM\n"
+                            prepend_gcode += ";added code by post processing\n"
+                            prepend_gcode += ";script: PauseAtHeight.py\n"
+                            prepend_gcode += ";current z: %f \n" % (current_z)
                             
                             #Retraction
                             prepend_gcode += "M83\n"
-                            prepend_gcode += "G1 E-%f F6000\n" % (retraction_ammount)
+                            if retraction_ammount != 0:
+                                prepend_gcode += "G1 E-%f F6000\n" % (retraction_ammount)
                             
                             #Move the head away
+                            prepend_gcode += "G1 Z%f F300\n" % (current_z + 1)
                             prepend_gcode += "G1 X%f Y%f F9000\n" % (park_x, park_y) 
                             if current_z < 15:
                                 prepend_gcode += "G1 Z15 F300\n"
@@ -88,15 +93,18 @@ class PauseAtHeight(Script):
                             prepend_gcode += "M0 ;Do the actual pause\n"
                             
                             #Push the filament back, and retract again, the properly primes the nozzle when changing filament.
-                            prepend_gcode += "G1 E%f F6000\n" % (retraction_ammount)
-                            prepend_gcode += "G1 E-%f F6000\n" % (retraction_ammount)
+                            if retraction_ammount != 0:
+                                prepend_gcode += "G1 E%f F6000\n" % (retraction_ammount)
+                                prepend_gcode += "G1 E-%f F6000\n" % (retraction_ammount)
+
                             #Move the head back
-                            if current_z < 15:
-                                prepend_gcode += "G1 Z%f F300\n" % (current_z + 1)
+                            prepend_gcode += "G1 Z%f F300\n" % (current_z + 1)
                             prepend_gcode +="G1 X%f Y%f F9000\n" % (x, y)
-                            prepend_gcode +="G1 E%f F6000\n" % (retraction_ammount)
+                            if retraction_ammount != 0:
+                                prepend_gcode +="G1 E%f F6000\n" % (retraction_ammount)
                             prepend_gcode +="G1 F9000\n"
                             prepend_gcode +="M82\n"
+
                             index = data.index(layer) 
                             layer = prepend_gcode + layer
                             data[index] = layer #Override the data of this layer with the modified data
