@@ -299,8 +299,28 @@ UM.Dialog
                         id: settingLoader
 
                         width: parent.width
-                        height: model.type != undefined ? UM.Theme.getSize("section").height : 0;
+                        height:
+                        {
+                            if(provider.properties.enabled == "True")
+                            {
+                                if(model.type != undefined)
+                                {
+                                    return UM.Theme.getSize("section").height;
+                                }
+                                else
+                                {
+                                    return 0;
+                                }
+                            }
+                            else
+                            {
+                                return 0;
+                            }
 
+                        }
+                        Behavior on height { NumberAnimation { duration: 100 } }
+                        opacity: provider.properties.enabled == "True" ? 1 : 0
+                        Behavior on opacity { NumberAnimation { duration: 100 } }
                         property var definition: model
                         property var settingDefinitionsModel: definitionsModel
                         property var propertyProvider: provider
