@@ -321,6 +321,7 @@ UM.Dialog
                         Behavior on height { NumberAnimation { duration: 100 } }
                         opacity: provider.properties.enabled == "True" ? 1 : 0
                         Behavior on opacity { NumberAnimation { duration: 100 } }
+                        enabled: opacity > 0
                         property var definition: model
                         property var settingDefinitionsModel: definitionsModel
                         property var propertyProvider: provider
