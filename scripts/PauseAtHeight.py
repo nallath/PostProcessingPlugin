@@ -42,6 +42,14 @@ class PauseAtHeight(Script):
                     "unit": "mm",
                     "type": "float",
                     "default_value": 0
+                },
+                "extrude_ammount":
+                {
+                    "label": "Extrude amount",
+                    "description": "How much filament should be extruded after pause. This is usually only needed when printing with multiple materials that require different temperatures.",
+                    "unit": "mm",
+                    "type": "float",
+                    "default_value": 0
                 }
             }
         }"""
@@ -52,6 +60,7 @@ class PauseAtHeight(Script):
         current_z = 0.
         pause_z = self.getSettingValueByKey("pause_height")
         retraction_ammount = self.getSettingValueByKey("retraction_ammount")
+        extrude_ammount = self.getSettingValueByKey("extrude_ammount")
         park_x = self.getSettingValueByKey("head_park_x")
         park_y = self.getSettingValueByKey("head_park_y")
         layers_started = False
@@ -91,6 +100,10 @@ class PauseAtHeight(Script):
                             prepend_gcode += "M84 E0\n"
                             #Wait till the user continues printing
                             prepend_gcode += "M0 ;Do the actual pause\n"
+                            
+                            # Optionally extrude material
+                            if extrude_ammount != 0:
+                                prepend_gcode += "G1 E%f F6000\n" % (extrude_ammount)
                             
                             #Push the filament back, and retract again, the properly primes the nozzle when changing filament.
                             if retraction_ammount != 0:
