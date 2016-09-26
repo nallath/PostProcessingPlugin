@@ -35,7 +35,7 @@ class PauseAtHeight(Script):
                     "type": "float",
                     "default_value": 190
                 },
-                "retraction_ammount":
+                "retraction_amount":
                 {
                     "label": "Retraction",
                     "description": "How much fillament must be retracted at pause.",
@@ -43,7 +43,7 @@ class PauseAtHeight(Script):
                     "type": "float",
                     "default_value": 0
                 },
-                "extrude_ammount":
+                "extrude_amount":
                 {
                     "label": "Extrude amount",
                     "description": "How much filament should be extruded after pause. This is usually only needed when printing with multiple materials that require different temperatures.",
@@ -59,8 +59,8 @@ class PauseAtHeight(Script):
         y = 0.
         current_z = 0.
         pause_z = self.getSettingValueByKey("pause_height")
-        retraction_ammount = self.getSettingValueByKey("retraction_ammount")
-        extrude_ammount = self.getSettingValueByKey("extrude_ammount")
+        retraction_amount = self.getSettingValueByKey("retraction_amount")
+        extrude_amount = self.getSettingValueByKey("extrude_amount")
         park_x = self.getSettingValueByKey("head_park_x")
         park_y = self.getSettingValueByKey("head_park_y")
         layers_started = False
@@ -87,8 +87,8 @@ class PauseAtHeight(Script):
                             
                             #Retraction
                             prepend_gcode += "M83\n"
-                            if retraction_ammount != 0:
-                                prepend_gcode += "G1 E-%f F6000\n" % (retraction_ammount)
+                            if retraction_amount != 0:
+                                prepend_gcode += "G1 E-%f F6000\n" % (retraction_amount)
                             
                             #Move the head away
                             prepend_gcode += "G1 Z%f F300\n" % (current_z + 1)
@@ -102,19 +102,19 @@ class PauseAtHeight(Script):
                             prepend_gcode += "M0 ;Do the actual pause\n"
                             
                             # Optionally extrude material
-                            if extrude_ammount != 0:
-                                prepend_gcode += "G1 E%f F6000\n" % (extrude_ammount)
+                            if extrude_amount != 0:
+                                prepend_gcode += "G1 E%f F6000\n" % (extrude_amount)
                             
                             #Push the filament back, and retract again, the properly primes the nozzle when changing filament.
-                            if retraction_ammount != 0:
-                                prepend_gcode += "G1 E%f F6000\n" % (retraction_ammount)
-                                prepend_gcode += "G1 E-%f F6000\n" % (retraction_ammount)
+                            if retraction_amount != 0:
+                                prepend_gcode += "G1 E%f F6000\n" % (retraction_amount)
+                                prepend_gcode += "G1 E-%f F6000\n" % (retraction_amount)
 
                             #Move the head back
                             prepend_gcode += "G1 Z%f F300\n" % (current_z + 1)
                             prepend_gcode +="G1 X%f Y%f F9000\n" % (x, y)
-                            if retraction_ammount != 0:
-                                prepend_gcode +="G1 E%f F6000\n" % (retraction_ammount)
+                            if retraction_amount != 0:
+                                prepend_gcode +="G1 E%f F6000\n" % (retraction_amount)
                             prepend_gcode +="G1 F9000\n"
                             prepend_gcode +="M82\n"
 
