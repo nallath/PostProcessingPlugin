@@ -103,7 +103,7 @@ class PauseAtHeight(Script):
                             
                             # Optionally extrude material
                             if extrude_amount != 0:
-                                prepend_gcode += "G1 E%f F6000\n" % (extrude_amount)
+                                prepend_gcode += "G1 E%f F200\n" % (extrude_amount)
                             
                             #Push the filament back, and retract again, the properly primes the nozzle when changing filament.
                             if retraction_amount != 0:
