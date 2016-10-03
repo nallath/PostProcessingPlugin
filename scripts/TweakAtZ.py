@@ -110,7 +110,7 @@ class TweakAtZ(Script):
                 },
                 "e1_Tweak_speed":
                 {
-                    "label": "Tw. Speed",
+                    "label": "Tweak Speed",
                     "description": "Select if total speed (print and travel) has to be tweaked",
                     "type": "bool",
                     "default_value": false
@@ -129,7 +129,7 @@ class TweakAtZ(Script):
                 },
                 "f1_Tweak_printspeed":
                 {
-                    "label": "Tw. Print Speed",
+                    "label": "Tweak Print Speed",
                     "description": "Select if print speed has to be tweaked",
                     "type": "bool",
                     "default_value": false
@@ -148,7 +148,7 @@ class TweakAtZ(Script):
                 },
                 "g1_Tweak_flowrate":
                 {
-                    "label": "Tw. Flow Rate",
+                    "label": "Tweak Flow Rate",
                     "description": "Select if flow rate has to be tweaked",
                     "type": "bool",
                     "default_value": false
@@ -167,7 +167,7 @@ class TweakAtZ(Script):
                 },
                 "g3_Tweak_flowrateOne":
                 {
-                    "label": "Tw. Fl. Rate1",
+                    "label": "Tweak Flow Rate 1",
                     "description": "Select if first extruder flow rate has to be tweaked",
                     "type": "bool",
                     "default_value": false
@@ -175,7 +175,7 @@ class TweakAtZ(Script):
                 "g4_flowrateOne":
                 {
                     "label": "Flow Rate One",
-                    "description": "New Flow rate Ex.1",
+                    "description": "New Flow rate Extruder 1",
                     "unit": "%",
                     "type": "int",
                     "default_value": 100,
@@ -186,7 +186,7 @@ class TweakAtZ(Script):
                 },
                 "g5_Tweak_flowrateTwo":
                 {
-                    "label": "Tw. Fl. Rate2",
+                    "label": "Tweak Flow Rate 2",
                     "description": "Select if second extruder flow rate has to be tweaked",
                     "type": "bool",
                     "default_value": false
@@ -194,7 +194,7 @@ class TweakAtZ(Script):
                 "g6_flowrateTwo":
                 {
                     "label": "Flow Rate two",
-                    "description": "New Flow rate Ex.2",
+                    "description": "New Flow rate Extruder 2",
                     "unit": "%",
                     "type": "int",
                     "default_value": 100,
@@ -205,7 +205,7 @@ class TweakAtZ(Script):
                 },
                 "h1_Tweak_bedTemp":
                 {
-                    "label": "Tw. Bed Temp",
+                    "label": "Tweak Bed Temp",
                     "description": "Select if Bed Temperature has to be tweaked",
                     "type": "bool",
                     "default_value": false
@@ -224,14 +224,14 @@ class TweakAtZ(Script):
                 },
                 "i1_Tweak_extruderOne":
                 {
-                    "label": "Tw. Ex.1 Temp",
+                    "label": "Tweak Extruder 1 Temp",
                     "description": "Select if First Extruder Temperature has to be tweaked",
                     "type": "bool",
                     "default_value": false
                 },
                 "i2_extruderOne":
                 {
-                    "label": "Ex. 1 Temp",
+                    "label": "Extruder 1 Temp",
                     "description": "New First Extruder Temperature",
                     "unit": "C",
                     "type": "float",
@@ -243,14 +243,14 @@ class TweakAtZ(Script):
                 },
                 "i3_Tweak_extruderTwo":
                 {
-                    "label": "Tw. Ex.2 Temp",
+                    "label": "Tweak Extruder 2 Temp",
                     "description": "Select if Second Extruder Temperature has to be tweaked",
                     "type": "bool",
                     "default_value": false
                 },
                 "i4_extruderTwo":
                 {
-                    "label": "Ex. 2 Temp",
+                    "label": "Extruder 2 Temp",
                     "description": "New Second Extruder Temperature",
                     "unit": "C",
                     "type": "float",
@@ -262,7 +262,7 @@ class TweakAtZ(Script):
                 },
                 "j1_Tweak_fanSpeed":
                 {
-                    "label": "Tw. Fan Speed",
+                    "label": "Tweak Fan Speed",
                     "description": "Select if Fan Speed has to be tweaked",
                     "type": "bool",
                     "default_value": false
