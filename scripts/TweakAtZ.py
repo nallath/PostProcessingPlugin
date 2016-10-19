@@ -386,9 +386,9 @@ class TweakAtZ(Script):
                 if ";LAYER:" in line: #new layer no. found
                     if state == 0:
                         state = old["state"]
-                    layer = self.getValue(line, ";LAYER:", layer)
+                    layer = int(self.getValue(line, ";LAYER:", layer))
                     if targetL_i > -100000: #target selected by layer no.
-                        if (state == 2 or targetL_i == 0) and layer == targetL_i: #determine targetZ from layer no.; checks for tweak on layer 0
+                        if (state == 1 or targetL_i == 0) and layer == targetL_i: #determine targetZ from layer no.; checks for tweak on layer 0
                             state = 2
                             targetZ = z + 0.001
                 if (self.getValue(line, "T", None) is not None) and (self.getValue(line, "M", None) is None): #looking for single T-cmd
@@ -426,6 +426,7 @@ class TweakAtZ(Script):
                     if 'G1' in line and TweakPrintSpeed and (state==3 or state==4):
                         # check for pure print movement in target range:
                         if x != None and y != None and f != None and e != None and newZ==z:
+                            # TODO: fix printspeed. what should it be?
                             modified_gcode += "G1 F%d X%1.3f Y%1.3f E%1.5f\n" % (int(f/100.0*float(printspeed)),self.getValue(line,"X"),
                                                                           self.getValue(line,"Y"),self.getValue(line,"E"))
                         else: #G1 command but not a print movement

@@ -55,7 +55,7 @@ class PauseAtHeight(Script):
         park_x = self.getSettingValueByKey("head_park_x")
         park_y = self.getSettingValueByKey("head_park_y")
         layers_started = False
-        for layer in data: 
+        for layer in data:
             lines = layer.split("\n")
             for line in lines:
                 if ";LAYER:0" in line:
