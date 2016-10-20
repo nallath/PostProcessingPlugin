@@ -46,7 +46,7 @@ class PauseAtHeight(Script):
                 "extrude_amount":
                 {
                     "label": "Extrude amount",
-                    "description": "How much filament should be extruded after pause. This is usually only needed when printing with multiple materials that require different temperatures.",
+                    "description": "How much filament should be extruded after pause. This is needed when doing a material change on Ultimaker2's to compensate for the retraction after the change. In that case 128+ is recommended.",
                     "unit": "mm",
                     "type": "float",
                     "default_value": 0
