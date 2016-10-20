@@ -50,6 +50,14 @@ class PauseAtHeight(Script):
                     "unit": "mm",
                     "type": "float",
                     "default_value": 0
+                },
+                "redo_layers":
+                {
+                    "label": "Redo layers",
+                    "description": "Redo a number of previous layers after a pause to increases adhesion.",
+                    "unit": "layers",
+                    "type": "int",
+                    "default_value": 0
                 }
             }
         }"""
@@ -64,6 +72,7 @@ class PauseAtHeight(Script):
         park_x = self.getSettingValueByKey("head_park_x")
         park_y = self.getSettingValueByKey("head_park_y")
         layers_started = False
+        redo_layers = self.getSettingValueByKey("redo_layers")
         for layer in data:
             lines = layer.split("\n")
             for line in lines:
@@ -135,6 +144,12 @@ class PauseAtHeight(Script):
                             prepend_gcode +="G92 E%f\n" % (current_e)
 
                             layer = prepend_gcode + layer
+
+                            # include a number of previous layers
+                            for i in range(1, redo_layers + 1):
+                                prevLayer = data[index-i]
+                                layer = prevLayer + layer
+
                             data[index] = layer #Override the data of this layer with the modified data
                             return data
                         break
