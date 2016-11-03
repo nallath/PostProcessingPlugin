@@ -21,7 +21,7 @@ class PauseAtHeight(Script):
                 },
                 "head_park_x":
                 {
-                    "label": "Head park X",
+                    "label": "Park print head X",
                     "description": "What x location does the head move to when pausing.",
                     "unit": "mm",
                     "type": "float",
@@ -29,7 +29,7 @@ class PauseAtHeight(Script):
                 },
                 "head_park_y":
                 {
-                    "label": "Head park Y",
+                    "label": "Park print head Y",
                     "description": "What y location does the head move to when pausing.",
                     "unit": "mm",
                     "type": "float",
