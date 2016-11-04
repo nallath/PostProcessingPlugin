@@ -194,7 +194,7 @@ class TweakAtZ(Script):
                     "maximum_value_warning": "200",
                     "enabled": "g3_tweak_flowrate_one"
                 },
-                "g5_tweak_flowrate_Two":
+                "g5_tweak_flowrate_two":
                 {
                     "label": "Tweak Flow Rate 2",
                     "description": "Select if second extruder flow rate has to be tweaked",
@@ -230,7 +230,7 @@ class TweakAtZ(Script):
                     "minimum_value": "0",
                     "minimum_value_warning": "30",
                     "maximum_value_warning": "120",
-                    "enabled": "h1_Tweak_bed_temp"
+                    "enabled": "h1_tweak_bed_temp"
                 },
                 "i1_tweak_extruder_one":
                 {
@@ -357,9 +357,9 @@ class TweakAtZ(Script):
         except:
             tweak_layers = 1
 
-        pres_ext = 0
+        current_extruder = 0
         done_layers = 0
-        z = 0
+        z = None
         x = None
         y = None
         layer = -100000  # layer number may be negative (raft) but never that low
@@ -383,6 +383,8 @@ class TweakAtZ(Script):
             modified_gcode = ""
             lines = active_layer.split("\n")
             for line in lines:
+                if line == "":
+                    continue
                 if ";Generated with Cura_SteamEngine" in line:
                     num_tweaker_instances += 1
                     modified_gcode += ";TweakAtZ instances: %d\n" % num_tweaker_instances
@@ -391,31 +393,30 @@ class TweakAtZ(Script):
                 is_um2 = ("FLAVOR:UltiGCode" in line) or is_um2  # Flavor is Ulti-GCode!
                 if ";TweakAtZ-state" in line:  # Checks for state change comment
                     state = self.getValue(line, ";TweakAtZ-state", state)
-                if ";TweakAtZ instances:" in line:
+                elif ";TweakAtZ instances:" in line:
                     try:
                         temp_num_tweaker_instances = int(line[20:])
                     except:
                         temp_num_tweaker_instances = num_tweaker_instances
                     num_tweaker_instances = temp_num_tweaker_instances
-                if ";Small layer" in line:  # Checks for begin of Cool Head Lift
+                elif ";Small layer" in line:  # Checks for begin of Cool Head Lift
                     old["state"] = state
                     state = 0
-                if ";LAYER:" in line:  # New layer number found
+                elif ";LAYER:" in line:  # New layer number found
                     if state == 0:
                         state = old["state"]
-                    layer = int(self.getValue(line, ";LAYER:", layer))
                     if target_layer > -100000:  # Target selected by layer number
                         if (state == 1 or target_layer == 0) and layer == target_layer:  # Determine target_height from layer no.; checks for tweak on layer 0
                             state = 2
                             target_height = z + 0.001
                 if self.getValue(line, "T", None) is not None and self.getValue(line, "M", None) is None:  # Looking for single T-command
-                    pres_ext = self.getValue(line, "T", pres_ext)
+                    current_extruder = self.getValue(line, "T", current_extruder)
                 if "M190" in line or "M140" in line and state < 3:  # Looking for bed temp, stops after target z is passed
                     old["bed_temperature"] = self.getValue(line, "S", old["bed_temperature"])
                 if "M109" in line or "M104" in line and state < 3:  # Looking for extruder temp, stops after target z is passed
-                    if self.getValue(line, "T", pres_ext) == 0:
+                    if self.getValue(line, "T", current_extruder) == 0:
                         old["extruder_one"] = self.getValue(line, "S", old["extruder_one"])
-                    elif self.getValue(line, "T", pres_ext) == 1:
+                    elif self.getValue(line, "T", current_extruder) == 1:
                         old["extruder_two"] = self.getValue(line, "S", old["extruder_two"])
                 if "M107" in line:  # Fan is stopped; is always updated in order not to miss switch off for next object
                     old["fan_speed"] = 0
@@ -450,6 +451,7 @@ class TweakAtZ(Script):
                             modified_gcode += line + "\n"
                     # no tweaking on retraction hops which have no x and y coordinate:
                     if new_z != z and x is not None and y is not None:
+                        print("blarg", new_z, z)
                         z = new_z
                         if z < target_height and state == 1:
                             state = 2
