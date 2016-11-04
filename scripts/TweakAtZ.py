@@ -62,8 +62,8 @@ class TweakAtZ(Script):
             {
                 "a_trigger":
                 {
-                    "label": "Trigger",
-                    "description": "Trigger at height or at layer no.",
+                    "label": "Trigger type",
+                    "description": "Trigger at height or at layer number",
                     "type": "enum",
                     "options":
                     {
@@ -107,7 +107,7 @@ class TweakAtZ(Script):
                     },
                     "default_value": "keep_value"
                 },
-                "d_twLayers":
+                "d_num_tweak_Layers":
                 {
                     "label": "Number Layers",
                     "description": "Number of layers used to tweak",
@@ -118,7 +118,7 @@ class TweakAtZ(Script):
                     "maximum_value_warning": "50",
                     "enabled": "c_behavior == 'keep_value'"
                 },
-                "e1_Tweak_speed":
+                "e1_tweak_speed":
                 {
                     "label": "Tweak Speed",
                     "description": "Select if total speed (print and travel) has to be tweaked",
@@ -135,16 +135,16 @@ class TweakAtZ(Script):
                     "minimum_value": "1",
                     "minimum_value_warning": "10",
                     "maximum_value_warning": "200",
-                    "enabled": "e1_Tweak_speed"
+                    "enabled": "e1_tweak_speed"
                 },
-                "f1_Tweak_printspeed":
+                "f1_tweak_print_speed":
                 {
                     "label": "Tweak Print Speed",
                     "description": "Select if print speed has to be tweaked",
                     "type": "bool",
                     "default_value": false
                 },
-                "f2_printspeed":
+                "f2_print_speed":
                 {
                     "label": "Print Speed",
                     "description": "New print speed",
@@ -154,9 +154,9 @@ class TweakAtZ(Script):
                     "minimum_value": "1",
                     "minimum_value_warning": "10",
                     "maximum_value_warning": "200",
-                    "enabled": "f1_Tweak_printspeed"
+                    "enabled": "f1_tweak_print_speed"
                 },
-                "g1_Tweak_flowrate":
+                "g1_tweak_flowrate":
                 {
                     "label": "Tweak Flow Rate",
                     "description": "Select if flow rate has to be tweaked",
@@ -173,16 +173,16 @@ class TweakAtZ(Script):
                     "minimum_value": "1",
                     "minimum_value_warning": "10",
                     "maximum_value_warning": "200",
-                    "enabled": "g1_Tweak_flowrate"
+                    "enabled": "g1_tweak_flowrate"
                 },
-                "g3_Tweak_flowrateOne":
+                "g3_tweak_flowrate_one":
                 {
                     "label": "Tweak Flow Rate 1",
                     "description": "Select if first extruder flow rate has to be tweaked",
                     "type": "bool",
                     "default_value": false
                 },
-                "g4_flowrateOne":
+                "g4_flowrate_one":
                 {
                     "label": "Flow Rate One",
                     "description": "New Flow rate Extruder 1",
@@ -192,16 +192,16 @@ class TweakAtZ(Script):
                     "minimum_value": "1",
                     "minimum_value_warning": "10",
                     "maximum_value_warning": "200",
-                    "enabled": "g3_Tweak_flowrateOne"
+                    "enabled": "g3_tweak_flowrate_one"
                 },
-                "g5_Tweak_flowrateTwo":
+                "g5_tweak_flowrate_Two":
                 {
                     "label": "Tweak Flow Rate 2",
                     "description": "Select if second extruder flow rate has to be tweaked",
                     "type": "bool",
                     "default_value": false
                 },
-                "g6_flowrateTwo":
+                "g6_flowrate_two":
                 {
                     "label": "Flow Rate two",
                     "description": "New Flow rate Extruder 2",
@@ -211,16 +211,16 @@ class TweakAtZ(Script):
                     "minimum_value": "1",
                     "minimum_value_warning": "10",
                     "maximum_value_warning": "200",
-                    "enabled": "g5_Tweak_flowrateTwo"
+                    "enabled": "g5_tweak_flowrate_two"
                 },
-                "h1_Tweak_bedTemp":
+                "h1_tweak_bed_temp":
                 {
                     "label": "Tweak Bed Temp",
                     "description": "Select if Bed Temperature has to be tweaked",
                     "type": "bool",
                     "default_value": false
                 },
-                "h2_bedTemp":
+                "h2_bed_temp":
                 {
                     "label": "Bed Temp",
                     "description": "New Bed Temperature",
@@ -230,16 +230,16 @@ class TweakAtZ(Script):
                     "minimum_value": "0",
                     "minimum_value_warning": "30",
                     "maximum_value_warning": "120",
-                    "enabled": "h1_Tweak_bedTemp"
+                    "enabled": "h1_Tweak_bed_temp"
                 },
-                "i1_Tweak_extruderOne":
+                "i1_tweak_extruder_one":
                 {
                     "label": "Tweak Extruder 1 Temp",
                     "description": "Select if First Extruder Temperature has to be tweaked",
                     "type": "bool",
                     "default_value": false
                 },
-                "i2_extruderOne":
+                "i2_extruder_one":
                 {
                     "label": "Extruder 1 Temp",
                     "description": "New First Extruder Temperature",
@@ -249,16 +249,16 @@ class TweakAtZ(Script):
                     "minimum_value": "0",
                     "minimum_value_warning": "160",
                     "maximum_value_warning": "250",
-                    "enabled": "i1_Tweak_extruderOne"
+                    "enabled": "i1_tweak_extruder_one"
                 },
-                "i3_Tweak_extruderTwo":
+                "i3_tweak_extruder_two":
                 {
                     "label": "Tweak Extruder 2 Temp",
                     "description": "Select if Second Extruder Temperature has to be tweaked",
                     "type": "bool",
                     "default_value": false
                 },
-                "i4_extruderTwo":
+                "i4_extruder_two":
                 {
                     "label": "Extruder 2 Temp",
                     "description": "New Second Extruder Temperature",
@@ -268,16 +268,16 @@ class TweakAtZ(Script):
                     "minimum_value": "0",
                     "minimum_value_warning": "160",
                     "maximum_value_warning": "250",
-                    "enabled": "i3_Tweak_extruderTwo"
+                    "enabled": "i3_tweak_extruder_two"
                 },
-                "j1_Tweak_fanSpeed":
+                "j1_tweak_fan_speed":
                 {
                     "label": "Tweak Fan Speed",
                     "description": "Select if Fan Speed has to be tweaked",
                     "type": "bool",
                     "default_value": false
                 },
-                "j2_fanSpeed":
+                "j2_fan_speed":
                 {
                     "label": "Fan Speed",
                     "description": "New Fan Speed (0-255)",
@@ -287,7 +287,7 @@ class TweakAtZ(Script):
                     "minimum_value": "0",
                     "minimum_value_warning": "15",
                     "maximum_value_warning": "255",
-                    "enabled": "j1_Tweak_fanSpeed"
+                    "enabled": "j1_tweak_fan_speed"
                 }
             }
         }"""
@@ -315,38 +315,38 @@ class TweakAtZ(Script):
 
     def execute(self, data):
         # Check which tweaks should apply
-        tweak_properties = {"speed": self.getSettingValueByKey("e1_Tweak_speed"),
-                            "flowrate": self.getSettingValueByKey("g1_Tweak_flowrate"),
-                            "flowrate_one": self.getSettingValueByKey("g3_Tweak_flowrateOne"),
-                            "flowrate_two": self.getSettingValueByKey("g5_Tweak_flowrateTwo"),
-                            "bed_temperature": self.getSettingValueByKey("h1_Tweak_bedTemp"),
-                            "extruder_one": self.getSettingValueByKey("i1_Tweak_extruderOne"),
-                            "extruder_two": self.getSettingValueByKey("i3_Tweak_extruderTwo"),
-                            "fanSpeed": self.getSettingValueByKey("j1_Tweak_fanSpeed")}
+        tweak_properties = {"speed": self.getSettingValueByKey("e1_tweak_speed"),
+                            "flowrate": self.getSettingValueByKey("g1_tweak_flowrate"),
+                            "flowrate_one": self.getSettingValueByKey("g3_tweak_flowrate_one"),
+                            "flowrate_two": self.getSettingValueByKey("g5_tweak_flowrate_two"),
+                            "bed_temperature": self.getSettingValueByKey("h1_tweak_bed_temp"),
+                            "extruder_one": self.getSettingValueByKey("i1_tweak_extruder_one"),
+                            "extruder_two": self.getSettingValueByKey("i3_tweak_extruder_two"),
+                            "fan_speed": self.getSettingValueByKey("j1_tweak_fan_speed")}
 
-        tweak_print_speed = self.getSettingValueByKey("f1_Tweak_printspeed")
-        tweak_strings = {"speed": "M220 S%f\n",
+        tweak_print_speed = self.getSettingValueByKey("f1_tweak_print_speed")
+        tweak_gcodes = {"speed": "M220 S%f\n",
                          "flowrate": "M221 S%f\n",
                          "flowrate_one": "M221 T0 S%f\n",
                          "flowrate_two": "M221 T1 S%f\n",
                          "bed_temperature": "M140 S%f\n",
                          "extruder_one": "M104 S%f T0\n",
                          "extruder_two": "M104 S%f T1\n",
-                         "fanSpeed": "M106 S%d\n"}
+                         "fan_speed": "M106 S%d\n"}
 
         target_values = {"speed": self.getSettingValueByKey("e2_speed"),
                          "flowrate": self.getSettingValueByKey("g2_flowrate"),
-                         "flowrate_one": self.getSettingValueByKey("g4_flowrateOne"),
-                         "flowrate_two": self.getSettingValueByKey("g6_flowrateTwo"),
-                         "bed_temperature": self.getSettingValueByKey("h2_bedTemp"),
-                         "extruder_one": self.getSettingValueByKey("i2_extruderOne"),
-                         "extruder_two": self.getSettingValueByKey("i4_extruderTwo"),
-                         "fan_speed": self.getSettingValueByKey("j2_fanSpeed")}
+                         "flowrate_one": self.getSettingValueByKey("g4_flowrate_one"),
+                         "flowrate_two": self.getSettingValueByKey("g6_flowrate_two"),
+                         "bed_temperature": self.getSettingValueByKey("h2_bed_temp"),
+                         "extruder_one": self.getSettingValueByKey("i2_extruder_one"),
+                         "extruder_two": self.getSettingValueByKey("i4_extruder_two"),
+                         "fan_speed": self.getSettingValueByKey("j2_fan_speed")}
 
         # Fill dict with -1 (indicated undefined) old values
         old = {key: -1 for key, value in target_values.items()}
 
-        tweak_layers = self.getSettingValueByKey("d_twLayers")
+        tweak_layers = self.getSettingValueByKey("d_num_tweak_Layers")
         if self.getSettingValueByKey("c_behavior") == "single_layer":
             behavior = 1
         else:
@@ -386,8 +386,7 @@ class TweakAtZ(Script):
                 if ";Generated with Cura_SteamEngine" in line:
                     num_tweaker_instances += 1
                     modified_gcode += ";TweakAtZ instances: %d\n" % num_tweaker_instances
-                if not ("M84" in line or "M25" in line or ("G1" in line and tweak_print_speed and (state == 3 or state == 4)) or
-                                ";TweakAtZ instances:" in line):
+                if not ("M84" in line or "M25" in line or ("G1" in line and tweak_print_speed and (state == 3 or state == 4)) or ";TweakAtZ instances:" in line):
                     modified_gcode += line + "\n"
                 is_um2 = ("FLAVOR:UltiGCode" in line) or is_um2  # Flavor is Ulti-GCode!
                 if ";TweakAtZ-state" in line:  # Checks for state change comment
@@ -474,11 +473,11 @@ class TweakAtZ(Script):
                                     modified_gcode += ";TweakAtZ V%s: executed at Layer %d\n" % (self.version, layer)
                                     modified_gcode += "M117 Printing... tw@L%4d\n" % layer
                                 else:
-                                    modified_gcode += (";TweakAtZ V%s: executed at %1.2f mm\n" % (self.version, z))
+                                    modified_gcode += ";TweakAtZ V%s: executed at %1.2f mm\n" % (self.version, z)
                                     modified_gcode += "M117 Printing... tw@%5.1f\n" % z
                                 for key in tweak_properties:
                                     if tweak_properties[key]:
-                                        modified_gcode += tweak_strings[key] % float(old[key] + (float(target_values[key]) - float(old[key])) / float(tweak_layers) * float(done_layers + 1))
+                                        modified_gcode += tweak_gcodes[key] % float(old[key] + (float(target_values[key]) - float(old[key])) / float(tweak_layers) * float(done_layers + 1))
                                 done_layers += 1
                             else:
                                 state = 4
@@ -488,11 +487,11 @@ class TweakAtZ(Script):
                                     else:
                                         modified_gcode += ";TweakAtZ V%s: reset at %1.2f mm\n" % (self.version, z)
                                     if is_um2 and is_old_value_unknown:  # Executes on UM2 with Ulti-GCode and machine setting
-                                        modified_gcode += "M606 S%d;recalls saved settings\n" % (num_tweaker_instances - 1)
+                                        modified_gcode += "M606 S%d ;recalls saved settings\n" % (num_tweaker_instances - 1)
                                     else:  # Executes on RepRap, UM2 with Ulti-GCode and Cura setting
                                         for key in tweak_properties:
                                             if tweak_properties[key]:
-                                                modified_gcode += tweak_strings[key] % float(old[key])
+                                                modified_gcode += tweak_gcodes[key] % float(old[key])
                         # Re-activates the plugin if executed by pre-print G-command, resets settings:
                         if (z < target_height or layer == 0) and state >= 3:  # Resets if below tweak level or at level 0
                             state = 2
@@ -506,7 +505,7 @@ class TweakAtZ(Script):
                             else:  # executes on RepRap, UM2 with Ulti-GCode and Cura setting
                                 for key in tweak_properties:
                                     if tweak_properties[key]:
-                                        modified_gcode += tweak_strings[key] % float(old[key])
+                                        modified_gcode += tweak_gcodes[key] % float(old[key])
             data[index] = modified_gcode
             index += 1
         return data
