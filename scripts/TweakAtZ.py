@@ -45,8 +45,10 @@ from ..Script import Script
 #from UM.Logger import Logger
 import re
 
+
 class TweakAtZ(Script):
     version = "5.1"
+
     def __init__(self):
         super().__init__()
 
@@ -63,7 +65,11 @@ class TweakAtZ(Script):
                     "label": "Trigger",
                     "description": "Trigger at height or at layer no.",
                     "type": "enum",
-                    "options": {"height":"Height","layer_no":"Layer No."},
+                    "options":
+                    {
+                        "height":"Height",
+                        "layer_no":"Layer Number"
+                    },
                     "default_value": "height"
                 },
                 "b_targetZ":
@@ -94,13 +100,17 @@ class TweakAtZ(Script):
                     "label": "Behavior",
                     "description": "Select behavior: Tweak value and keep it for the rest, Tweak value for single layer only",
                     "type": "enum",
-                    "options": {"keep_value":"Keep value","single_layer":"Single Layer"},
+                    "options":
+                    {
+                        "keep_value": "Keep value",
+                        "single_layer":"Single Layer"
+                    },
                     "default_value": "keep_value"
                 },
                 "d_twLayers":
                 {
-                    "label": "No. Layers",
-                    "description": "No. of layers used to tweak",
+                    "label": "Number Layers",
+                    "description": "Number of layers used to tweak",
                     "unit": "",
                     "type": "int",
                     "default_value": 1,
@@ -282,19 +292,21 @@ class TweakAtZ(Script):
             }
         }"""
 
-    def getValue(self, line, key, default = None): #replace default getvalue due to comment-reading feature
-        if not key in line or (";" in line and line.find(key) > line.find(";") and
-                                   not ";TweakAtZ" in key and not ";LAYER:" in key):
+    # Replace default getValue due to comment-reading feature
+    def getValue(self, line, key, default = None):
+        if key not in line or (";" in line and line.find(key) > line.find(";") and ";TweakAtZ" not in key and ";LAYER:" not in key):
             return default
-        subPart = line[line.find(key) + len(key):] #allows for string lengths larger than 1
+
+        sub_part = line[line.find(key) + len(key):] # Allows for string lengths larger than 1
         if ";TweakAtZ" in key:
-            m = re.search("^[0-4]", subPart)
+            m = re.search("^[0-4]", sub_part)
         elif ";LAYER:" in key:
-            m = re.search("^[+-]?[0-9]*", subPart)
+            m = re.search("^[+-]?[0-9]*", sub_part)
         else:
-            #the minus at the beginning allows for negative values, e.g. for delta printers
-            m = re.search("^[-]?[0-9]+\.?[0-9]*", subPart)
-        if m == None:
+            # The minus at the beginning allows for negative values, e.g. for delta printers
+            m = re.search("^[-]?[0-9]+\.?[0-9]*", sub_part)
+
+        if m is None:
             return default
         try:
             return float(m.group(0))
@@ -302,193 +314,199 @@ class TweakAtZ(Script):
             return default
 
     def execute(self, data):
-        #Check which tweaks should apply
-        TweakProp = {"speed": self.getSettingValueByKey("e1_Tweak_speed"),
-             "flowrate": self.getSettingValueByKey("g1_Tweak_flowrate"),
-             "flowrateOne": self.getSettingValueByKey("g3_Tweak_flowrateOne"),
-             "flowrateTwo": self.getSettingValueByKey("g5_Tweak_flowrateTwo"),
-             "bedTemp": self.getSettingValueByKey("h1_Tweak_bedTemp"),
-             "extruderOne": self.getSettingValueByKey("i1_Tweak_extruderOne"),
-             "extruderTwo": self.getSettingValueByKey("i3_Tweak_extruderTwo"),
-             "fanSpeed": self.getSettingValueByKey("j1_Tweak_fanSpeed")}
-        TweakPrintSpeed = self.getSettingValueByKey("f1_Tweak_printspeed")
-        TweakStrings = {"speed": "M220 S%f\n",
-            "flowrate": "M221 S%f\n",
-            "flowrateOne": "M221 T0 S%f\n",
-            "flowrateTwo": "M221 T1 S%f\n",
-            "bedTemp": "M140 S%f\n",
-            "extruderOne": "M104 S%f T0\n",
-            "extruderTwo": "M104 S%f T1\n",
-            "fanSpeed": "M106 S%d\n"}
+        # Check which tweaks should apply
+        tweak_properties = {"speed": self.getSettingValueByKey("e1_Tweak_speed"),
+                            "flowrate": self.getSettingValueByKey("g1_Tweak_flowrate"),
+                            "flowrateOne": self.getSettingValueByKey("g3_Tweak_flowrateOne"),
+                            "flowrateTwo": self.getSettingValueByKey("g5_Tweak_flowrateTwo"),
+                            "bedTemp": self.getSettingValueByKey("h1_Tweak_bedTemp"),
+                            "extruderOne": self.getSettingValueByKey("i1_Tweak_extruderOne"),
+                            "extruderTwo": self.getSettingValueByKey("i3_Tweak_extruderTwo"),
+                            "fanSpeed": self.getSettingValueByKey("j1_Tweak_fanSpeed")}
+
+        tweak_print_speed = self.getSettingValueByKey("f1_Tweak_printspeed")
+        tweak_strings = {"speed": "M220 S%f\n",
+                         "flowrate": "M221 S%f\n",
+                         "flowrateOne": "M221 T0 S%f\n",
+                         "flowrateTwo": "M221 T1 S%f\n",
+                         "bedTemp": "M140 S%f\n",
+                         "extruderOne": "M104 S%f T0\n",
+                         "extruderTwo": "M104 S%f T1\n",
+                         "fanSpeed": "M106 S%d\n"}
+
         target_values = {"speed": self.getSettingValueByKey("e2_speed"),
-             "flowrate": self.getSettingValueByKey("g2_flowrate"),
-             "flowrateOne": self.getSettingValueByKey("g4_flowrateOne"),
-             "flowrateTwo": self.getSettingValueByKey("g6_flowrateTwo"),
-             "bedTemp": self.getSettingValueByKey("h2_bedTemp"),
-             "extruderOne": self.getSettingValueByKey("i2_extruderOne"),
-             "extruderTwo": self.getSettingValueByKey("i4_extruderTwo"),
-             "fanSpeed": self.getSettingValueByKey("j2_fanSpeed")}
+                         "flowrate": self.getSettingValueByKey("g2_flowrate"),
+                         "flowrateOne": self.getSettingValueByKey("g4_flowrateOne"),
+                         "flowrateTwo": self.getSettingValueByKey("g6_flowrateTwo"),
+                         "bedTemp": self.getSettingValueByKey("h2_bedTemp"),
+                         "extruderOne": self.getSettingValueByKey("i2_extruderOne"),
+                         "extruderTwo": self.getSettingValueByKey("i4_extruderTwo"),
+                         "fanSpeed": self.getSettingValueByKey("j2_fanSpeed")}
+
         old = {"speed": -1, "flowrate": -1, "flowrateOne": -1, "flowrateTwo": -1, "platformTemp": -1, "extruderOne": -1,
-            "extruderTwo": -1, "bedTemp": -1, "fanSpeed": -1, "state": -1}
-        twLayers = self.getSettingValueByKey("d_twLayers")
+               "extruderTwo": -1, "bedTemp": -1, "fanSpeed": -1, "state": -1}
+
+        tweak_layers = self.getSettingValueByKey("d_twLayers")
         if self.getSettingValueByKey("c_behavior") == "single_layer":
             behavior = 1
         else:
             behavior = 0
+
         try:
-            twLayers = max(int(twLayers),1) #for the case someone entered something as "funny" as -1
+            tweak_layers = max(int(tweak_layers), 1)  # For the case someone entered something as "funny" as -1
         except:
-            twLayers = 1
+            tweak_layers = 1
+
         pres_ext = 0
         done_layers = 0
         z = 0
         x = None
         y = None
-        layer = -100000 #layer no. may be negative (raft) but never that low
+        layer = -100000  # layer number may be negative (raft) but never that low
         # state 0: deactivated, state 1: activated, state 2: active, but below z,
         # state 3: active and partially executed (multi layer), state 4: active and passed z
         state = 1
-        # IsUM2: Used for reset of values (ok for Marlin/Sprinter),
+        # is_um2: Used for reset of values (ok for Marlin/Sprinter),
         # has to be set to 1 for UltiGCode (work-around for missing default values)
-        IsUM2 = False
-        oldValueUnknown = False
-        TWinstances = 0
+        is_um2 = False
+        is_old_value_unknown = False
+        num_tweaker_instances = 0
 
         if self.getSettingValueByKey("a_trigger") == "layer_no":
-            targetL_i = int(self.getSettingValueByKey("b_targetL"))
-            targetZ = 100000
+            target_layer = int(self.getSettingValueByKey("b_targetL"))
+            target_height = 100000
         else:
-            targetL_i = -100000
-            targetZ = self.getSettingValueByKey("b_targetZ")
+            target_layer = -100000
+            target_height = self.getSettingValueByKey("b_targetZ")
         index = 0
         for active_layer in data:
             modified_gcode = ""
             lines = active_layer.split("\n")
             for line in lines:
                 if ";Generated with Cura_SteamEngine" in line:
-                    TWinstances += 1
-                    modified_gcode += ";TweakAtZ instances: %d\n" % TWinstances
-                if not ("M84" in line or "M25" in line or ("G1" in line and TweakPrintSpeed and (state==3 or state==4)) or
+                    num_tweaker_instances += 1
+                    modified_gcode += ";TweakAtZ instances: %d\n" % num_tweaker_instances
+                if not ("M84" in line or "M25" in line or ("G1" in line and tweak_print_speed and (state == 3 or state == 4)) or
                                 ";TweakAtZ instances:" in line):
                     modified_gcode += line + "\n"
-                IsUM2 = ("FLAVOR:UltiGCode" in line) or IsUM2 #Flavor is UltiGCode!
-                if ";TweakAtZ-state" in line: #checks for state change comment
+                is_um2 = ("FLAVOR:UltiGCode" in line) or is_um2  # Flavor is Ulti-GCode!
+                if ";TweakAtZ-state" in line:  # Checks for state change comment
                     state = self.getValue(line, ";TweakAtZ-state", state)
                 if ";TweakAtZ instances:" in line:
                     try:
-                        tempTWi = int(line[20:])
+                        temp_num_tweaker_instances = int(line[20:])
                     except:
-                        tempTWi = TWinstances
-                    TWinstances = tempTWi
-                if ";Small layer" in line: #checks for begin of Cool Head Lift
+                        temp_num_tweaker_instances = num_tweaker_instances
+                    num_tweaker_instances = temp_num_tweaker_instances
+                if ";Small layer" in line:  # Checks for begin of Cool Head Lift
                     old["state"] = state
                     state = 0
-                if ";LAYER:" in line: #new layer no. found
+                if ";LAYER:" in line:  # New layer number found
                     if state == 0:
                         state = old["state"]
                     layer = int(self.getValue(line, ";LAYER:", layer))
-                    if targetL_i > -100000: #target selected by layer no.
-                        if (state == 1 or targetL_i == 0) and layer == targetL_i: #determine targetZ from layer no.; checks for tweak on layer 0
+                    if target_layer > -100000:  # Target selected by layer number
+                        if (state == 1 or target_layer == 0) and layer == target_layer:  # Determine target_height from layer no.; checks for tweak on layer 0
                             state = 2
-                            targetZ = z + 0.001
-                if (self.getValue(line, "T", None) is not None) and (self.getValue(line, "M", None) is None): #looking for single T-cmd
+                            target_height = z + 0.001
+                if self.getValue(line, "T", None) is not None and self.getValue(line, "M", None) is None:  # Looking for single T-command
                     pres_ext = self.getValue(line, "T", pres_ext)
-                if "M190" in line or "M140" in line and state < 3: #looking for bed temp, stops after target z is passed
+                if "M190" in line or "M140" in line and state < 3:  # Looking for bed temp, stops after target z is passed
                     old["bedTemp"] = self.getValue(line, "S", old["bedTemp"])
-                if "M109" in line or "M104" in line and state < 3: #looking for extruder temp, stops after target z is passed
+                if "M109" in line or "M104" in line and state < 3:  # Looking for extruder temp, stops after target z is passed
                     if self.getValue(line, "T", pres_ext) == 0:
                         old["extruderOne"] = self.getValue(line, "S", old["extruderOne"])
                     elif self.getValue(line, "T", pres_ext) == 1:
                         old["extruderTwo"] = self.getValue(line, "S", old["extruderTwo"])
-                if "M107" in line: #fan is stopped; is always updated in order not to miss switch off for next object
+                if "M107" in line:  # Fan is stopped; is always updated in order not to miss switch off for next object
                     old["fanSpeed"] = 0
-                if "M106" in line and state < 3: #looking for fan speed
+                if "M106" in line and state < 3:  # Looking for fan speed
                     old["fanSpeed"] = self.getValue(line, "S", old["fanSpeed"])
-                if "M221" in line and state < 3: #looking for flow rate
-                    tmp_extruder = self.getValue(line,"T",None)
-                    if tmp_extruder == None: #check if extruder is specified
+                if "M221" in line and state < 3:  # Looking for flow rate
+                    target_extruder = self.getValue(line, "T", None)
+                    if target_extruder is None:  # Check if extruder is specified
                         old["flowrate"] = self.getValue(line, "S", old["flowrate"])
-                    elif tmp_extruder == 0: #first extruder
+                    elif target_extruder == 0:  # First extruder
                         old["flowrateOne"] = self.getValue(line, "S", old["flowrateOne"])
-                    elif tmp_extruder == 1: #second extruder
-                        old["flowrateOne"] = self.getValue(line, "S", old["flowrateOne"])
-                if ("M84" in line or "M25" in line):
-                    if state>0 and TweakProp["speed"]: #"finish" commands for UM Original and UM2
+                    elif target_extruder == 1:  # Second extruder
+                        old["flowrateTwo"] = self.getValue(line, "S", old["flowrateTwo"])
+                if "M84" in line or "M25" in line:
+                    if state > 0 and tweak_properties["speed"]:  # "finish" commands for UM Original and UM2
                         modified_gcode += "M220 S100 ; speed reset to 100% at the end of print\n"
                         modified_gcode += "M117                     \n"
                     modified_gcode += line + "\n"
                 if "G1" in line or "G0" in line:
-                    newZ = self.getValue(line, "Z", z)
+                    new_z = self.getValue(line, "Z", z)
                     x = self.getValue(line, "X", None)
                     y = self.getValue(line, "Y", None)
                     e = self.getValue(line, "E", None)
                     f = self.getValue(line, "F", None)
-                    if 'G1' in line and TweakPrintSpeed and (state==3 or state==4):
+                    if 'G1' in line and tweak_print_speed and (state == 3 or state == 4):
                         # check for pure print movement in target range:
-                        if x != None and y != None and f != None and e != None and newZ==z:
+                        if x is not None and y is not None and f is not None and e is not None and new_z == z:
                             # TODO: fix printspeed. what should it be?
-                            modified_gcode += "G1 F%d X%1.3f Y%1.3f E%1.5f\n" % (int(f/100.0*float(printspeed)),self.getValue(line,"X"),
-                                                                          self.getValue(line,"Y"),self.getValue(line,"E"))
-                        else: #G1 command but not a print movement
+                            modified_gcode += "G1 F%d X%1.3f Y%1.3f E%1.5f\n" % (int(f / 100.0 * float(printspeed)), self.getValue(line, "X"),
+                                                                          self.getValue(line, "Y"), self.getValue(line, "E"))
+                        else:  # G1 command but not a print movement
                             modified_gcode += line + "\n"
                     # no tweaking on retraction hops which have no x and y coordinate:
-                    if (newZ != z) and (x is not None) and (y is not None):
-                        z = newZ
-                        if z < targetZ and state == 1:
+                    if new_z != z and x is not None and y is not None:
+                        z = new_z
+                        if z < target_height and state == 1:
                             state = 2
-                        if z >= targetZ and state == 2:
+                        if z >= target_height and state == 2:
                             state = 3
                             done_layers = 0
-                            for key in TweakProp:
-                                if TweakProp[key] and old[key]==-1: #old value is not known
-                                    oldValueUnknown = True
-                            if oldValueUnknown: #the tweaking has to happen within one layer
-                                twLayers = 1
-                                if IsUM2: #Parameters have to be stored in the printer (UltiGCode=UM2)
-                                    modified_gcode += "M605 S%d;stores parameters before tweaking\n" % (TWinstances-1)
-                            if behavior == 1: #single layer tweak only and then reset
-                                twLayers = 1
-                            if TweakPrintSpeed and behavior == 0:
-                                twLayers = done_layers + 1
-                        if state==3:
-                            if twLayers-done_layers>0: #still layers to go?
-                                if targetL_i > -100000:
-                                    modified_gcode += ";TweakAtZ V%s: executed at Layer %d\n" % (self.version,layer)
+                            for key in tweak_properties:
+                                if tweak_properties[key] and old[key] == -1:  # old value is not known
+                                    is_old_value_unknown = True
+                            if is_old_value_unknown:  # The tweaking has to happen within one layer
+                                tweak_layers = 1
+                                if is_um2:  # Parameters have to be stored in the printer (UltiGCode=UM2)
+                                    modified_gcode += "M605 S%d;stores parameters before tweaking\n" % (num_tweaker_instances - 1)
+                            if behavior == 1:  # Single layer tweak only and then reset
+                                tweak_layers = 1
+                            if tweak_print_speed and behavior == 0:
+                                tweak_layers = done_layers + 1
+                        if state == 3:
+                            if tweak_layers - done_layers > 0: # Still layers to go?
+                                if target_layer > -100000:
+                                    modified_gcode += ";TweakAtZ V%s: executed at Layer %d\n" % (self.version, layer)
                                     modified_gcode += "M117 Printing... tw@L%4d\n" % layer
                                 else:
-                                    modified_gcode += (";TweakAtZ V%s: executed at %1.2f mm\n" % (self.version,z))
+                                    modified_gcode += (";TweakAtZ V%s: executed at %1.2f mm\n" % (self.version, z))
                                     modified_gcode += "M117 Printing... tw@%5.1f\n" % z
-                                for key in TweakProp:
-                                    if TweakProp[key]:
-                                        modified_gcode += TweakStrings[key] % float(old[key]+(float(target_values[key])-float(old[key]))/float(twLayers)*float(done_layers+1))
+                                for key in tweak_properties:
+                                    if tweak_properties[key]:
+                                        modified_gcode += tweak_strings[key] % float(old[key] + (float(target_values[key]) - float(old[key])) / float(tweak_layers) * float(done_layers + 1))
                                 done_layers += 1
                             else:
                                 state = 4
-                                if behavior == 1: #reset values after one layer
-                                    if targetL_i > -100000:
-                                        modified_gcode += ";TweakAtZ V%s: reset on Layer %d\n" % (self.version,layer)
+                                if behavior == 1:  # Reset values after one layer
+                                    if target_layer > -100000:
+                                        modified_gcode += ";TweakAtZ V%s: reset on Layer %d\n" % (self.version, layer)
                                     else:
-                                        modified_gcode += ";TweakAtZ V%s: reset at %1.2f mm\n" % (self.version,z)
-                                    if IsUM2 and oldValueUnknown: #executes on UM2 with Ultigcode and machine setting
-                                        modified_gcode += "M606 S%d;recalls saved settings\n" % (TWinstances-1)
-                                    else: #executes on RepRap, UM2 with Ultigcode and Cura setting
-                                        for key in TweakProp:
-                                            if TweakProp[key]:
-                                                modified_gcode += TweakStrings[key] % float(old[key])
-                        # re-activates the plugin if executed by pre-print G-command, resets settings:
-                        if (z < targetZ or layer == 0) and state >= 3: #resets if below tweak level or at level 0
+                                        modified_gcode += ";TweakAtZ V%s: reset at %1.2f mm\n" % (self.version, z)
+                                    if is_um2 and is_old_value_unknown:  # Executes on UM2 with Ulti-GCode and machine setting
+                                        modified_gcode += "M606 S%d;recalls saved settings\n" % (num_tweaker_instances - 1)
+                                    else: # Executes on RepRap, UM2 with Ulti-GCode and Cura setting
+                                        for key in tweak_properties:
+                                            if tweak_properties[key]:
+                                                modified_gcode += tweak_strings[key] % float(old[key])
+                        # Re-activates the plugin if executed by pre-print G-command, resets settings:
+                        if (z < target_height or layer == 0) and state >= 3:  # Resets if below tweak level or at level 0
                             state = 2
                             done_layers = 0
-                            if targetL_i > -100000:
-                                modified_gcode += ";TweakAtZ V%s: reset below Layer %d\n" % (self.version,targetL_i)
+                            if target_layer > -100000:
+                                modified_gcode += ";TweakAtZ V%s: reset below Layer %d\n" % (self.version,target_layer)
                             else:
-                                modified_gcode += ";TweakAtZ V%s: reset below %1.2f mm\n" % (self.version,targetZ)
-                            if IsUM2 and oldValueUnknown: #executes on UM2 with Ultigcode and machine setting
-                                modified_gcode += "M606 S%d;recalls saved settings\n" % (TWinstances-1)
-                            else: #executes on RepRap, UM2 with Ultigcode and Cura setting
-                                for key in TweakProp:
-                                    if TweakProp[key]:
-                                        modified_gcode += TweakStrings[key] % float(old[key])
+                                modified_gcode += ";TweakAtZ V%s: reset below %1.2f mm\n" % (self.version,target_height)
+                            if is_um2 and is_old_value_unknown:  # Executes on UM2 with Ulti-GCode and machine setting
+                                modified_gcode += "M606 S%d;recalls saved settings\n" % (num_tweaker_instances-1)
+                            else:  # executes on RepRap, UM2 with Ulti-GCode and Cura setting
+                                for key in tweak_properties:
+                                    if tweak_properties[key]:
+                                        modified_gcode += tweak_strings[key] % float(old[key])
             data[index] = modified_gcode
             index += 1
         return data
