@@ -61,8 +61,8 @@ class PostProcessingPlugin(QObject, Extension):
                     for script in self._script_list:
                         try:
                             gcode_list = script.execute(gcode_list)
-                        except Exception as e:
-                            Logger.logException("e", "Script raised the following exception %s", str(e))
+                        except Exception:
+                            Logger.logException("e", "Exception in post-processing script.")
                     if len(self._script_list):  # Add comment to g-code if any changes were made.
                         gcode_list[0] += ";POSTPROCESSED\n"
                     setattr(scene, "gcode_list", gcode_list)
