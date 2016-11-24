@@ -293,7 +293,7 @@ class TweakAtZ(Script):
             m = re.search("^[+-]?[0-9]*", subPart)
         else:
             #the minus at the beginning allows for negative values, e.g. for delta printers
-            m = re.search("^[-]?[0-9]+\.?[0-9]*", subPart)
+            m = re.search("^[-]?[0-9]*\.?[0-9]*", subPart)
         if m == None:
             return default
         try:
