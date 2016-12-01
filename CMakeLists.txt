@@ -8,6 +8,7 @@ install(FILES
     __init__.py
     PostProcessingPlugin.py
     PostProcessingPlugin.qml
+    postprocessing.svg
     Script.py
     LICENSE
     README.md
