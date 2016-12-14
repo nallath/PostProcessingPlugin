@@ -34,7 +34,6 @@ class PostProcessingPlugin(QObject, Extension):
         self._selected_script_index = -1
 
         Application.getInstance().getOutputDeviceManager().writeStarted.connect(self.execute)
-        self.scriptListChanged.connect(Application.getInstance().getBackend().forceSlice)
 
     selectedIndexChanged = pyqtSignal()
     @pyqtProperty("QVariant", notify = selectedIndexChanged)
@@ -144,7 +143,6 @@ class PostProcessingPlugin(QObject, Extension):
     def addScriptToList(self, key):
         Logger.log("d", "Adding script %s to list.", key)
         new_script = self._loaded_scripts[key]()
-        new_script.valueChanged.connect(Application.getInstance().getBackend().forceSlice)
         self._script_list.append(new_script)
         self.setSelectedScriptIndex(len(self._script_list) - 1)
         self.scriptListChanged.emit()
