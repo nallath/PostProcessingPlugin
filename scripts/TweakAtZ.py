@@ -52,7 +52,7 @@ class TweakAtZ(Script):
 
     def getSettingDataString(self):
         return """{
-            "name":"TweakAtZ """ + self.version + """",
+            "name":"TweakAtZ """ + self.version + """ (Experimental)",
             "key":"TweakAtZ",
             "metadata": {},
             "version": 2,
