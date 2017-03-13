@@ -13,7 +13,7 @@ class PauseAtHeight(Script):
             {
                 "pause_height":
                 {
-                    "label": "Pause height",
+                    "label": "Pause Height",
                     "description": "At what height should the pause occur",
                     "unit": "mm",
                     "type": "float",
@@ -21,16 +21,16 @@ class PauseAtHeight(Script):
                 },
                 "head_park_x":
                 {
-                    "label": "Park print head X",
-                    "description": "What x location does the head move to when pausing.",
+                    "label": "Park Print Head X",
+                    "description": "What X location does the head move to when pausing.",
                     "unit": "mm",
                     "type": "float",
                     "default_value": 190
                 },
                 "head_park_y":
                 {
-                    "label": "Park print head Y",
-                    "description": "What y location does the head move to when pausing.",
+                    "label": "Park Print Head Y",
+                    "description": "What Y location does the head move to when pausing.",
                     "unit": "mm",
                     "type": "float",
                     "default_value": 190
@@ -38,22 +38,38 @@ class PauseAtHeight(Script):
                 "retraction_amount":
                 {
                     "label": "Retraction",
-                    "description": "How much fillament must be retracted at pause.",
+                    "description": "How much filament must be retracted at pause.",
                     "unit": "mm",
                     "type": "float",
                     "default_value": 0
                 },
+                "retraction_speed":
+                {
+                    "label": "Retraction Speed",
+                    "description": "How fast to retract the filament.",
+                    "unit": "mm/s",
+                    "type": "float",
+                    "default_value": 25
+                }
                 "extrude_amount":
                 {
-                    "label": "Extrude amount",
+                    "label": "Extrude Amount",
                     "description": "How much filament should be extruded after pause. This is needed when doing a material change on Ultimaker2's to compensate for the retraction after the change. In that case 128+ is recommended.",
                     "unit": "mm",
                     "type": "float",
                     "default_value": 0
                 },
+                "extrude_speed":
+                {
+                    "label": "Extrude Speed",
+                    "description": "How fast to extrude the material after pause."
+                    "unit": "mm/s",
+                    "type": "float",
+                    "default_value": 3.3333
+                }
                 "redo_layers":
                 {
-                    "label": "Redo layers",
+                    "label": "Redo Layers",
                     "description": "Redo a number of previous layers after a pause to increases adhesion.",
                     "unit": "layers",
                     "type": "int",
@@ -68,7 +84,9 @@ class PauseAtHeight(Script):
         current_z = 0.
         pause_z = self.getSettingValueByKey("pause_height")
         retraction_amount = self.getSettingValueByKey("retraction_amount")
+        retraction_speed = self.getSettingValueByKey("retraction_speed")
         extrude_amount = self.getSettingValueByKey("extrude_amount")
+        extrude_speed = self.getSettingValueByKey("extrude_speed")
         park_x = self.getSettingValueByKey("head_park_x")
         park_y = self.getSettingValueByKey("head_park_y")
         layers_started = False
@@ -107,7 +125,7 @@ class PauseAtHeight(Script):
                             #Retraction
                             prepend_gcode += "M83\n"
                             if retraction_amount != 0:
-                                prepend_gcode += "G1 E-%f F6000\n" % (retraction_amount)
+                                prepend_gcode += "G1 E-%f F%f\n" % (retraction_amount, retraction_speed * 60)
 
                             #Move the head away
                             prepend_gcode += "G1 Z%f F300\n" % (current_z + 1)
@@ -122,21 +140,21 @@ class PauseAtHeight(Script):
 
                             #Push the filament back,
                             if retraction_amount != 0:
-                                prepend_gcode += "G1 E%f F6000\n" % (retraction_amount)
+                                prepend_gcode += "G1 E%f F%f\n" % (retraction_amount, retraction_speed * 60)
 
                             # Optionally extrude material
                             if extrude_amount != 0:
-                                prepend_gcode += "G1 E%f F200\n" % (extrude_amount)
+                                prepend_gcode += "G1 E%f F%f\n" % (extrude_amount, extrude_speed * 60)
 
                             # and retract again, the properly primes the nozzle when changing filament.
                             if retraction_amount != 0:
-                                prepend_gcode += "G1 E-%f F6000\n" % (retraction_amount)
+                                prepend_gcode += "G1 E-%f F%f\n" % (retraction_amount, retraction_speed * 60)
 
                             #Move the head back
                             prepend_gcode += "G1 Z%f F300\n" % (current_z + 1)
                             prepend_gcode +="G1 X%f Y%f F9000\n" % (x, y)
                             if retraction_amount != 0:
-                                prepend_gcode +="G1 E%f F6000\n" % (retraction_amount)
+                                prepend_gcode +="G1 E%f F%f\n" % (retraction_amount, retraction_speed * 60)
                             prepend_gcode +="G1 F9000\n"
                             prepend_gcode +="M82\n"
 
