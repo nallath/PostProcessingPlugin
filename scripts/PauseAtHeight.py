@@ -50,7 +50,7 @@ class PauseAtHeight(Script):
                     "unit": "mm/s",
                     "type": "float",
                     "default_value": 25
-                }
+                },
                 "extrude_amount":
                 {
                     "label": "Extrude Amount",
@@ -62,11 +62,11 @@ class PauseAtHeight(Script):
                 "extrude_speed":
                 {
                     "label": "Extrude Speed",
-                    "description": "How fast to extrude the material after pause."
+                    "description": "How fast to extrude the material after pause.",
                     "unit": "mm/s",
                     "type": "float",
                     "default_value": 3.3333
-                }
+                },
                 "redo_layers":
                 {
                     "label": "Redo Layers",
