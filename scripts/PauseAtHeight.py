@@ -85,7 +85,7 @@ class PauseAtHeight(Script):
         x = 0.
         y = 0.
         current_z = 0.
-        pause_z = self.getSettingValueByKey("pause_height")
+        pause_height = self.getSettingValueByKey("pause_height")
         retraction_amount = self.getSettingValueByKey("retraction_amount")
         retraction_speed = self.getSettingValueByKey("retraction_speed")
         extrude_amount = self.getSettingValueByKey("extrude_amount")
@@ -95,6 +95,9 @@ class PauseAtHeight(Script):
         layers_started = False
         redo_layers = self.getSettingValueByKey("redo_layers")
 
+        # use offset to calculate the current height: <current_height> = <current_z> - <layer_0_z>
+        layer_0_z = 0.
+        got_first_g_cmd_on_layer_0 = False
         for layer in data:
             lines = layer.split("\n")
             for line in lines:
@@ -107,11 +110,15 @@ class PauseAtHeight(Script):
 
                 if self.getValue(line, 'G') == 1 or self.getValue(line, 'G') == 0:
                     current_z = self.getValue(line, 'Z')
+                    if not got_first_g_cmd_on_layer_0:
+                        layer_0_z = current_z
+                        got_first_g_cmd_on_layer_0 = True
+
                     x = self.getValue(line, 'X', x)
                     y = self.getValue(line, 'Y', y)
                     if current_z is not None:
-                        if current_z >= pause_z:
-
+                        current_height = current_z - layer_0_z
+                        if current_height >= pause_height:
                             index = data.index(layer)
                             prevLayer = data[index - 1]
                             prevLines = prevLayer.split("\n")
@@ -129,7 +136,8 @@ class PauseAtHeight(Script):
                             prepend_gcode = ";TYPE:CUSTOM\n"
                             prepend_gcode += ";added code by post processing\n"
                             prepend_gcode += ";script: PauseAtHeight.py\n"
-                            prepend_gcode += ";current z: %f \n" % (current_z)
+                            prepend_gcode += ";current z: %f \n" % current_z
+                            prepend_gcode += ";current height: %f \n" % current_height
 
                             # Retraction
                             prepend_gcode += "M83\n"
