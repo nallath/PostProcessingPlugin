@@ -86,7 +86,8 @@ class PostProcessingPlugin(QObject, Extension):
             self._script_list[new_index], self._script_list[index] = self._script_list[index], self._script_list[new_index]
             self.scriptListChanged.emit()
             self.selectedIndexChanged.emit() #Ensure that settings are updated
-    
+            self._propertyChanged()
+
     ##  Remove a script from the active script list by index.
     @pyqtSlot(int)
     def removeScriptByIndex(self, index):
@@ -95,7 +96,8 @@ class PostProcessingPlugin(QObject, Extension):
             self._selected_script_index = len(self._script_list) - 1
         self.scriptListChanged.emit()
         self.selectedIndexChanged.emit()  # Ensure that settings are updated
-    
+        self._propertyChanged()
+
     ##  Load all scripts from provided path.
     #   This should probably only be done on init.
     #   \param path Path to check for scripts.
@@ -146,6 +148,7 @@ class PostProcessingPlugin(QObject, Extension):
         self._script_list.append(new_script)
         self.setSelectedScriptIndex(len(self._script_list) - 1)
         self.scriptListChanged.emit()
+        self._propertyChanged()
     
     ##  Creates the view used by show popup. The view is saved because of the fairly aggressive garbage collection.
     def _createView(self):
@@ -173,3 +176,12 @@ class PostProcessingPlugin(QObject, Extension):
         if self._view is None:
             self._createView()
         self._view.show()
+
+    ##  Property changed: trigger reslice
+    #   To do this we use the global container stack propertyChanged.
+    #   Reslicing is necessary for setting changes in this plugin, because the changes
+    #   are applied only once per "fresh" gcode
+    def _propertyChanged(self):
+        global_container_stack = Application.getInstance().getGlobalContainerStack()
+        global_container_stack.propertyChanged.emit("post_processing_plugin", "value")
+

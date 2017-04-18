@@ -5,6 +5,7 @@ from UM.Signal import Signal, signalemitter
 from UM.i18n import i18nCatalog
 
 # Setting stuff import
+from UM.Application import Application
 from UM.Settings.ContainerStack import ContainerStack
 from UM.Settings.InstanceContainer import InstanceContainer
 from UM.Settings.DefinitionContainer import DefinitionContainer
@@ -53,6 +54,13 @@ class Script:
     def _onPropertyChanged(self, key, property_name):
         if property_name == "value":
             self.valueChanged.emit()
+
+            # Property changed: trigger reslice
+            # To do this we use the global container stack propertyChanged.
+            # Reslicing is necessary for setting changes in this plugin, because the changes
+            # are applied only once per "fresh" gcode
+            global_container_stack = Application.getInstance().getGlobalContainerStack()
+            global_container_stack.propertyChanged.emit(key, property_name)
 
     ##  Needs to return a dict that can be used to construct a settingcategory file.
     #   See the example script for an example.
