@@ -74,6 +74,22 @@ class PauseAtHeight(Script):
                     "unit": "layers",
                     "type": "int",
                     "default_value": 0
+                },
+                "standby_temperature":
+                {
+                    "label": "Standby Temperature",
+                    "description": "Change the temperature during the pause",
+                    "unit": "degrees",
+                    "type": "int",
+                    "default_value": 0
+                },
+                "resume_temperature":
+                {
+                    "label": "Resume Temperature",
+                    "description": "Change the temperature after the pause",
+                    "unit": "degrees",
+                    "type": "int",
+                    "default_value": 0
                 }
             }
         }"""
@@ -94,6 +110,8 @@ class PauseAtHeight(Script):
         park_y = self.getSettingValueByKey("head_park_y")
         layers_started = False
         redo_layers = self.getSettingValueByKey("redo_layers")
+        standby_temperature = self.getSettingValueByKey("standby_temperature")
+        resume_temperature = self.getSettingValueByKey("resume_temperature")
 
         for layer in data:
             lines = layer.split("\n")
@@ -144,8 +162,15 @@ class PauseAtHeight(Script):
 
                             # Disable the E steppers
                             prepend_gcode += "M84 E0\n"
+
+                            # Set extruder standby temperature
+                            prepend_gcode += "M104 S%i; standby temperature\n" % (standby_temperature)
+
                             # Wait till the user continues printing
                             prepend_gcode += "M0 ;Do the actual pause\n"
+
+                            # Set extruder resume temperature
+                            prepend_gcode += "M109 S%i; resume temperature\n" % (resume_temperature)
 
                             # Push the filament back,
                             if retraction_amount != 0:
