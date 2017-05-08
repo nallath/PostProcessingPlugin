@@ -225,6 +225,8 @@ class Stretch(Script):
                 r=((vPos[i]-vPosBefore[i1])*(vPosAfter[i3]-vPosBefore[i1])).sum(0)
                 if np.fabs(r) < 1000.0*np.fabs(rd):
                     r /= rd
+                else:
+                    r = 0.5
                 pp=vPosBefore[i1] + r*(vPosAfter[i3]-vPosBefore[i1])
                 dpp=np.sqrt(((pp-vPos[i])**2).sum(0))
                 if dpp > 0.001:
@@ -262,6 +264,8 @@ class Stretch(Script):
                 r=((vPos[i]-vPos[i1])*(vPos[i3]-vPos[i1])).sum(0)
                 if np.fabs(r) < 1000.0*np.fabs(rd):
                     r /= rd
+                else:
+                    r = 0.5
                 pp=vPos[i1] + r*(vPos[i3]-vPos[i1])
                 dpp=np.sqrt(((pp-vPos[i])**2).sum(0))
                 if dpp > 0.001:
