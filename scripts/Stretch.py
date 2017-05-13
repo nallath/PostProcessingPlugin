@@ -1,7 +1,5 @@
-# Copyright (c) 2015 Jaime van Kessel, Ultimaker B.V.
-# The PostProcessingPlugin is released under the terms of the AGPLv3 or higher.
-#
-# Christophe Baribaud 2017
+# Copyright (c) 2017 Christophe Baribaud 2017
+# This PostProcessingPlugin script is released under the terms of the AGPLv3 or higher.
 # Python implementation of https://github.com/electrocbd/post_stretch
 # Correction of hole sizes, cylinder diameters and curves
 #
