@@ -8,6 +8,7 @@
 from ..Script import Script
 import math
 import numpy as np
+from UM.Logger import Logger
 
 class GCodeStep():
     def __init__(self,step,x,y,z,e,f,comment):
@@ -59,7 +60,7 @@ class Stretch(Script):
         self.line_width = self.getSettingValueByKey("line_width")
         self.stretch = self.getSettingValueByKey("stretch")
         retdata = []
-        LayerSteps = []
+        layerSteps = []
         current_x = 0.
         current_y = 0.
         current_z = 0.
@@ -103,43 +104,44 @@ class Stretch(Script):
                 else:
                     onestep = GCodeStep(-1,current_x,current_y,current_z,current_e,current_f,line);
                 if current_z != layer_z:
-                    print("Layer Z " + "{:.3f}".format(layer_z) + " " + str(len(LayerSteps)) + " steps")
-                    if len(LayerSteps):
-                        retdata.append(self.ProcessLayer(LayerSteps))
-                    LayerSteps = []
+                    Logger.log("d","Layer Z " + "{:.3f}".format(layer_z) + " " + str(len(layerSteps)) + " steps")
+                    if len(layerSteps):
+                        retdata.append(self.processLayer(layerSteps))
+                    layerSteps = []
                     layer_z = current_z
-                LayerSteps.append(onestep)
-        if len(LayerSteps):
-            retdata.append(self.ProcessLayer(LayerSteps))
+                layerSteps.append(onestep)
+        if len(layerSteps):
+            retdata.append(self.processLayer(layerSteps))
         return retdata
-    def ProcessLayer(self,LayerSteps):
+
+    def processLayer(self,layerSteps):
         layergcode = ""
         self.vd1 = np.empty((0,2)) #Start points of segments of already deposited material for this layer
         self.vd2 = np.empty((0,2)) #End points of segments of already deposited material for this layer
-        curE = LayerSteps[0].e
+        current_e = layerSteps[0].e
         vPos = np.empty((0,2))
         iflush = 0
-        for i in range(len(LayerSteps)):
+        for i in range(len(layerSteps)):
             if i==0:
-                curE = LayerSteps[i].e
-            if curE == LayerSteps[i].e:
+                current_e = layerSteps[i].e
+            if current_e == layerSteps[i].e:
                 vTrans = np.copy(vPos)
                 if len(vPos) >= 2:
-                    self.WorkOnSequence(vPos,vTrans)
-                layergcode = self.generate(LayerSteps,iflush,i,vTrans,layergcode)
+                    self.workOnSequence(vPos,vTrans)
+                layergcode = self.generate(layerSteps,iflush,i,vTrans,layergcode)
                 iflush = i
                 vPos = np.empty((0,2))
-            if LayerSteps[i].step == 0 or LayerSteps[i].step == 1:
-                vPos = np.concatenate([vPos,np.array([[LayerSteps[i].x,LayerSteps[i].y]])])
-            curE = LayerSteps[i].e
+            if layerSteps[i].step == 0 or layerSteps[i].step == 1:
+                vPos = np.concatenate([vPos,np.array([[layerSteps[i].x,layerSteps[i].y]])])
+            current_e = layerSteps[i].e
         if len(vPos):
             vTrans = np.copy(vPos)
         if len(vPos)>=2:
-            self.WorkOnSequence(vPos,vTrans)
-        layergcode = self.generate(LayerSteps,iflush,len(LayerSteps),vTrans,layergcode)
+            self.workOnSequence(vPos,vTrans)
+        layergcode = self.generate(layerSteps,iflush,len(layerSteps),vTrans,layergcode)
         return layergcode
 
-    def dumppos(self,onestep):
+    def dumpPos(self,onestep):
         sout = ""
         if onestep.f != self.output_f:
             self.output_f = onestep.f
@@ -162,38 +164,38 @@ class Stretch(Script):
             sout += "{:.5f}".format(self.output_e).rstrip('0').rstrip('.')
         return sout
 
-    def generate(self,LayerSteps,i,iend,vPos,layergcode):
+    def generate(self,layerSteps,i,iend,vPos,layergcode):
         ipos = 0
         while i < iend:
-            if LayerSteps[i].step == 0:
-                sout = "G0" + self.dumppos(LayerSteps[i])
+            if layerSteps[i].step == 0:
+                sout = "G0" + self.dumpPos(layerSteps[i])
                 layergcode = layergcode + sout + "\n"
                 ipos = ipos + 1
-            elif LayerSteps[i].step == 1:
-                LayerSteps[i].x = vPos[ipos][0]
-                LayerSteps[i].y = vPos[ipos][1]
-                sout = "G1" + self.dumppos(LayerSteps[i])
+            elif layerSteps[i].step == 1:
+                layerSteps[i].x = vPos[ipos][0]
+                layerSteps[i].y = vPos[ipos][1]
+                sout = "G1" + self.dumpPos(layerSteps[i])
                 layergcode = layergcode + sout + "\n"
                 ipos = ipos + 1
             else:
-                layergcode = layergcode + LayerSteps[i].comment + "\n"
+                layergcode = layergcode + layerSteps[i].comment + "\n"
             i = i + 1
         return layergcode
 
 
-    def WorkOnSequence(self,vPos,vTrans):
+    def workOnSequence(self,vPos,vTrans):
         if len(vPos)>2 and ((vPos[len(vPos)-1]-vPos[0])**2).sum(0) < 0.3*0.3:
-            self.WideCircle(vPos,vTrans)
+            self.wideCircle(vPos,vTrans)
         else:
-            self.WideTurn(vPos,vTrans)
-        self.PushWall(vPos,vTrans)
+            self.wideTurn(vPos,vTrans)
+        self.pushWall(vPos,vTrans)
         if (len(vPos)):
             self.vd1 = np.concatenate([self.vd1,np.array(vPos[:-1])])
             self.vd2 = np.concatenate([self.vd2,np.array(vPos[1:])])
 
-    def WideCircle(self,vPos,vTrans):
+    def wideCircle(self,vPos,vTrans):
         '''
-        Similar to WideTurn
+        Similar to wideTurn
         The first and last point of the sequence are the same,
         so it is possible to extend the end of the sequence with its beginning when seeking for triangles
         '''
@@ -233,7 +235,7 @@ class Stretch(Script):
             i = i + 1
         return
 
-    def WideTurn(self,vPos,vTrans):
+    def wideTurn(self,vPos,vTrans):
         '''
         We have to select three points in order to form a triangle
         These three points should be far enough from each other to have
@@ -271,7 +273,7 @@ class Stretch(Script):
             i = i + 1
         return
 
-    def PushWall(self,vPos,vTrans):
+    def pushWall(self,vPos,vTrans):
         d2 = self.line_width / 2.0
         d4 = self.stretch
         mrot = np.array([[0,-1],[1,0]]) # Quarter turn
