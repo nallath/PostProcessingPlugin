@@ -53,7 +53,7 @@ class Stretcher():
     def execute(self,data):
         Logger.log("d","Post stretch with line width=" + str(self.line_width) + "mm and stretch=" + str(self.stretch)+ "mm")
         retdata = []
-        layerSteps = []
+        layer_steps = []
         current_x = 0.
         current_y = 0.
         current_z = 0.
@@ -90,41 +90,42 @@ class Stretcher():
                 else:
                     onestep = GCodeStep(-1,current_x,current_y,current_z,current_e,current_f,line);
                 if current_z != layer_z:
-                    Logger.log("d","Layer Z " + "{:.3f}".format(layer_z) + " " + str(len(layerSteps)) + " steps")
-                    if len(layerSteps):
-                        retdata.append(self.processLayer(layerSteps))
-                    layerSteps = []
+                    Logger.log("d","Layer Z " + "{:.3f}".format(layer_z) + " " + str(len(layer_steps)) + " steps")
+                    if len(layer_steps):
+                        retdata.append(self.processLayer(layer_steps))
+                    layer_steps = []
                     layer_z = current_z
-                layerSteps.append(onestep)
-        if len(layerSteps):
-            retdata.append(self.processLayer(layerSteps))
+                layer_steps.append(onestep)
+        if len(layer_steps):
+            retdata.append(self.processLayer(layer_steps))
+        retdata.append(";Stretch distance "+str(self.stretch)+"\n")
         return retdata
 
-    def processLayer(self,layerSteps):
+    def processLayer(self,layer_steps):
         layergcode = ""
         self.vd1 = np.empty((0,2)) #Start points of segments of already deposited material for this layer
         self.vd2 = np.empty((0,2)) #End points of segments of already deposited material for this layer
-        current_e = layerSteps[0].e
+        current_e = layer_steps[0].e
         vPos = np.empty((0,2))
         iflush = 0
-        for i in range(len(layerSteps)):
+        for i,step in enumerate(layer_steps):
             if i==0:
-                current_e = layerSteps[i].e
-            if current_e == layerSteps[i].e:
+                current_e = step.e
+            if current_e == step.e:
                 vTrans = np.copy(vPos)
                 if len(vPos) >= 2:
                     self.workOnSequence(vPos,vTrans)
-                layergcode = self.generate(layerSteps,iflush,i,vTrans,layergcode)
+                layergcode = self.generate(layer_steps,iflush,i,vTrans,layergcode)
                 iflush = i
                 vPos = np.empty((0,2))
-            if layerSteps[i].step == 0 or layerSteps[i].step == 1:
-                vPos = np.concatenate([vPos,np.array([[layerSteps[i].x,layerSteps[i].y]])])
-            current_e = layerSteps[i].e
+            if step.step == 0 or step.step == 1:
+                vPos = np.concatenate([vPos,np.array([[step.x,step.y]])])
+            current_e = step.e
         if len(vPos):
             vTrans = np.copy(vPos)
         if len(vPos)>=2:
             self.workOnSequence(vPos,vTrans)
-        layergcode = self.generate(layerSteps,iflush,len(layerSteps),vTrans,layergcode)
+        layergcode = self.generate(layer_steps,iflush,len(layer_steps),vTrans,layergcode)
         return layergcode
 
     def dumpPos(self,onestep):
@@ -152,21 +153,21 @@ class Stretcher():
             sout += "{:.5f}".format(self.output_e).rstrip("0").rstrip(".")
         return sout
 
-    def generate(self,layerSteps,i,iend,vPos,layergcode):
+    def generate(self,layer_steps,i,iend,vPos,layergcode):
         ipos = 0
         while i < iend:
-            if layerSteps[i].step == 0:
-                sout = "G0" + self.dumpPos(layerSteps[i])
+            if layer_steps[i].step == 0:
+                sout = "G0" + self.dumpPos(layer_steps[i])
                 layergcode = layergcode + sout + "\n"
                 ipos = ipos + 1
-            elif layerSteps[i].step == 1:
-                layerSteps[i].x = vPos[ipos][0]
-                layerSteps[i].y = vPos[ipos][1]
-                sout = "G1" + self.dumpPos(layerSteps[i])
+            elif layer_steps[i].step == 1:
+                layer_steps[i].x = vPos[ipos][0]
+                layer_steps[i].y = vPos[ipos][1]
+                sout = "G1" + self.dumpPos(layer_steps[i])
                 layergcode = layergcode + sout + "\n"
                 ipos = ipos + 1
             else:
-                layergcode = layergcode + layerSteps[i].comment + "\n"
+                layergcode = layergcode + layer_steps[i].comment + "\n"
             i = i + 1
         return layergcode
 
