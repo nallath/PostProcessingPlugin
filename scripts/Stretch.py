@@ -9,6 +9,8 @@ from ..Script import Script
 import math
 import numpy as np
 from UM.Logger import Logger
+from UM.Application import Application
+import re
 
 class GCodeStep():
     def __init__(self,step,x,y,z,e,f,comment):
@@ -20,45 +22,36 @@ class GCodeStep():
         self.f = f
         self.comment = comment
 
-class Stretch(Script):
-    def __init__(self):
-        super().__init__()
+# Execution part of the stretch plugin
+class Stretcher():
+    def __init__(self,line_width,stretch):
+        self.line_width = line_width
+        self.stretch = stretch
+        self.output_x = 0.
+        self.output_y = 0.
+        self.output_z = 0.
+        self.output_e = 0.
+        self.output_f = 0.
 
-    def getSettingDataString(self):
-        return """{
-            "name":"Post stretch script",
-            "key": "Stretch",
-            "metadata": {},
-            "version": 2,
-            "settings":
-            {
-                "stretch":
-                {
-                    "label": "Stretch distance",
-                    "description": "Distance by which the points are moved by the correction effect. The higher this value, the higher the effect",
-                    "unit": "mm",
-                    "type": "float",
-                    "default_value": 0.08,
-                    "minimum_value": 0,
-                    "minimum_value_warning": 0,
-                    "maximum_value_warning": 0.2
-                },
-                "line_width":
-                {
-                    "label": "Wall size",
-                    "description": "Average value of line width, should match roughly the corresponding parameter of Cura/CuraEngine",
-                    "unit": "mm",
-                    "type": "float",
-                    "default_value": 0.7,
-                    "minimum_value": 0.1,
-                    "maximum_value_warning": 1
-                }
-            }
-        }"""
+    ##  Convenience function that finds the value in a line of g-code.
+    #   When requesting key = x from line "G1 X100" the value 100 is returned.
+    #   It is a copy of Stript's method, so it is no DontRepeatYourself, but
+    #   I split the class into setup part (Stretch) and execution part (Strecher)
+    #   and only the setup part inherits from Script
+    def getValue(self, line, key, default = None):
+        if not key in line or (';' in line and line.find(key) > line.find(';')):
+            return default
+        sub_part = line[line.find(key) + 1:]
+        m = re.search('^-?[0-9]+\.?[0-9]*', sub_part)
+        if m is None:
+            return default
+        try:
+            return float(m.group(0))
+        except:
+            return default
 
-    def execute(self, data):
-        self.line_width = self.getSettingValueByKey("line_width")
-        self.stretch = self.getSettingValueByKey("stretch")
+    def execute(self,data):
+        Logger.log("d","Post stretch with line width=" + str(self.line_width) + "mm and stretch=" + str(self.stretch)+ "mm")
         retdata = []
         layerSteps = []
         current_x = 0.
@@ -66,13 +59,6 @@ class Stretch(Script):
         current_z = 0.
         current_e = 0.
         current_f = 0.
-
-        self.output_x = 0.
-        self.output_y = 0.
-        self.output_z = 0.
-        self.output_e = 0.
-        self.output_f = 0.
-
         layer_z = 0.
         for layer in data:
             lines = layer.rstrip("\n").split("\n")
@@ -148,9 +134,11 @@ class Stretch(Script):
             sout += " F"
             sout += "{:.0f}".format(self.output_f).rstrip('.')
         if onestep.x != self.output_x or onestep.y != self.output_y or onestep.z != self.output_z:
+            assert onestep.x >= 0 and onestep.x < 200 # Security
             self.output_x = onestep.x
             sout += " X"
             sout += "{:.3f}".format(self.output_x).rstrip('0').rstrip('.')
+            assert onestep.y >= 0 and onestep.y < 200 # Security
             self.output_y = onestep.y
             sout += " Y"
             sout += "{:.3f}".format(self.output_y).rstrip('0').rstrip('.')
@@ -326,14 +314,44 @@ class Stretch(Script):
                     touchemoins = True
             if toucheplus and not touchemoins:
                 xp = vTrans[i1] + xperp * d4
-                assert xp[0] >= 0 and xp[0] < 200
-                assert xp[1] >= 0 and xp[1] < 200
                 vTrans[i1] = xp
             elif not toucheplus and touchemoins:
                 xp = vTrans[i1] - xperp * d4;
-                assert xp[0] >= 0 and xp[0] < 200
-                assert xp[1] >= 0 and xp[1] < 200
                 vTrans[i1] = xp
             if toucheplus and touchemoins:
                 vTrans[i1] = vPos[i1]
+
+# Setup part of the stretch plugin
+class Stretch(Script):
+    def __init__(self):
+        super().__init__()
+
+    def getSettingDataString(self):
+        return """{
+            "name":"Post stretch script",
+            "key": "Stretch",
+            "metadata": {},
+            "version": 2,
+            "settings":
+            {
+                "stretch":
+                {
+                    "label": "Stretch distance",
+                    "description": "Distance by which the points are moved by the correction effect. The higher this value, the higher the effect",
+                    "unit": "mm",
+                    "type": "float",
+                    "default_value": 0.08,
+                    "minimum_value": 0,
+                    "minimum_value_warning": 0,
+                    "maximum_value_warning": 0.2
+                }
+            }
+        }"""
+
+    def execute(self, data):
+        stretcher = Stretcher(
+                Application.getInstance().getGlobalContainerStack().getProperty("line_width", "value"),
+                self.getSettingValueByKey("stretch"))
+        return stretcher.execute(data)
+
 
