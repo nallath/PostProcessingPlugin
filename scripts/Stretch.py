@@ -39,10 +39,10 @@ class Stretcher():
     #   I split the class into setup part (Stretch) and execution part (Strecher)
     #   and only the setup part inherits from Script
     def getValue(self, line, key, default = None):
-        if not key in line or (';' in line and line.find(key) > line.find(';')):
+        if not key in line or (";" in line and line.find(key) > line.find(";")):
             return default
         sub_part = line[line.find(key) + 1:]
-        m = re.search('^-?[0-9]+\.?[0-9]*', sub_part)
+        m = re.search("^-?[0-9]+\.?[0-9]*", sub_part)
         if m is None:
             return default
         try:
@@ -64,28 +64,28 @@ class Stretcher():
             lines = layer.rstrip("\n").split("\n")
             for line in lines:
                 comment = ""
-                if line.find(';') >= 0:
-                    comment = line[line.find(';'):]
-                if self.getValue(line,'G') == 0:
-                    current_x = self.getValue(line,'X',current_x)
-                    current_y = self.getValue(line,'Y',current_y)
-                    current_z = self.getValue(line,'Z',current_z)
-                    current_e = self.getValue(line,'E',current_e)
-                    current_f = self.getValue(line,'F',current_f)
+                if line.find(";") >= 0:
+                    comment = line[line.find(";"):]
+                if self.getValue(line,"G") == 0:
+                    current_x = self.getValue(line,"X",current_x)
+                    current_y = self.getValue(line,"Y",current_y)
+                    current_z = self.getValue(line,"Z",current_z)
+                    current_e = self.getValue(line,"E",current_e)
+                    current_f = self.getValue(line,"F",current_f)
                     onestep = GCodeStep(0,current_x,current_y,current_z,current_e,current_f,comment)
-                elif self.getValue(line,'G') == 1:
-                    current_x = self.getValue(line,'X',current_x)
-                    current_y = self.getValue(line,'Y',current_y)
-                    current_z = self.getValue(line,'Z',current_z)
-                    current_e = self.getValue(line,'E',current_e)
-                    current_f = self.getValue(line,'F',current_f)
+                elif self.getValue(line,"G") == 1:
+                    current_x = self.getValue(line,"X",current_x)
+                    current_y = self.getValue(line,"Y",current_y)
+                    current_z = self.getValue(line,"Z",current_z)
+                    current_e = self.getValue(line,"E",current_e)
+                    current_f = self.getValue(line,"F",current_f)
                     onestep = GCodeStep(1,current_x,current_y,current_z,current_e,current_f,comment)
-                elif self.getValue(line,'G') == 92:
-                    current_x = self.getValue(line,'X',current_x)
-                    current_y = self.getValue(line,'Y',current_y)
-                    current_z = self.getValue(line,'Z',current_z)
-                    current_e = self.getValue(line,'E',current_e)
-                    current_f = self.getValue(line,'F',current_f)
+                elif self.getValue(line,"G") == 92:
+                    current_x = self.getValue(line,"X",current_x)
+                    current_y = self.getValue(line,"Y",current_y)
+                    current_z = self.getValue(line,"Z",current_z)
+                    current_e = self.getValue(line,"E",current_e)
+                    current_f = self.getValue(line,"F",current_f)
                     onestep = GCodeStep(-1,current_x,current_y,current_z,current_e,current_f,comment)
                 else:
                     onestep = GCodeStep(-1,current_x,current_y,current_z,current_e,current_f,line);
@@ -132,24 +132,24 @@ class Stretcher():
         if onestep.f != self.output_f:
             self.output_f = onestep.f
             sout += " F"
-            sout += "{:.0f}".format(self.output_f).rstrip('.')
+            sout += "{:.0f}".format(self.output_f).rstrip(".")
         if onestep.x != self.output_x or onestep.y != self.output_y or onestep.z != self.output_z:
             assert onestep.x >= 0 and onestep.x < 200 # Security
             self.output_x = onestep.x
             sout += " X"
-            sout += "{:.3f}".format(self.output_x).rstrip('0').rstrip('.')
+            sout += "{:.3f}".format(self.output_x).rstrip("0").rstrip(".")
             assert onestep.y >= 0 and onestep.y < 200 # Security
             self.output_y = onestep.y
             sout += " Y"
-            sout += "{:.3f}".format(self.output_y).rstrip('0').rstrip('.')
+            sout += "{:.3f}".format(self.output_y).rstrip("0").rstrip(".")
         if onestep.z != self.output_z:
             self.output_z = onestep.z
             sout += " Z"
-            sout += "{:.3f}".format(self.output_z).rstrip('0').rstrip('.')
+            sout += "{:.3f}".format(self.output_z).rstrip("0").rstrip(".")
         if onestep.e != self.output_e:
             self.output_e = onestep.e
             sout += " E"
-            sout += "{:.5f}".format(self.output_e).rstrip('0').rstrip('.')
+            sout += "{:.5f}".format(self.output_e).rstrip("0").rstrip(".")
         return sout
 
     def generate(self,layerSteps,i,iend,vPos,layergcode):
