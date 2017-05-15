@@ -1,4 +1,5 @@
-# Copyright (c) 2015 Jaime van Kessel, Ultimaker B.V.
+# Copyright (c) 2015 Jaime van Kessel
+# Copyright (c) 2017 Ultimaker B.V.
 # The PostProcessingPlugin is released under the terms of the AGPLv3 or higher.
 from UM.Logger import Logger
 from UM.Signal import Signal, signalemitter
@@ -43,6 +44,7 @@ class Script:
         self._stack.addContainer(self._definition)
         self._instance = InstanceContainer(container_id="ScriptInstanceContainer")
         self._instance.setDefinition(self._definition)
+        self._instance.addMetaDataEntry("setting_version", self._definition.getMetaDataEntry("setting_version", default = 0))
         self._stack.addContainer(self._instance)
         self._stack.propertyChanged.connect(self._onPropertyChanged)
 
