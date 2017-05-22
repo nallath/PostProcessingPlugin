@@ -9,6 +9,7 @@
 # Modified by Ricardo Gomez, ricardoga@otulook.com, to add Bed Temperature and make it work with Cura_13.06.04+
 # Modified by Stefan Heule, Dim3nsioneer@gmx.ch since V3.0 (see changelog below)
 # Modified by Jaime van Kessel (Ultimaker), j.vankessel@ultimaker.com to make it work for 15.10 / 2.x
+# Modified by Ruben Dulek (Ultimaker), r.dulek@ultimaker.com, to debug.
 
 ##history / changelog:
 ##V3.0.1: TweakAtZ-state default 1 (i.e. the plugin works without any TweakAtZ comment)
@@ -46,7 +47,7 @@ from ..Script import Script
 import re
 
 class TweakAtZ(Script):
-    version = "5.1"
+    version = "5.1.1"
     def __init__(self):
         super().__init__()
 
@@ -321,13 +322,14 @@ class TweakAtZ(Script):
             "extruderTwo": "M104 S%f T1\n",
             "fanSpeed": "M106 S%d\n"}
         target_values = {"speed": self.getSettingValueByKey("e2_speed"),
-             "flowrate": self.getSettingValueByKey("g2_flowrate"),
-             "flowrateOne": self.getSettingValueByKey("g4_flowrateOne"),
-             "flowrateTwo": self.getSettingValueByKey("g6_flowrateTwo"),
-             "bedTemp": self.getSettingValueByKey("h2_bedTemp"),
-             "extruderOne": self.getSettingValueByKey("i2_extruderOne"),
-             "extruderTwo": self.getSettingValueByKey("i4_extruderTwo"),
-             "fanSpeed": self.getSettingValueByKey("j2_fanSpeed")}
+            "printspeed": self.getSettingValueByKey("f2_printspeed"),
+            "flowrate": self.getSettingValueByKey("g2_flowrate"),
+            "flowrateOne": self.getSettingValueByKey("g4_flowrateOne"),
+            "flowrateTwo": self.getSettingValueByKey("g6_flowrateTwo"),
+            "bedTemp": self.getSettingValueByKey("h2_bedTemp"),
+            "extruderOne": self.getSettingValueByKey("i2_extruderOne"),
+            "extruderTwo": self.getSettingValueByKey("i4_extruderTwo"),
+            "fanSpeed": self.getSettingValueByKey("j2_fanSpeed")}
         old = {"speed": -1, "flowrate": -1, "flowrateOne": -1, "flowrateTwo": -1, "platformTemp": -1, "extruderOne": -1,
             "extruderTwo": -1, "bedTemp": -1, "fanSpeed": -1, "state": -1}
         twLayers = self.getSettingValueByKey("d_twLayers")
@@ -426,8 +428,8 @@ class TweakAtZ(Script):
                     if 'G1' in line and TweakPrintSpeed and (state==3 or state==4):
                         # check for pure print movement in target range:
                         if x != None and y != None and f != None and e != None and newZ==z:
-                            modified_gcode += "G1 F%d X%1.3f Y%1.3f E%1.5f\n" % (int(f/100.0*float(printspeed)),self.getValue(line,"X"),
-                                                                          self.getValue(line,"Y"),self.getValue(line,"E"))
+                            modified_gcode += "G1 F%d X%1.3f Y%1.3f E%1.5f\n" % (int(f / 100.0 * float(target_values["printspeed"])), self.getValue(line, "X"),
+                                                                          self.getValue(line, "Y"), self.getValue(line, "E"))
                         else: #G1 command but not a print movement
                             modified_gcode += line + "\n"
                     # no tweaking on retraction hops which have no x and y coordinate:
