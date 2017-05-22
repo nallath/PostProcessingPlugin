@@ -1,4 +1,6 @@
 from ..Script import Script
+# from cura.Settings.ExtruderManager import ExtruderManager
+
 class PauseAtHeight(Script):
     def __init__(self):
         super().__init__()
@@ -79,7 +81,7 @@ class PauseAtHeight(Script):
                 {
                     "label": "Standby Temperature",
                     "description": "Change the temperature during the pause",
-                    "unit": "degrees",
+                    "unit": "°C",
                     "type": "int",
                     "default_value": 0
                 },
@@ -87,7 +89,7 @@ class PauseAtHeight(Script):
                 {
                     "label": "Resume Temperature",
                     "description": "Change the temperature after the pause",
-                    "unit": "degrees",
+                    "unit": "°C",
                     "type": "int",
                     "default_value": 0
                 }
@@ -112,6 +114,10 @@ class PauseAtHeight(Script):
         redo_layers = self.getSettingValueByKey("redo_layers")
         standby_temperature = self.getSettingValueByKey("standby_temperature")
         resume_temperature = self.getSettingValueByKey("resume_temperature")
+
+        # T = ExtruderManager.getInstance().getActiveExtruderStack().getProperty("material_print_temperature", "value")
+        # with open("out.txt", "w") as f:
+            # f.write(T)
 
         for layer in data:
             lines = layer.split("\n")
