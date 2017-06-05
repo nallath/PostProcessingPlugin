@@ -135,11 +135,11 @@ class Stretcher():
             sout += " F"
             sout += "{:.0f}".format(self.output_f).rstrip(".")
         if onestep.x != self.output_x or onestep.y != self.output_y or onestep.z != self.output_z:
-            assert onestep.x >= 0 and onestep.x < 200 # Security
+            assert onestep.x >= -1000 and onestep.x < 1000 # If this assertion fails, something went really wrong !
             self.output_x = onestep.x
             sout += " X"
             sout += "{:.3f}".format(self.output_x).rstrip("0").rstrip(".")
-            assert onestep.y >= 0 and onestep.y < 200 # Security
+            assert onestep.y >= -1000 and onestep.y < 1000 # If this assertion fails, something went really wrong !
             self.output_y = onestep.y
             sout += " Y"
             sout += "{:.3f}".format(self.output_y).rstrip("0").rstrip(".")
