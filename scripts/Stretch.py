@@ -138,6 +138,9 @@ class Stretcher():
             if i == 0:
                 current_e = step.step_e
             if current_e == step.step_e:
+                # No extrusion since the previous step, so it is a travel move
+                # Let process steps accumulated into orig_steps,
+                # which are a sequence of continuous extrusion
                 modif_seq = np.copy(orig_seq)
                 if len(orig_seq) >= 2:
                     self.workOnSequence(orig_seq, modif_seq)
@@ -267,16 +270,21 @@ class Stretcher():
                 else:
                     ibeg = np.argmax(dist_from_point >= dmin_tri * dmin_tri)
             if good_triangle:
-                rd = ((pos_after[iend] - pos_before[ibeg]) ** 2).sum(0)
-                r = ((orig_seq[i] - pos_before[ibeg]) * (pos_after[iend] - pos_before[ibeg])).sum(0)
-                if np.fabs(r) < 1000.0 * np.fabs(rd):
-                    r /= rd
+                # See https://github.com/electrocbd/post_stretch for explanations
+                # relpos is the relative position of the projection of the second point
+                # of the triangle on the segment from the first to the third point
+                # 0 means the position of the first point, 1 means the position of the third,
+                # intermediate values are positions between
+                length_base = ((pos_after[iend] - pos_before[ibeg]) ** 2).sum(0)
+                relpos = ((orig_seq[i] - pos_before[ibeg]) * (pos_after[iend] - pos_before[ibeg])).sum(0)
+                if np.fabs(relpos) < 1000.0 * np.fabs(length_base):
+                    relpos /= length_base
                 else:
-                    r = 0.5
-                pp = (pos_before[ibeg] + r * (pos_after[iend] - pos_before[ibeg]))
-                dpp = np.sqrt(((pp - orig_seq[i]) ** 2).sum(0))
-                if dpp > 0.001:
-                    modif_seq[i] = orig_seq[i] - (self.stretch / dpp) * (pp - orig_seq[i])
+                    relpos = 0.5 # To avoid division by zero or precision loss
+                projection = (pos_before[ibeg] + relpos * (pos_after[iend] - pos_before[ibeg]))
+                dist_from_proj = np.sqrt(((projection - orig_seq[i]) ** 2).sum(0))
+                if dist_from_proj > 0.001: # Move central point only if points are not aligned
+                    modif_seq[i] = orig_seq[i] - (self.stretch / dist_from_proj) * (projection - orig_seq[i])
             i = i + 1
         return
 
@@ -304,16 +312,16 @@ class Stretcher():
                 else:
                     ibeg = i - 1 - np.argmax(dist_from_point >= dmin_tri * dmin_tri)
             if good_triangle:
-                rd = ((orig_seq[iend] - orig_seq[ibeg]) ** 2).sum(0)
-                r = ((orig_seq[i] - orig_seq[ibeg]) * (orig_seq[iend] - orig_seq[ibeg])).sum(0)
-                if np.fabs(r) < 1000.0 * np.fabs(rd):
-                    r /= rd
+                length_base = ((orig_seq[iend] - orig_seq[ibeg]) ** 2).sum(0)
+                relpos = ((orig_seq[i] - orig_seq[ibeg]) * (orig_seq[iend] - orig_seq[ibeg])).sum(0)
+                if np.fabs(relpos) < 1000.0 * np.fabs(length_base):
+                    relpos /= length_base
                 else:
-                    r = 0.5
-                pp = orig_seq[ibeg] + r * (orig_seq[iend] - orig_seq[ibeg])
-                dpp = np.sqrt(((pp - orig_seq[i]) ** 2).sum(0))
-                if dpp > 0.001:
-                    modif_seq[i] = orig_seq[i] - (self.stretch / dpp) * (pp - orig_seq[i])
+                    relpos = 0.5
+                projection = orig_seq[ibeg] + relpos * (orig_seq[iend] - orig_seq[ibeg])
+                dist_from_proj = np.sqrt(((projection - orig_seq[i]) ** 2).sum(0))
+                if dist_from_proj > 0.001:
+                    modif_seq[i] = orig_seq[i] - (self.stretch / dist_from_proj) * (projection - orig_seq[i])
             i = i + 1
         return
 
