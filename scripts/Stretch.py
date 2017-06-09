@@ -167,28 +167,23 @@ class Stretcher():
         sout = ""
         if onestep.step_f != self.output_f:
             self.output_f = onestep.step_f
-            sout += " F"
-            sout += "{:.0f}".format(self.output_f).rstrip(".")
+            sout += " F{:.0f}".format(self.output_f).rstrip(".")
         if (onestep.step_x != self.output_x or onestep.step_y != self.output_y
                 or onestep.step_z != self.output_z):
             assert onestep.step_x >= -1000 and onestep.step_x < 1000 # If this assertion fails,
                                                            # something went really wrong !
             self.output_x = onestep.step_x
-            sout += " X"
-            sout += "{:.3f}".format(self.output_x).rstrip("0").rstrip(".")
+            sout += " X{:.3f}".format(self.output_x).rstrip("0").rstrip(".")
             assert onestep.step_y >= -1000 and onestep.step_y < 1000 # If this assertion fails,
                                                            # something went really wrong !
             self.output_y = onestep.step_y
-            sout += " Y"
-            sout += "{:.3f}".format(self.output_y).rstrip("0").rstrip(".")
+            sout += " Y{:.3f}".format(self.output_y).rstrip("0").rstrip(".")
         if onestep.z != self.output_z:
             self.output_z = onestep.step_z
-            sout += " Z"
-            sout += "{:.3f}".format(self.output_z).rstrip("0").rstrip(".")
+            sout += " Z{:.3f}".format(self.output_z).rstrip("0").rstrip(".")
         if onestep.step_e != self.output_e:
             self.output_e = onestep.step_e
-            sout += " E"
-            sout += "{:.5f}".format(self.output_e).rstrip("0").rstrip(".")
+            sout += " E{:.5f}".format(self.output_e).rstrip("0").rstrip(".")
         return sout
 
     def generate(self, layer_steps, i, iend, orig_seq, layergcode):
