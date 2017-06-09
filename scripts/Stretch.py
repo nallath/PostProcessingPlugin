@@ -169,7 +169,8 @@ class Stretcher():
             self.output_f = onestep.step_f
             sout += " F"
             sout += "{:.0f}".format(self.output_f).rstrip(".")
-        if onestep.step_x != self.output_x or onestep.step_y != self.output_y or onestep.step_z != self.output_z:
+        if (onestep.step_x != self.output_x or onestep.step_y != self.output_y
+                or onestep.step_z != self.output_z):
             assert onestep.step_x >= -1000 and onestep.step_x < 1000 # If this assertion fails,
                                                            # something went really wrong !
             self.output_x = onestep.step_x
@@ -218,7 +219,8 @@ class Stretcher():
         A sequence is a list of consecutive g-code steps
         of continuous material extrusion
         """
-        if len(orig_seq) > 2 and ((orig_seq[len(orig_seq) - 1] - orig_seq[0]) ** 2).sum(0) < 0.3 * 0.3:
+        if (len(orig_seq) > 2 and
+                ((orig_seq[len(orig_seq) - 1] - orig_seq[0]) ** 2).sum(0) < 0.3 * 0.3):
             self.wideCircle(orig_seq, modif_seq)
         else:
             self.wideTurn(orig_seq, modif_seq)
@@ -276,7 +278,8 @@ class Stretcher():
                 # 0 means the position of the first point, 1 means the position of the third,
                 # intermediate values are positions between
                 length_base = ((pos_after[iend] - pos_before[ibeg]) ** 2).sum(0)
-                relpos = ((orig_seq[i] - pos_before[ibeg]) * (pos_after[iend] - pos_before[ibeg])).sum(0)
+                relpos = ((orig_seq[i] - pos_before[ibeg])
+                          * (pos_after[iend] - pos_before[ibeg])).sum(0)
                 if np.fabs(relpos) < 1000.0 * np.fabs(length_base):
                     relpos /= length_base
                 else:
@@ -284,7 +287,8 @@ class Stretcher():
                 projection = (pos_before[ibeg] + relpos * (pos_after[iend] - pos_before[ibeg]))
                 dist_from_proj = np.sqrt(((projection - orig_seq[i]) ** 2).sum(0))
                 if dist_from_proj > 0.001: # Move central point only if points are not aligned
-                    modif_seq[i] = orig_seq[i] - (self.stretch / dist_from_proj) * (projection - orig_seq[i])
+                    modif_seq[i] = (orig_seq[i] - (self.stretch / dist_from_proj)
+                                    * (projection - orig_seq[i]))
             i = i + 1
         return
 
@@ -321,7 +325,8 @@ class Stretcher():
                 projection = orig_seq[ibeg] + relpos * (orig_seq[iend] - orig_seq[ibeg])
                 dist_from_proj = np.sqrt(((projection - orig_seq[i]) ** 2).sum(0))
                 if dist_from_proj > 0.001:
-                    modif_seq[i] = orig_seq[i] - (self.stretch / dist_from_proj) * (projection - orig_seq[i])
+                    modif_seq[i] = (orig_seq[i] - (self.stretch / dist_from_proj)
+                                    * (projection - orig_seq[i]))
             i = i + 1
         return
 
@@ -351,38 +356,37 @@ class Stretcher():
             iend = i + 1 # Index of the last point of the segment
             if iend == len(orig_seq):
                 iend = i - 1
-            xm = orig_seq[ibeg]
             xperp = np.dot(mrot, orig_seq[iend] - orig_seq[ibeg])
             xperp = xperp / np.sqrt((xperp ** 2).sum(-1))
-            xp1 = xm + xperp * dist_palp
-            toucheplus = False
-            xp2 = xm - xperp * dist_palp
-            touchemoins = False
+            testleft = orig_seq[ibeg] + xperp * dist_palp
+            materialleft = False # Is there already extruded material at the left of the segment
+            testright = orig_seq[ibeg] - xperp * dist_palp
+            materialright = False # Is there already extruded material at the right of the segment
             if self.vd1.shape[0]:
-                p = xp1
-                r = np.clip(((p - self.vd1) * (self.vd2 - self.vd1)).sum(1) / ((self.vd2 - self.vd1) * (self.vd2 - self.vd1)).sum(1), 0., 1.)
-                pp = self.vd1 + r[:, np.newaxis] * (self.vd2 - self.vd1)
-                # pp is the array of the nearest points of each segment from the point p
-                dist = ((p - pp) * (p - pp)).sum(1)
-                # dist is the array of the squares of the distances between p and each segment
+                relpos = np.clip(((testleft - self.vd1) * (self.vd2 - self.vd1)).sum(1)
+                                 / ((self.vd2 - self.vd1) * (self.vd2 - self.vd1)).sum(1), 0., 1.)
+                nearpoints = self.vd1 + relpos[:, np.newaxis] * (self.vd2 - self.vd1)
+                # nearpoints is the array of the nearest points of each segment
+                # from the point testleft
+                dist = ((testleft - nearpoints) * (testleft - nearpoints)).sum(1)
+                # dist is the array of the squares of the distances between testleft
+                # and each segment
                 if np.amin(dist) <= dist_palp * dist_palp:
-                    toucheplus = True
-                # Now the same computation with the point xp2 at the other side of the
+                    materialleft = True
+                # Now the same computation with the point testright at the other side of the
                 # current segment
-                p = xp2
-                r = np.clip(((p - self.vd1) * (self.vd2 - self.vd1)).sum(1) / ((self.vd2 - self.vd1) * (self.vd2 - self.vd1)).sum(1), 0., 1.)
-                pp = self.vd1 + r[:, np.newaxis] * (self.vd2 - self.vd1)
-                dist = ((p - pp) * (p - pp)).sum(1)
+                relpos = np.clip(((testright - self.vd1) * (self.vd2 - self.vd1)).sum(1)
+                                 / ((self.vd2 - self.vd1) * (self.vd2 - self.vd1)).sum(1), 0., 1.)
+                nearpoints = self.vd1 + relpos[:, np.newaxis] * (self.vd2 - self.vd1)
+                dist = ((testright - nearpoints) * (testright - nearpoints)).sum(1)
                 if np.amin(dist) <= dist_palp * dist_palp:
-                    touchemoins = True
-            if toucheplus and not touchemoins:
-                xp = modif_seq[ibeg] + xperp * self.stretch
-                modif_seq[ibeg] = xp
-            elif not toucheplus and touchemoins:
-                xp = modif_seq[ibeg] - xperp * self.stretch
-                modif_seq[ibeg] = xp
-            if toucheplus and touchemoins:
-                modif_seq[ibeg] = orig_seq[ibeg]
+                    materialright = True
+            if materialleft and not materialright:
+                modif_seq[ibeg] = modif_seq[ibeg] + xperp * self.stretch
+            elif not materialleft and materialright:
+                modif_seq[ibeg] = modif_seq[ibeg] - xperp * self.stretch
+            if materialleft and materialright:
+                modif_seq[ibeg] = orig_seq[ibeg] # Surrounded by walls, don't move
 
 # Setup part of the stretch plugin
 class Stretch(Script):
@@ -421,7 +425,9 @@ class Stretch(Script):
         data is the list of original g-code instructions,
         the returned string is the list of modified g-code instructions
         """
-        stretcher = Stretcher(Application.getInstance().getGlobalContainerStack().getProperty("line_width", "value"), self.getSettingValueByKey("stretch"))
+        stretcher = Stretcher(
+            Application.getInstance().getGlobalContainerStack().getProperty("line_width", "value")
+            , self.getSettingValueByKey("stretch"))
         return stretcher.execute(data)
 
 
