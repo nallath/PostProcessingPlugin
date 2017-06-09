@@ -1,6 +1,6 @@
-# Copyright (c) 2017 Christophe Baribaud 2017
 # This PostProcessingPlugin script is released under the terms of the AGPLv3 or higher.
 """
+Copyright (c) 2017 Christophe Baribaud 2017
 Python implementation of https://github.com/electrocbd/post_stretch
 Correction of hole sizes, cylinder diameters and curves
 
@@ -343,11 +343,6 @@ class Stretcher():
         vd2 is the array of the ending points of the segments
         For example, segment nr 8 starts at position self.vd1[8]
         and ends at position self.vd2[8]
-        For each segment of already deposited material,
-        r is the index of the nearest point of this segment
-        from the point p
-        r=0 means the start of the segment, r=1 means the end of the segment,
-        r=0.5 means the middle between the start and the end of the segment, etc.
         """
         dist_palp = self.line_width / 2.0 # Palpation distance to seek for a wall
         mrot = np.array([[0, -1], [1, 0]]) # Rotation matrix for a quarter turn
