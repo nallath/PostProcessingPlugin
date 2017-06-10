@@ -12,21 +12,6 @@ from UM.Logger import Logger
 from UM.Application import Application
 import re
 
-class GCodeStep():
-    """
-    Class to store the current value of each G_Code parameter
-    for any G-Code step
-    """
-    def __init__(self, step, x, y, z, e, f, comment):
-        self.step = step
-        self.step_x = x
-        self.step_y = y
-        self.step_z = z
-        self.step_e = e
-        self.step_f = f
-        self.comment = comment
-
-
 def _getValue(line, key, default=None):
     """
     Convenience function that finds the value in a line of g-code.
@@ -41,10 +26,44 @@ def _getValue(line, key, default=None):
     number = re.search(r"^-?[0-9]+\.?[0-9]*", sub_part)
     if number is None:
         return default
-    try:
-        return float(number.group(0))
-    except:
-        return default
+    return float(number.group(0))
+
+class GCodeStep():
+    """
+    Class to store the current value of each G_Code parameter
+    for any G-Code step
+    """
+    def __init__(self, step):
+        self.step = step
+        self.step_x = 0
+        self.step_y = 0
+        self.step_z = 0
+        self.step_e = 0
+        self.step_f = 0
+        self.comment = ""
+
+    def readStep(self, line):
+        """
+        Reads gcode from line into self
+        """
+        self.step_x = _getValue(line, "X", self.step_x)
+        self.step_y = _getValue(line, "Y", self.step_y)
+        self.step_z = _getValue(line, "Z", self.step_z)
+        self.step_e = _getValue(line, "E", self.step_e)
+        self.step_f = _getValue(line, "F", self.step_f)
+        return
+
+    def copyPosFrom(self, step):
+        """
+        Copies positions of step into self
+        """
+        self.step_x = step.step_x
+        self.step_y = step.step_y
+        self.step_z = step.step_z
+        self.step_e = step.step_e
+        self.step_f = step.step_f
+        self.comment = step.comment
+        return
 
 
 # Execution part of the stretch plugin
@@ -55,11 +74,11 @@ class Stretcher():
     def __init__(self, line_width, stretch):
         self.line_width = line_width
         self.stretch = stretch
-        self.output_x = 0.
-        self.output_y = 0.
-        self.output_z = 0.
-        self.output_e = 0.
-        self.output_f = 0.
+        self.outpos = GCodeStep(0)
+        self.vd1 = np.empty((0, 2)) # Start points of segments
+                                    # of already deposited material for current layer
+        self.vd2 = np.empty((0, 2)) # End points of segments
+                                    # of already deposited material for current layer
 
     def execute(self, data):
         """
@@ -69,52 +88,37 @@ class Stretcher():
                    + "mm and stretch=" + str(self.stretch)+ "mm")
         retdata = []
         layer_steps = []
-        current_x = 0.
-        current_y = 0.
-        current_z = 0.
-        current_e = 0.
-        current_f = 0.
+        current = GCodeStep(0)
         layer_z = 0.
         for layer in data:
             lines = layer.rstrip("\n").split("\n")
             for line in lines:
-                comment = ""
+                current.comment = ""
                 if line.find(";") >= 0:
-                    comment = line[line.find(";"):]
+                    current.comment = line[line.find(";"):]
                 if _getValue(line, "G") == 0:
-                    current_x = _getValue(line, "X", current_x)
-                    current_y = _getValue(line, "Y", current_y)
-                    current_z = _getValue(line, "Z", current_z)
-                    current_e = _getValue(line, "E", current_e)
-                    current_f = _getValue(line, "F", current_f)
-                    onestep = GCodeStep(0, current_x, current_y, current_z,
-                                        current_e, current_f, comment)
+                    current.readStep(line)
+                    onestep = GCodeStep(0)
+                    onestep.copyPosFrom(current)
                 elif _getValue(line, "G") == 1:
-                    current_x = _getValue(line, "X", current_x)
-                    current_y = _getValue(line, "Y", current_y)
-                    current_z = _getValue(line, "Z", current_z)
-                    current_e = _getValue(line, "E", current_e)
-                    current_f = _getValue(line, "F", current_f)
-                    onestep = GCodeStep(1, current_x, current_y, current_z,
-                                        current_e, current_f, comment)
+                    current.readStep(line)
+                    onestep = GCodeStep(1)
+                    onestep.copyPosFrom(current)
                 elif _getValue(line, "G") == 92:
-                    current_x = _getValue(line, "X", current_x)
-                    current_y = _getValue(line, "Y", current_y)
-                    current_z = _getValue(line, "Z", current_z)
-                    current_e = _getValue(line, "E", current_e)
-                    current_f = _getValue(line, "F", current_f)
-                    onestep = GCodeStep(-1, current_x, current_y, current_z,
-                                        current_e, current_f, comment)
+                    current.readStep(line)
+                    onestep = GCodeStep(-1)
+                    onestep.copyPosFrom(current)
                 else:
-                    onestep = GCodeStep(-1, current_x, current_y, current_z,
-                                        current_e, current_f, line)
-                if current_z != layer_z:
+                    onestep = GCodeStep(-1)
+                    onestep.copyPosFrom(current)
+                    onestep.comment = line
+                if current.step_z != layer_z:
                     Logger.log("d", "Layer Z " + "{:.3f}".format(layer_z)
                                + " " + str(len(layer_steps)) + " steps")
                     if len(layer_steps):
                         retdata.append(self.processLayer(layer_steps))
                     layer_steps = []
-                    layer_z = current_z
+                    layer_z = current.step_z
                 layer_steps.append(onestep)
         if len(layer_steps):
             retdata.append(self.processLayer(layer_steps))
@@ -127,10 +131,8 @@ class Stretcher():
         for one layer (all the steps at the same Z coordinate)
         """
         layergcode = ""
-        self.vd1 = np.empty((0, 2)) # Start points of segments
-                                    # of already deposited material for this layer
-        self.vd2 = np.empty((0, 2)) # End points of segments
-                                    # of already deposited material for this layer
+        self.vd1 = np.empty((0, 2))
+        self.vd2 = np.empty((0, 2))
         current_e = layer_steps[0].step_e
         orig_seq = np.empty((0, 2))
         iflush = 0
@@ -165,25 +167,25 @@ class Stretcher():
         previous g-code step.
         """
         sout = ""
-        if onestep.step_f != self.output_f:
-            self.output_f = onestep.step_f
-            sout += " F{:.0f}".format(self.output_f).rstrip(".")
-        if (onestep.step_x != self.output_x or onestep.step_y != self.output_y
-                or onestep.step_z != self.output_z):
+        if onestep.step_f != self.outpos.step_f:
+            self.outpos.step_f = onestep.step_f
+            sout += " F{:.0f}".format(self.outpos.step_f).rstrip(".")
+        if (onestep.step_x != self.outpos.step_x or onestep.step_y != self.outpos.step_y
+                or onestep.step_z != self.outpos.step_z):
             assert onestep.step_x >= -1000 and onestep.step_x < 1000 # If this assertion fails,
                                                            # something went really wrong !
-            self.output_x = onestep.step_x
-            sout += " X{:.3f}".format(self.output_x).rstrip("0").rstrip(".")
+            self.outpos.step_x = onestep.step_x
+            sout += " X{:.3f}".format(self.outpos.step_x).rstrip("0").rstrip(".")
             assert onestep.step_y >= -1000 and onestep.step_y < 1000 # If this assertion fails,
                                                            # something went really wrong !
-            self.output_y = onestep.step_y
-            sout += " Y{:.3f}".format(self.output_y).rstrip("0").rstrip(".")
-        if onestep.step_z != self.output_z:
-            self.output_z = onestep.step_z
-            sout += " Z{:.3f}".format(self.output_z).rstrip("0").rstrip(".")
-        if onestep.step_e != self.output_e:
-            self.output_e = onestep.step_e
-            sout += " E{:.5f}".format(self.output_e).rstrip("0").rstrip(".")
+            self.outpos.step_y = onestep.step_y
+            sout += " Y{:.3f}".format(self.outpos.step_y).rstrip("0").rstrip(".")
+        if onestep.step_z != self.outpos.step_z:
+            self.outpos.step_z = onestep.step_z
+            sout += " Z{:.3f}".format(self.outpos.step_z).rstrip("0").rstrip(".")
+        if onestep.step_e != self.outpos.step_e:
+            self.outpos.step_e = onestep.step_e
+            sout += " E{:.5f}".format(self.outpos.step_e).rstrip("0").rstrip(".")
         return sout
 
     def generate(self, layer_steps, i, iend, orig_seq, layergcode):
@@ -243,48 +245,42 @@ class Stretcher():
         dmin_tri = self.line_width / 2.0
         iextra = np.floor_divide(len(orig_seq), 3) # Nb of extra points
         ibeg = 0 # Index of first point of the triangle
-        i = 0 # Index of the middle point
-        iend = 0 # Index of the last point
-        while i < len(orig_seq):
+        iend = 0 # Index of the third point of the triangle
+        for i, step in enumerate(orig_seq):
+            # i is the index of the second point of the triangle
             # pos_after is the array of positions of the original sequence
             # after the current point
             pos_after = np.resize(np.roll(orig_seq, -i-1, 0), (iextra, 2))
-            good_triangle = True
             # Vector of distances between the current point and each following point
-            dist_from_point = ((orig_seq[i] - pos_after) ** 2).sum(1)
+            dist_from_point = ((step - pos_after) ** 2).sum(1)
             if np.amax(dist_from_point) < dmin_tri * dmin_tri:
-                good_triangle = False
+                continue
+            iend = np.argmax(dist_from_point >= dmin_tri * dmin_tri)
+            # pos_before is the array of positions of the original sequence
+            # before the current point
+            pos_before = np.resize(np.roll(orig_seq, -i, 0)[::-1], (iextra, 2))
+            # This time, vector of distances between the current point and each preceding point
+            dist_from_point = ((step - pos_before) ** 2).sum(1)
+            if np.amax(dist_from_point) < dmin_tri * dmin_tri:
+                continue
+            ibeg = np.argmax(dist_from_point >= dmin_tri * dmin_tri)
+            # See https://github.com/electrocbd/post_stretch for explanations
+            # relpos is the relative position of the projection of the second point
+            # of the triangle on the segment from the first to the third point
+            # 0 means the position of the first point, 1 means the position of the third,
+            # intermediate values are positions between
+            length_base = ((pos_after[iend] - pos_before[ibeg]) ** 2).sum(0)
+            relpos = ((step - pos_before[ibeg])
+                      * (pos_after[iend] - pos_before[ibeg])).sum(0)
+            if np.fabs(relpos) < 1000.0 * np.fabs(length_base):
+                relpos /= length_base
             else:
-                iend = np.argmax(dist_from_point >= dmin_tri * dmin_tri)
-            if good_triangle:
-                # pos_before is the array of positions of the original sequence
-                # before the current point
-                pos_before = np.resize(np.roll(orig_seq, -i, 0)[::-1], (iextra, 2))
-                # This time, vector of distances between the current point and each preceding point
-                dist_from_point = ((orig_seq[i] - pos_before) ** 2).sum(1)
-                if np.amax(dist_from_point) < dmin_tri * dmin_tri:
-                    good_triangle = False
-                else:
-                    ibeg = np.argmax(dist_from_point >= dmin_tri * dmin_tri)
-            if good_triangle:
-                # See https://github.com/electrocbd/post_stretch for explanations
-                # relpos is the relative position of the projection of the second point
-                # of the triangle on the segment from the first to the third point
-                # 0 means the position of the first point, 1 means the position of the third,
-                # intermediate values are positions between
-                length_base = ((pos_after[iend] - pos_before[ibeg]) ** 2).sum(0)
-                relpos = ((orig_seq[i] - pos_before[ibeg])
-                          * (pos_after[iend] - pos_before[ibeg])).sum(0)
-                if np.fabs(relpos) < 1000.0 * np.fabs(length_base):
-                    relpos /= length_base
-                else:
-                    relpos = 0.5 # To avoid division by zero or precision loss
-                projection = (pos_before[ibeg] + relpos * (pos_after[iend] - pos_before[ibeg]))
-                dist_from_proj = np.sqrt(((projection - orig_seq[i]) ** 2).sum(0))
-                if dist_from_proj > 0.001: # Move central point only if points are not aligned
-                    modif_seq[i] = (orig_seq[i] - (self.stretch / dist_from_proj)
-                                    * (projection - orig_seq[i]))
-            i = i + 1
+                relpos = 0.5 # To avoid division by zero or precision loss
+            projection = (pos_before[ibeg] + relpos * (pos_after[iend] - pos_before[ibeg]))
+            dist_from_proj = np.sqrt(((projection - step) ** 2).sum(0))
+            if dist_from_proj > 0.001: # Move central point only if points are not aligned
+                modif_seq[i] = (step - (self.stretch / dist_from_proj)
+                                * (projection - step))
         return
 
     def wideTurn(self, orig_seq, modif_seq):
