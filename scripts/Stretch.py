@@ -27,7 +27,7 @@ class GCodeStep():
         self.comment = comment
 
 
-def __getValue(line, key, default=None):
+def _getValue(line, key, default=None):
     """
     Convenience function that finds the value in a line of g-code.
     When requesting key = x from line "G1 X100" the value 100 is returned.
@@ -81,28 +81,28 @@ class Stretcher():
                 comment = ""
                 if line.find(";") >= 0:
                     comment = line[line.find(";"):]
-                if __getValue(line, "G") == 0:
-                    current_x = __getValue(line, "X", current_x)
-                    current_y = __getValue(line, "Y", current_y)
-                    current_z = __getValue(line, "Z", current_z)
-                    current_e = __getValue(line, "E", current_e)
-                    current_f = __getValue(line, "F", current_f)
+                if _getValue(line, "G") == 0:
+                    current_x = _getValue(line, "X", current_x)
+                    current_y = _getValue(line, "Y", current_y)
+                    current_z = _getValue(line, "Z", current_z)
+                    current_e = _getValue(line, "E", current_e)
+                    current_f = _getValue(line, "F", current_f)
                     onestep = GCodeStep(0, current_x, current_y, current_z,
                                         current_e, current_f, comment)
-                elif __getValue(line, "G") == 1:
-                    current_x = __getValue(line, "X", current_x)
-                    current_y = __getValue(line, "Y", current_y)
-                    current_z = __getValue(line, "Z", current_z)
-                    current_e = __getValue(line, "E", current_e)
-                    current_f = __getValue(line, "F", current_f)
+                elif _getValue(line, "G") == 1:
+                    current_x = _getValue(line, "X", current_x)
+                    current_y = _getValue(line, "Y", current_y)
+                    current_z = _getValue(line, "Z", current_z)
+                    current_e = _getValue(line, "E", current_e)
+                    current_f = _getValue(line, "F", current_f)
                     onestep = GCodeStep(1, current_x, current_y, current_z,
                                         current_e, current_f, comment)
-                elif __getValue(line, "G") == 92:
-                    current_x = __getValue(line, "X", current_x)
-                    current_y = __getValue(line, "Y", current_y)
-                    current_z = __getValue(line, "Z", current_z)
-                    current_e = __getValue(line, "E", current_e)
-                    current_f = __getValue(line, "F", current_f)
+                elif _getValue(line, "G") == 92:
+                    current_x = _getValue(line, "X", current_x)
+                    current_y = _getValue(line, "Y", current_y)
+                    current_z = _getValue(line, "Z", current_z)
+                    current_e = _getValue(line, "E", current_e)
+                    current_f = _getValue(line, "F", current_f)
                     onestep = GCodeStep(-1, current_x, current_y, current_z,
                                         current_e, current_f, comment)
                 else:
@@ -178,7 +178,7 @@ class Stretcher():
                                                            # something went really wrong !
             self.output_y = onestep.step_y
             sout += " Y{:.3f}".format(self.output_y).rstrip("0").rstrip(".")
-        if onestep.z != self.output_z:
+        if onestep.step_z != self.output_z:
             self.output_z = onestep.step_z
             sout += " Z{:.3f}".format(self.output_z).rstrip("0").rstrip(".")
         if onestep.step_e != self.output_e:
