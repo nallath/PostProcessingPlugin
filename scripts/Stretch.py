@@ -3,6 +3,7 @@
 Copyright (c) 2017 Christophe Baribaud 2017
 Python implementation of https://github.com/electrocbd/post_stretch
 Correction of hole sizes, cylinder diameters and curves
+See the original description in https://github.com/electrocbd/post_stretch
 
 WARNING This script has never been tested with several extruders
 """
@@ -141,7 +142,7 @@ class Stretcher():
                 current_e = step.step_e
             if current_e == step.step_e:
                 # No extrusion since the previous step, so it is a travel move
-                # Let process steps accumulated into orig_steps,
+               # Let process steps accumulated into orig_seq,
                 # which are a sequence of continuous extrusion
                 modif_seq = np.copy(orig_seq)
                 if len(orig_seq) >= 2:
@@ -188,12 +189,13 @@ class Stretcher():
             sout += " E{:.5f}".format(self.outpos.step_e).rstrip("0").rstrip(".")
         return sout
 
-    def generate(self, layer_steps, i, iend, orig_seq, layergcode):
+    def generate(self, layer_steps, ibeg, iend, orig_seq, layergcode):
         """
         Appends g-code lines to the plugin's returned string
+        starting from step ibeg included and until step iend excluded
         """
         ipos = 0
-        while i < iend:
+        for i in range(ibeg, iend):
             if layer_steps[i].step == 0:
                 sout = "G0" + self.stepToGcode(layer_steps[i])
                 layergcode = layergcode + sout + "\n"
@@ -206,7 +208,6 @@ class Stretcher():
                 ipos = ipos + 1
             else:
                 layergcode = layergcode + layer_steps[i].comment + "\n"
-            i = i + 1
         return layergcode
 
 
@@ -291,34 +292,27 @@ class Stretcher():
         '''
         dmin_tri = self.line_width / 2.0
         ibeg = 0
-        i = 1
         iend = 2
-        while i+1 < len(orig_seq):
-            good_triangle = True
+        for i in range(1, len(orig_seq) - 1):
             dist_from_point = ((orig_seq[i] - orig_seq[i+1:]) ** 2).sum(1)
             if np.amax(dist_from_point) < dmin_tri * dmin_tri:
-                good_triangle = False
+                continue;
+            iend = i + 1 + np.argmax(dist_from_point >= dmin_tri * dmin_tri)
+            dist_from_point = ((orig_seq[i] - orig_seq[i-1::-1]) ** 2).sum(1)
+            if np.amax(dist_from_point) < dmin_tri * dmin_tri:
+                continue;
+            ibeg = i - 1 - np.argmax(dist_from_point >= dmin_tri * dmin_tri)
+            length_base = ((orig_seq[iend] - orig_seq[ibeg]) ** 2).sum(0)
+            relpos = ((orig_seq[i] - orig_seq[ibeg]) * (orig_seq[iend] - orig_seq[ibeg])).sum(0)
+            if np.fabs(relpos) < 1000.0 * np.fabs(length_base):
+                relpos /= length_base
             else:
-                iend = i + 1 + np.argmax(dist_from_point >= dmin_tri * dmin_tri)
-            if good_triangle:
-                dist_from_point = ((orig_seq[i] - orig_seq[i-1::-1]) ** 2).sum(1)
-                if np.amax(dist_from_point) < dmin_tri * dmin_tri:
-                    good_triangle = False
-                else:
-                    ibeg = i - 1 - np.argmax(dist_from_point >= dmin_tri * dmin_tri)
-            if good_triangle:
-                length_base = ((orig_seq[iend] - orig_seq[ibeg]) ** 2).sum(0)
-                relpos = ((orig_seq[i] - orig_seq[ibeg]) * (orig_seq[iend] - orig_seq[ibeg])).sum(0)
-                if np.fabs(relpos) < 1000.0 * np.fabs(length_base):
-                    relpos /= length_base
-                else:
-                    relpos = 0.5
-                projection = orig_seq[ibeg] + relpos * (orig_seq[iend] - orig_seq[ibeg])
-                dist_from_proj = np.sqrt(((projection - orig_seq[i]) ** 2).sum(0))
-                if dist_from_proj > 0.001:
-                    modif_seq[i] = (orig_seq[i] - (self.stretch / dist_from_proj)
-                                    * (projection - orig_seq[i]))
-            i = i + 1
+                relpos = 0.5
+            projection = orig_seq[ibeg] + relpos * (orig_seq[iend] - orig_seq[ibeg])
+            dist_from_proj = np.sqrt(((projection - orig_seq[i]) ** 2).sum(0))
+            if dist_from_proj > 0.001:
+                modif_seq[i] = (orig_seq[i] - (self.stretch / dist_from_proj)
+                                * (projection - orig_seq[i]))
         return
 
     def pushWall(self, orig_seq, modif_seq):
@@ -415,5 +409,4 @@ class Stretch(Script):
             Application.getInstance().getGlobalContainerStack().getProperty("line_width", "value")
             , self.getSettingValueByKey("stretch"))
         return stretcher.execute(data)
-
 
