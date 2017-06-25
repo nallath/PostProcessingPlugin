@@ -217,11 +217,14 @@ class Stretcher():
         A sequence is a list of consecutive g-code steps
         of continuous material extrusion
         """
+        d_contact = self.line_width / 2.0
         if (len(orig_seq) > 2 and
-                ((orig_seq[len(orig_seq) - 1] - orig_seq[0]) ** 2).sum(0) < 0.3 * 0.3):
+                ((orig_seq[len(orig_seq) - 1] - orig_seq[0]) ** 2).sum(0) < d_contact * d_contact):
+            # Starting and ending point of the sequence are nearby
+            # It is a closed loop
             self.wideCircle(orig_seq, modif_seq)
         else:
-            self.wideTurn(orig_seq, modif_seq)
+            self.wideTurn(orig_seq, modif_seq) # It is an open curve
         self.pushWall(orig_seq, modif_seq)
         if len(orig_seq):
             self.vd1 = np.concatenate([self.vd1, np.array(orig_seq[:-1])])
@@ -296,11 +299,11 @@ class Stretcher():
         for i in range(1, len(orig_seq) - 1):
             dist_from_point = ((orig_seq[i] - orig_seq[i+1:]) ** 2).sum(1)
             if np.amax(dist_from_point) < dmin_tri * dmin_tri:
-                continue;
+                continue
             iend = i + 1 + np.argmax(dist_from_point >= dmin_tri * dmin_tri)
             dist_from_point = ((orig_seq[i] - orig_seq[i-1::-1]) ** 2).sum(1)
             if np.amax(dist_from_point) < dmin_tri * dmin_tri:
-                continue;
+                continue
             ibeg = i - 1 - np.argmax(dist_from_point >= dmin_tri * dmin_tri)
             length_base = ((orig_seq[iend] - orig_seq[ibeg]) ** 2).sum(0)
             relpos = ((orig_seq[i] - orig_seq[ibeg]) * (orig_seq[iend] - orig_seq[ibeg])).sum(0)
