@@ -80,6 +80,7 @@ class Stretcher():
                                     # of already deposited material for current layer
         self.vd2 = np.empty((0, 2)) # End points of segments
                                     # of already deposited material for current layer
+        self.layer_z = 0            # Z position of the extrusion moves of the current layer
 
     def execute(self, data):
         """
@@ -90,7 +91,7 @@ class Stretcher():
         retdata = []
         layer_steps = []
         current = GCodeStep(0)
-        layer_z = 0.
+        self.layer_z = 0.
         current_e = 0.
         for layer in data:
             lines = layer.rstrip("\n").split("\n")
@@ -114,17 +115,22 @@ class Stretcher():
                     onestep = GCodeStep(-1)
                     onestep.copyPosFrom(current)
                     onestep.comment = line
-                if current.step_z != layer_z and current.step_e != current_e:
-                    Logger.log("d", "Layer Z " + "{:.3f}".format(layer_z)
+                if line.find(";LAYER:") >= 0 and len(layer_steps):
+                    # Previous plugin "forgot" to separate two layers...
+                    Logger.log("d", "Layer Z " + "{:.3f}".format(self.layer_z)
                                + " " + str(len(layer_steps)) + " steps")
-                    if len(layer_steps):
-                        retdata.append(self.processLayer(layer_steps))
+                    retdata.append(self.processLayer(layer_steps))
                     layer_steps = []
-                    layer_z = current.step_z
                 layer_steps.append(onestep)
+                # self.layer_z is the z position of the last extrusion move (not travel move)
+                if current.step_z != self.layer_z and current.step_e != current_e:
+                    self.layer_z = current.step_z
                 current_e = current.step_e
-        if len(layer_steps):
-            retdata.append(self.processLayer(layer_steps))
+            if len(layer_steps): # Force a new item in the array
+                Logger.log("d", "Layer Z " + "{:.3f}".format(self.layer_z)
+                           + " " + str(len(layer_steps)) + " steps")
+                retdata.append(self.processLayer(layer_steps))
+                layer_steps = []
         retdata.append(";Stretch distance " + str(self.stretch) + "\n")
         return retdata
 
@@ -133,6 +139,8 @@ class Stretcher():
         Computes the new coordinates of g-code steps
         for one layer (all the steps at the same Z coordinate)
         """
+        self.outpos.step_x = -1000 # Force output of X and Y coordinates
+        self.outpos.step_y = -1000 # at each start of layer
         layergcode = ""
         self.vd1 = np.empty((0, 2))
         self.vd2 = np.empty((0, 2))
@@ -173,8 +181,7 @@ class Stretcher():
         if onestep.step_f != self.outpos.step_f:
             self.outpos.step_f = onestep.step_f
             sout += " F{:.0f}".format(self.outpos.step_f).rstrip(".")
-        if (onestep.step_x != self.outpos.step_x or onestep.step_y != self.outpos.step_y
-                or onestep.step_z != self.outpos.step_z):
+        if onestep.step_x != self.outpos.step_x or onestep.step_y != self.outpos.step_y:
             assert onestep.step_x >= -1000 and onestep.step_x < 1000 # If this assertion fails,
                                                            # something went really wrong !
             self.outpos.step_x = onestep.step_x
@@ -183,7 +190,7 @@ class Stretcher():
                                                            # something went really wrong !
             self.outpos.step_y = onestep.step_y
             sout += " Y{:.3f}".format(self.outpos.step_y).rstrip("0").rstrip(".")
-        if onestep.step_z != self.outpos.step_z:
+        if onestep.step_z != self.outpos.step_z or onestep.step_z != self.layer_z:
             self.outpos.step_z = onestep.step_z
             sout += " Z{:.3f}".format(self.outpos.step_z).rstrip("0").rstrip(".")
         if onestep.step_e != self.outpos.step_e:
