@@ -91,6 +91,7 @@ class Stretcher():
         layer_steps = []
         current = GCodeStep(0)
         layer_z = 0.
+        current_e = 0.
         for layer in data:
             lines = layer.rstrip("\n").split("\n")
             for line in lines:
@@ -113,7 +114,7 @@ class Stretcher():
                     onestep = GCodeStep(-1)
                     onestep.copyPosFrom(current)
                     onestep.comment = line
-                if current.step_z != layer_z:
+                if current.step_z != layer_z and current.step_e != current_e:
                     Logger.log("d", "Layer Z " + "{:.3f}".format(layer_z)
                                + " " + str(len(layer_steps)) + " steps")
                     if len(layer_steps):
@@ -121,6 +122,7 @@ class Stretcher():
                     layer_steps = []
                     layer_z = current.step_z
                 layer_steps.append(onestep)
+                current_e = current.step_e
         if len(layer_steps):
             retdata.append(self.processLayer(layer_steps))
         retdata.append(";Stretch distance " + str(self.stretch) + "\n")
