@@ -146,21 +146,22 @@ class Stretcher():
         self.vd2 = np.empty((0, 2))
         current_e = layer_steps[0].step_e
         orig_seq = np.empty((0, 2))
+        modif_seq = np.empty((0, 2))
         iflush = 0
         for i, step in enumerate(layer_steps):
             if i == 0:
                 current_e = step.step_e
-            if current_e == step.step_e:
-                # No extrusion since the previous step, so it is a travel move
-               # Let process steps accumulated into orig_seq,
-                # which are a sequence of continuous extrusion
-                modif_seq = np.copy(orig_seq)
-                if len(orig_seq) >= 2:
-                    self.workOnSequence(orig_seq, modif_seq)
-                layergcode = self.generate(layer_steps, iflush, i, modif_seq, layergcode)
-                iflush = i
-                orig_seq = np.empty((0, 2))
             if step.step == 0 or step.step == 1:
+                if current_e == step.step_e:
+                    # No extrusion since the previous step, so it is a travel move
+                    # Let process steps accumulated into orig_seq,
+                    # which are a sequence of continuous extrusion
+                    modif_seq = np.copy(orig_seq)
+                    if len(orig_seq) >= 2:
+                        self.workOnSequence(orig_seq, modif_seq)
+                    layergcode = self.generate(layer_steps, iflush, i, modif_seq, layergcode)
+                    iflush = i
+                    orig_seq = np.empty((0, 2))
                 orig_seq = np.concatenate([orig_seq, np.array([[step.step_x, step.step_y]])])
             current_e = step.step_e
         if len(orig_seq):
@@ -206,6 +207,8 @@ class Stretcher():
         ipos = 0
         for i in range(ibeg, iend):
             if layer_steps[i].step == 0:
+                layer_steps[i].step_x = orig_seq[ipos][0]
+                layer_steps[i].step_y = orig_seq[ipos][1]
                 sout = "G0" + self.stepToGcode(layer_steps[i])
                 layergcode = layergcode + sout + "\n"
                 ipos = ipos + 1
@@ -234,7 +237,8 @@ class Stretcher():
             self.wideCircle(orig_seq, modif_seq)
         else:
             self.wideTurn(orig_seq, modif_seq) # It is an open curve
-        self.pushWall(orig_seq, modif_seq)
+        if len(orig_seq) > 6: # Don't try push wall on a short sequence
+            self.pushWall(orig_seq, modif_seq)
         if len(orig_seq):
             self.vd1 = np.concatenate([self.vd1, np.array(orig_seq[:-1])])
             self.vd2 = np.concatenate([self.vd2, np.array(orig_seq[1:])])
@@ -256,10 +260,17 @@ class Stretcher():
         of an acceptable triangle
         """
         dmin_tri = self.line_width / 2.0
-        iextra = np.floor_divide(len(orig_seq), 3) # Nb of extra points
+        iextra_base = np.floor_divide(len(orig_seq), 3) # Nb of extra points
         ibeg = 0 # Index of first point of the triangle
         iend = 0 # Index of the third point of the triangle
         for i, step in enumerate(orig_seq):
+            if i == 0 or i == len(orig_seq) - 1:
+                # First and last point of the sequence are the same,
+                # so it is necessary to skip one of these two points
+                # when creating a triangle containing the first or the last point
+                iextra = iextra_base + 1
+            else:
+                iextra = iextra_base
             # i is the index of the second point of the triangle
             # pos_after is the array of positions of the original sequence
             # after the current point
@@ -341,7 +352,7 @@ class Stretcher():
         For example, segment nr 8 starts at position self.vd1[8]
         and ends at position self.vd2[8]
         """
-        dist_palp = self.line_width / 2.0 # Palpation distance to seek for a wall
+        dist_palp = self.line_width # Palpation distance to seek for a wall
         mrot = np.array([[0, -1], [1, 0]]) # Rotation matrix for a quarter turn
         for i in range(len(orig_seq)):
             ibeg = i # Index of the first point of the segment
