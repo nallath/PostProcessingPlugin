@@ -72,22 +72,27 @@ class Stretcher():
     """
     Execution part of the stretch algorithm
     """
-    def __init__(self, line_width, stretch):
+    def __init__(self, line_width, wc_stretch, pw_stretch):
         self.line_width = line_width
-        self.stretch = stretch
+        self.wc_stretch = wc_stretch
+        self.pw_stretch = pw_stretch
+        if self.pw_stretch > line_width / 4:
+            self.pw_stretch = line_width / 4 # Limit value of pushwall stretch distance
         self.outpos = GCodeStep(0)
         self.vd1 = np.empty((0, 2)) # Start points of segments
                                     # of already deposited material for current layer
         self.vd2 = np.empty((0, 2)) # End points of segments
                                     # of already deposited material for current layer
         self.layer_z = 0            # Z position of the extrusion moves of the current layer
+        self.layergcode = ""
 
     def execute(self, data):
         """
         Computes the new X and Y coordinates of all g-code steps
         """
-        Logger.log("d", "Post stretch with line width=" + str(self.line_width)
-                   + "mm and stretch=" + str(self.stretch)+ "mm")
+        Logger.log("d", "Post stretch with line width = " + str(self.line_width)
+                   + "mm wide circle stretch = " + str(self.wc_stretch)+ "mm"
+                   + "and push wall stretch = " + str(self.pw_stretch) + "mm")
         retdata = []
         layer_steps = []
         current = GCodeStep(0)
@@ -131,8 +136,29 @@ class Stretcher():
                            + " " + str(len(layer_steps)) + " steps")
                 retdata.append(self.processLayer(layer_steps))
                 layer_steps = []
-        retdata.append(";Stretch distance " + str(self.stretch) + "\n")
+        retdata.append(";Wide circle stretch distance " + str(self.wc_stretch) + "\n")
+        retdata.append(";Push wall stretch distance " + str(self.pw_stretch) + "\n")
         return retdata
+
+    def extrusionBreak(self, layer_steps, i_pos):
+        """
+        Returns true if the command layer_steps[i_pos] breaks the extruded filament
+        i.e. it is a travel move
+        """
+        if i_pos == 0:
+            return True # Begining a layer always breaks filament (for simplicity)
+        step = layer_steps[i_pos]
+        prev_step = layer_steps[i_pos - 1]
+        if step.step_e != prev_step.step_e:
+            return False
+        delta_x = step.step_x - prev_step.step_x
+        delta_y = step.step_y - prev_step.step_y
+        if delta_x * delta_x + delta_y * delta_y < self.line_width * self.line_width / 4:
+            # This is a very short movement, less than 0.5 * line_width
+            # It does not break filament, we should stay in the same extrusion sequence
+            return False
+        return True # New sequence
+
 
     def processLayer(self, layer_steps):
         """
@@ -141,35 +167,31 @@ class Stretcher():
         """
         self.outpos.step_x = -1000 # Force output of X and Y coordinates
         self.outpos.step_y = -1000 # at each start of layer
-        layergcode = ""
+        self.layergcode = ""
         self.vd1 = np.empty((0, 2))
         self.vd2 = np.empty((0, 2))
-        current_e = layer_steps[0].step_e
         orig_seq = np.empty((0, 2))
         modif_seq = np.empty((0, 2))
         iflush = 0
         for i, step in enumerate(layer_steps):
-            if i == 0:
-                current_e = step.step_e
             if step.step == 0 or step.step == 1:
-                if current_e == step.step_e:
+                if self.extrusionBreak(layer_steps, i):
                     # No extrusion since the previous step, so it is a travel move
                     # Let process steps accumulated into orig_seq,
                     # which are a sequence of continuous extrusion
                     modif_seq = np.copy(orig_seq)
                     if len(orig_seq) >= 2:
                         self.workOnSequence(orig_seq, modif_seq)
-                    layergcode = self.generate(layer_steps, iflush, i, modif_seq, layergcode)
+                    self.generate(layer_steps, iflush, i, modif_seq)
                     iflush = i
                     orig_seq = np.empty((0, 2))
                 orig_seq = np.concatenate([orig_seq, np.array([[step.step_x, step.step_y]])])
-            current_e = step.step_e
         if len(orig_seq):
             modif_seq = np.copy(orig_seq)
         if len(orig_seq) >= 2:
             self.workOnSequence(orig_seq, modif_seq)
-        layergcode = self.generate(layer_steps, iflush, len(layer_steps), modif_seq, layergcode)
-        return layergcode
+        self.generate(layer_steps, iflush, len(layer_steps), modif_seq)
+        return self.layergcode
 
     def stepToGcode(self, onestep):
         """
@@ -199,7 +221,7 @@ class Stretcher():
             sout += " E{:.5f}".format(self.outpos.step_e).rstrip("0").rstrip(".")
         return sout
 
-    def generate(self, layer_steps, ibeg, iend, orig_seq, layergcode):
+    def generate(self, layer_steps, ibeg, iend, orig_seq):
         """
         Appends g-code lines to the plugin's returned string
         starting from step ibeg included and until step iend excluded
@@ -210,17 +232,16 @@ class Stretcher():
                 layer_steps[i].step_x = orig_seq[ipos][0]
                 layer_steps[i].step_y = orig_seq[ipos][1]
                 sout = "G0" + self.stepToGcode(layer_steps[i])
-                layergcode = layergcode + sout + "\n"
+                self.layergcode = self.layergcode + sout + "\n"
                 ipos = ipos + 1
             elif layer_steps[i].step == 1:
                 layer_steps[i].step_x = orig_seq[ipos][0]
                 layer_steps[i].step_y = orig_seq[ipos][1]
                 sout = "G1" + self.stepToGcode(layer_steps[i])
-                layergcode = layergcode + sout + "\n"
+                self.layergcode = self.layergcode + sout + "\n"
                 ipos = ipos + 1
             else:
-                layergcode = layergcode + layer_steps[i].comment + "\n"
-        return layergcode
+                self.layergcode = self.layergcode + layer_steps[i].comment + "\n"
 
 
     def workOnSequence(self, orig_seq, modif_seq):
@@ -234,8 +255,10 @@ class Stretcher():
                 ((orig_seq[len(orig_seq) - 1] - orig_seq[0]) ** 2).sum(0) < d_contact * d_contact):
             # Starting and ending point of the sequence are nearby
             # It is a closed loop
+            #self.layergcode = self.layergcode + ";wideCircle\n"
             self.wideCircle(orig_seq, modif_seq)
         else:
+            #self.layergcode = self.layergcode + ";wideTurn\n"
             self.wideTurn(orig_seq, modif_seq) # It is an open curve
         if len(orig_seq) > 6: # Don't try push wall on a short sequence
             self.pushWall(orig_seq, modif_seq)
@@ -303,7 +326,7 @@ class Stretcher():
             projection = (pos_before[ibeg] + relpos * (pos_after[iend] - pos_before[ibeg]))
             dist_from_proj = np.sqrt(((projection - step) ** 2).sum(0))
             if dist_from_proj > 0.001: # Move central point only if points are not aligned
-                modif_seq[i] = (step - (self.stretch / dist_from_proj)
+                modif_seq[i] = (step - (self.wc_stretch / dist_from_proj)
                                 * (projection - step))
         return
 
@@ -334,7 +357,7 @@ class Stretcher():
             projection = orig_seq[ibeg] + relpos * (orig_seq[iend] - orig_seq[ibeg])
             dist_from_proj = np.sqrt(((projection - orig_seq[i]) ** 2).sum(0))
             if dist_from_proj > 0.001:
-                modif_seq[i] = (orig_seq[i] - (self.stretch / dist_from_proj)
+                modif_seq[i] = (orig_seq[i] - (self.wc_stretch / dist_from_proj)
                                 * (projection - orig_seq[i]))
         return
 
@@ -385,9 +408,9 @@ class Stretcher():
                 if np.amin(dist) <= dist_palp * dist_palp:
                     materialright = True
             if materialleft and not materialright:
-                modif_seq[ibeg] = modif_seq[ibeg] + xperp * self.stretch
+                modif_seq[ibeg] = modif_seq[ibeg] + xperp * self.pw_stretch
             elif not materialleft and materialright:
-                modif_seq[ibeg] = modif_seq[ibeg] - xperp * self.stretch
+                modif_seq[ibeg] = modif_seq[ibeg] - xperp * self.pw_stretch
             if materialleft and materialright:
                 modif_seq[ibeg] = orig_seq[ibeg] # Surrounded by walls, don't move
 
@@ -408,10 +431,21 @@ class Stretch(Script):
             "version": 2,
             "settings":
             {
-                "stretch":
+                "wc_stretch":
                 {
-                    "label": "Stretch distance",
-                    "description": "Distance by which the points are moved by the correction effect. The higher this value, the higher the effect",
+                    "label": "Wide circle stretch distance",
+                    "description": "Distance by which the points are moved by the correction effect in corners. The higher this value, the higher the effect",
+                    "unit": "mm",
+                    "type": "float",
+                    "default_value": 0.08,
+                    "minimum_value": 0,
+                    "minimum_value_warning": 0,
+                    "maximum_value_warning": 0.2
+                },
+                "pw_stretch":
+                {
+                    "label": "Push Wall stretch distance",
+                    "description": "Distance by which the points are moved by the correction effect when two lines are nearby. The higher this value, the higher the effect",
                     "unit": "mm",
                     "type": "float",
                     "default_value": 0.08,
@@ -430,6 +464,6 @@ class Stretch(Script):
         """
         stretcher = Stretcher(
             Application.getInstance().getGlobalContainerStack().getProperty("line_width", "value")
-            , self.getSettingValueByKey("stretch"))
+            , self.getSettingValueByKey("wc_stretch"), self.getSettingValueByKey("pw_stretch"))
         return stretcher.execute(data)
 
