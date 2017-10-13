@@ -71,7 +71,7 @@ class PrusaColorChange(Script):
                     lines = layer.split("\n")
                     lines.insert(2, color_change )
                     final_line = "\n".join( lines )
-                    data[ layer_num ] = final_line
+                    data[ layer_num - 1 ] = final_line
                     break
 
         return data
