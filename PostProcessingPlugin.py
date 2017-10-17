@@ -4,6 +4,7 @@ from PyQt5.QtCore import QObject, QUrl, pyqtProperty, pyqtSignal, pyqtSlot
 from PyQt5.QtQml import QQmlComponent, QQmlContext
 
 from UM.PluginRegistry import PluginRegistry
+from UM.Resources import Resources
 from UM.Application import Application
 from UM.Extension import Extension
 from UM.Logger import Logger
@@ -154,11 +155,21 @@ class PostProcessingPlugin(QObject, Extension):
     def _createView(self):
         Logger.log("d", "Creating post processing plugin view.")
 
-        ## Load all scripts in the scripts folder
-        try:
-            self.loadAllScripts(os.path.join(PluginRegistry.getInstance().getPluginPath("PostProcessingPlugin"), "scripts"))
-        except Exception as e:
-            print("Exception occured", e)  # TODO: Debug code (far to general catch. Remove this once done testing)
+        ## Load all scripts in the scripts folders
+        for root in [PluginRegistry.getInstance().getPluginPath("PostProcessingPlugin"), Resources.getStoragePath(Resources.Preferences)]:
+            try:
+                path = os.path.join(root, "scripts")
+                if not os.path.isdir(path):
+                    try:
+                        os.makedirs(path)
+                    except OSError:
+                        Logger.log("w", "Unable to create a folder for scripts: " % path)
+                        continue
+
+                self.loadAllScripts(path)
+            except Exception as e:
+                Logger.logException("e", "Exception occured while loading post processing plugin")
+
 
         path = QUrl.fromLocalFile(os.path.join(PluginRegistry.getInstance().getPluginPath("PostProcessingPlugin"), "PostProcessingPlugin.qml"))
         self._component = QQmlComponent(Application.getInstance()._engine, path)
