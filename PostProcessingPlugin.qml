@@ -16,17 +16,17 @@ UM.Dialog
     id: dialog
 
     title: catalog.i18nc("@title:window", "Post Processing Plugin")
-    width: 700 * Screen.devicePixelRatio;
-    height: 500 * Screen.devicePixelRatio;
-    minimumWidth: 400 * Screen.devicePixelRatio;
-    minimumHeight: 250 * Screen.devicePixelRatio;
+    width: 700 * screenScaleFactor;
+    height: 500 * screenScaleFactor;
+    minimumWidth: 400 * screenScaleFactor;
+    minimumHeight: 250 * screenScaleFactor;
 
     Item
     {
         UM.I18nCatalog{id: catalog; name:"cura"}
         id: base
-        property int columnWidth: (base.width / 2) - UM.Theme.getSize("default_margin").width
-        property int textMargin: UM.Theme.getSize("default_margin").width / 2
+        property int columnWidth: Math.floor((base.width / 2) - UM.Theme.getSize("default_margin").width)
+        property int textMargin: Math.floor(UM.Theme.getSize("default_margin").width / 2)
         property string activeScriptName
         SystemPalette{ id: palette }
         SystemPalette{ id: disabledPalette; colorGroup: SystemPalette.Disabled }
@@ -36,13 +36,13 @@ UM.Dialog
         {
             id: selectedScriptGroup
         }
-        Rectangle
+        Item
         {
             id: activeScripts
             anchors.left: parent.left
             width: base.columnWidth
             height: parent.height
-            color: "transparent"
+
             Label
             {
                 id: activeScriptsHeader
@@ -66,11 +66,10 @@ UM.Dialog
                 anchors.rightMargin: base.textMargin
                 height: childrenRect.height
                 model: manager.scriptList
-                delegate: Rectangle
+                delegate: Item
                 {
                     width: parent.width
                     height: activeScriptButton.height
-                    color: "transparent"
                     Button
                     {
                         id: activeScriptButton
@@ -116,8 +115,8 @@ UM.Dialog
                     {
                         id: removeButton
                         text: "x"
-                        width: 20
-                        height: 20
+                        width: 20 * screenScaleFactor
+                        height: 20 * screenScaleFactor
                         anchors.right:parent.right
                         anchors.rightMargin: base.textMargin
                         anchors.verticalCenter: parent.verticalCenter
@@ -130,8 +129,8 @@ UM.Dialog
                                 {
                                     anchors.verticalCenter: parent.verticalCenter
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    width: control.width / 2.7
-                                    height: control.height / 2.7
+                                    width: Math.floor(control.width / 2.7)
+                                    height: Math.floor(control.height / 2.7)
                                     sourceSize.width: width
                                     sourceSize.height: width
                                     color: palette.text
@@ -147,8 +146,8 @@ UM.Dialog
                         anchors.right: removeButton.left
                         anchors.verticalCenter: parent.verticalCenter
                         enabled: index != manager.scriptList.length - 1
-                        width: 20
-                        height: 20
+                        width: 20 * screenScaleFactor
+                        height: 20 * screenScaleFactor
                         onClicked:
                         {
                             if (manager.selectedScriptIndex == index)
@@ -165,8 +164,8 @@ UM.Dialog
                                 {
                                     anchors.verticalCenter: parent.verticalCenter
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    width: control.width / 2.5
-                                    height: control.height / 2.5
+                                    width: Math.floor(control.width / 2.5)
+                                    height: Math.floor(control.height / 2.5)
                                     sourceSize.width: width
                                     sourceSize.height: width
                                     color: control.enabled ? palette.text : disabledPalette.text
@@ -180,8 +179,8 @@ UM.Dialog
                         id: upButton
                         text: ""
                         enabled: index != 0
-                        width: 20
-                        height: 20
+                        width: 20 * screenScaleFactor
+                        height: 20 * screenScaleFactor
                         anchors.right: downButton.left
                         anchors.verticalCenter: parent.verticalCenter
                         onClicked:
@@ -200,8 +199,8 @@ UM.Dialog
                                 {
                                     anchors.verticalCenter: parent.verticalCenter
                                     anchors.horizontalCenter: parent.horizontalCenter
-                                    width: control.width / 2.5
-                                    height: control.height / 2.5
+                                    width: Math.floor(control.width / 2.5)
+                                    height: Math.floor(control.height / 2.5)
                                     sourceSize.width: width
                                     sourceSize.height: width
                                     color: control.enabled ? palette.text : disabledPalette.text
@@ -268,7 +267,7 @@ UM.Dialog
                 anchors.leftMargin: base.textMargin
                 anchors.right: parent.right
                 anchors.rightMargin: base.textMargin
-                height: 20
+                height: 20 * screenScaleFactor
                 font: UM.Theme.getFont("large")
                 color: UM.Theme.getColor("text")
             }
@@ -468,15 +467,15 @@ UM.Dialog
                            control.hovered ? UM.Theme.getColor("action_button_hovered") : UM.Theme.getColor("action_button")
                 Behavior on color { ColorAnimation { duration: 50; } }
                 anchors.left: parent.left
-                anchors.leftMargin: UM.Theme.getSize("save_button_text_margin").width / 2;
+                anchors.leftMargin: Math.floor(UM.Theme.getSize("save_button_text_margin").width / 2);
                 width: parent.height
                 height: parent.height
 
                 UM.RecolorImage {
                     anchors.verticalCenter: parent.verticalCenter
                     anchors.horizontalCenter: parent.horizontalCenter
-                    width: parent.width / 2
-                    height: parent.height / 2
+                    width: Math.floor(parent.width / 2)
+                    height: Math.floor(parent.height / 2)
                     sourceSize.width: width
                     sourceSize.height: height
                     color: !control.enabled ? UM.Theme.getColor("action_button_disabled_text") :
