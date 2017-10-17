@@ -24,14 +24,14 @@ class PostProcessingPlugin(QObject, Extension):
         super().__init__(parent)
         self.addMenuItem(i18n_catalog.i18n("Modify G-Code"), self.showPopup)
         self._view = None
-        
+
         # Loaded scripts are all scripts that can be used
-        self._loaded_scripts = {} 
+        self._loaded_scripts = {}
         self._script_labels = {}
-        
+
         # Script list contains instances of scripts in loaded_scripts.
         # There can be duplicates, which will be executed in sequence.
-        self._script_list = [] 
+        self._script_list = []
         self._selected_script_index = -1
 
         Application.getInstance().getOutputDeviceManager().writeStarted.connect(self.execute)
@@ -73,11 +73,11 @@ class PostProcessingPlugin(QObject, Extension):
     def setSelectedScriptIndex(self, index):
         self._selected_script_index = index
         self.selectedIndexChanged.emit()
-    
+
     @pyqtProperty(int, notify = selectedIndexChanged)
     def selectedScriptIndex(self):
         return self._selected_script_index
-    
+
     @pyqtSlot(int, int)
     def moveScript(self, index, new_index):
         if new_index < 0 or new_index > len(self._script_list) - 1:
@@ -112,7 +112,7 @@ class PostProcessingPlugin(QObject, Extension):
                 loaded_class = getattr(loaded_script, script_name)
                 temp_object = loaded_class()
                 Logger.log("d", "Begin loading of script: %s", script_name)
-                try: 
+                try:
                     setting_data = temp_object.getSettingData()
                     if "name" in setting_data and "key" in setting_data:
                         self._script_labels[setting_data["key"]] = setting_data["name"]
@@ -131,17 +131,17 @@ class PostProcessingPlugin(QObject, Extension):
     @pyqtProperty("QVariantList", notify = loadedScriptListChanged)
     def loadedScriptList(self):
         return sorted(list(self._loaded_scripts.keys()))
-    
+
     @pyqtSlot(str, result = str)
     def getScriptLabelByKey(self, key):
         return self._script_labels[key]
-    
+
     scriptListChanged = pyqtSignal()
     @pyqtProperty("QVariantList", notify = scriptListChanged)
     def scriptList(self):
         script_list = [script.getSettingData()["key"] for script in self._script_list]
         return script_list
-    
+
     @pyqtSlot(str)
     def addScriptToList(self, key):
         Logger.log("d", "Adding script %s to list.", key)
@@ -150,7 +150,7 @@ class PostProcessingPlugin(QObject, Extension):
         self.setSelectedScriptIndex(len(self._script_list) - 1)
         self.scriptListChanged.emit()
         self._propertyChanged()
-    
+
     ##  Creates the view used by show popup. The view is saved because of the fairly aggressive garbage collection.
     def _createView(self):
         Logger.log("d", "Creating post processing plugin view.")
