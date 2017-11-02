@@ -12,6 +12,7 @@ from UM.Logger import Logger
 import os.path
 import pkgutil
 import sys
+import importlib
 
 from UM.i18n import i18nCatalog
 i18n_catalog = i18nCatalog("cura")
@@ -107,8 +108,11 @@ class PostProcessingPlugin(QObject, Extension):
         for loader, script_name, ispkg in scripts:
             # Iterate over all scripts.
             if script_name not in sys.modules:
-                # Import module
-                loaded_script = __import__("PostProcessingPlugin.scripts."+ script_name, fromlist = [script_name])
+                spec = importlib.util.spec_from_file_location(__name__ + "." + script_name, os.path.join(path, script_name + ".py"))
+                loaded_script = importlib.util.module_from_spec(spec)
+                spec.loader.exec_module(loaded_script)
+                sys.modules[script_name] = loaded_script
+
                 loaded_class = getattr(loaded_script, script_name)
                 temp_object = loaded_class()
                 Logger.log("d", "Begin loading of script: %s", script_name)
