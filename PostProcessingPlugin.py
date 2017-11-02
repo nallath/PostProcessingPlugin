@@ -12,7 +12,7 @@ from UM.Logger import Logger
 import os.path
 import pkgutil
 import sys
-import importlib
+import importlib.util
 
 from UM.i18n import i18nCatalog
 i18n_catalog = i18nCatalog("cura")
