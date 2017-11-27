@@ -13,8 +13,8 @@ install(FILES
     Script.py
     LICENSE
     README.md
-    DESTINATION lib/cura/plugins/PostProcessingPlugin
+    DESTINATION lib${LIB_SUFFIX}/cura/plugins/PostProcessingPlugin
 )
 
-install(DIRECTORY scripts DESTINATION lib/cura/plugins/PostProcessingPlugin PATTERN "ExampleScript.py" EXCLUDE)
+install(DIRECTORY scripts DESTINATION lib${LIB_SUFFIX}/cura/plugins/PostProcessingPlugin PATTERN "ExampleScript.py" EXCLUDE)
 
