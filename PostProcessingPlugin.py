@@ -1,7 +1,6 @@
 # Copyright (c) 2015 Jaime van Kessel, Ultimaker B.V.
 # The PostProcessingPlugin is released under the terms of the AGPLv3 or higher.
-from PyQt5.QtCore import QObject, QUrl, pyqtProperty, pyqtSignal, pyqtSlot
-from PyQt5.QtQml import QQmlComponent, QQmlContext
+from PyQt5.QtCore import QObject, pyqtProperty, pyqtSignal, pyqtSlot
 
 from UM.PluginRegistry import PluginRegistry
 from UM.Resources import Resources
@@ -172,18 +171,14 @@ class PostProcessingPlugin(QObject, Extension):
 
                 self.loadAllScripts(path)
             except Exception as e:
-                Logger.logException("e", "Exception occured while loading post processing plugin")
+                Logger.logException("e", "Exception occurred while loading post processing plugin")
 
-
-        path = QUrl.fromLocalFile(os.path.join(PluginRegistry.getInstance().getPluginPath("PostProcessingPlugin"), "PostProcessingPlugin.qml"))
-        self._component = QQmlComponent(Application.getInstance()._engine, path)
-
-        # We need access to engine (although technically we can't)
-        self._context = QQmlContext(Application.getInstance()._engine.rootContext())
-        self._context.setContextProperty("manager", self)
-        self._view = self._component.create(self._context)
+        # Create the plugin dialog component
+        path = os.path.join(PluginRegistry.getInstance().getPluginPath("PostProcessingPlugin"), "PostProcessingPlugin.qml")
+        self._view = Application.getInstance().createQmlComponent(path, {"manager": self})
         Logger.log("d", "Post processing view created.")
 
+        # Create the save button component
         Application.getInstance().addAdditionalComponent("saveButton", self._view.findChild(QObject, "postProcessingSaveAreaButton"))
 
     ##  Show the (GUI) popup of the post processing plugin.
@@ -192,9 +187,9 @@ class PostProcessingPlugin(QObject, Extension):
             self._createView()
         self._view.show()
 
-    ##  Property changed: trigger reslice
+    ##  Property changed: trigger re-slice
     #   To do this we use the global container stack propertyChanged.
-    #   Reslicing is necessary for setting changes in this plugin, because the changes
+    #   Re-slicing is necessary for setting changes in this plugin, because the changes
     #   are applied only once per "fresh" gcode
     def _propertyChanged(self):
         global_container_stack = Application.getInstance().getGlobalContainerStack()
