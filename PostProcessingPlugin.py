@@ -166,11 +166,11 @@ class PostProcessingPlugin(QObject, Extension):
                     try:
                         os.makedirs(path)
                     except OSError:
-                        Logger.log("w", "Unable to create a folder for scripts: " % path)
+                        Logger.log("w", "Unable to create a folder for scripts: " + path)
                         continue
 
                 self.loadAllScripts(path)
-            except Exception as e:
+            except Exception:
                 Logger.logException("e", "Exception occurred while loading post processing plugin")
 
         # Create the plugin dialog component
