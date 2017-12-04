@@ -43,7 +43,7 @@ class Script:
                 ContainerRegistry.getInstance().addContainer(self._definition)
         self._stack.addContainer(self._definition)
         self._instance = InstanceContainer(container_id="ScriptInstanceContainer")
-        self._instance.setDefinition(self._definition)
+        self._instance.setDefinition(self._definition.getId())
         self._instance.addMetaDataEntry("setting_version", self._definition.getMetaDataEntry("setting_version", default = 0))
         self._stack.addContainer(self._instance)
         self._stack.propertyChanged.connect(self._onPropertyChanged)
