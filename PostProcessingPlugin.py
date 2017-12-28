@@ -170,8 +170,8 @@ class PostProcessingPlugin(QObject, Extension):
                         continue
 
                 self.loadAllScripts(path)
-            except Exception:
-                Logger.logException("e", "Exception occurred while loading post processing plugin")
+            except Exception as e:
+                Logger.logException("e", "Exception occurred while loading post processing plugin: {error_msg}".format(error_msg = str(e)))
 
         # Create the plugin dialog component
         path = os.path.join(PluginRegistry.getInstance().getPluginPath("PostProcessingPlugin"), "PostProcessingPlugin.qml")
