@@ -324,6 +324,7 @@ UM.Dialog
                         property var definition: model
                         property var settingDefinitionsModel: definitionsModel
                         property var propertyProvider: provider
+                        property var globalPropertyProvider: inheritStackProvider
 
                         //Qt5.4.2 and earlier has a bug where this causes a crash: https://bugreports.qt.io/browse/QTBUG-35989
                         //In addition, while it works for 5.5 and higher, the ordering of the actual combo box drop down changes,
@@ -368,6 +369,16 @@ UM.Dialog
                             key: model.key ? model.key : "None"
                             watchedProperties: [ "value", "enabled", "state", "validationState" ]
                             storeIndex: 0
+                        }
+
+                        // Specialty provider that only watches global_inherits (we cant filter on what property changed we get events
+                        // so we bypass that to make a dedicated provider).
+                        UM.SettingPropertyProvider
+                        {
+                            id: inheritStackProvider
+                            containerStackId: Cura.MachineManager.activeMachineId
+                            key: model.key
+                            watchedProperties: [ "limit_to_extruder" ]
                         }
 
                         Connections
