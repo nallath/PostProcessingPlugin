@@ -377,7 +377,7 @@ UM.Dialog
                         {
                             id: inheritStackProvider
                             containerStackId: Cura.MachineManager.activeMachineId
-                            key: model.key
+                            key: model.key ? model.key : "None"
                             watchedProperties: [ "limit_to_extruder" ]
                         }
 
