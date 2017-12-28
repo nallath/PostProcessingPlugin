@@ -27,7 +27,7 @@ class Script:
         self._stack = None
 
         setting_data = self.getSettingData()
-        self._stack = ContainerStack(stack_id=id(self))
+        self._stack = ContainerStack(stack_id = str(id(self)))
         self._stack.setDirty(False)  # This stack does not need to be saved.
 
 
