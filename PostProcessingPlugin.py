@@ -54,28 +54,28 @@ class PostProcessingPlugin(QObject, Extension):
     ##  Execute all post-processing scripts on the gcode.
     def execute(self, output_device):
         scene = Application.getInstance().getController().getScene()
-        if hasattr(scene, "gcode_list"):
-            gcode_list = getattr(scene, "gcode_list")
-            if gcode_list:
-                if ";POSTPROCESSED" not in gcode_list[0]:
-                    result = {}
-                    for script in self._script_list:
-                        try:
-                            if isinstance(gcode_list, dict):
-                                dictlist = []
-                                for key, value in gcode_list.items():
-                                    for item in value:
-                                        dictlist.append(item)
-                                    temp_result = script.execute(dictlist)
-                                    temp_result[0] += ";POSTPROCESSED\n" # Add comment to g-code if any changes were made.
-                                    result[key] = temp_result
-                        except Exception:
-                            Logger.logException("e", "Exception in post-processing script.")
-                    if len(self._script_list):
-                        gcode_list = result
-                    setattr(scene, "gcode_list", gcode_list)
-                else:
-                    Logger.log("e", "Already post processed")
+        gcode_dict = getattr(scene, "gcode_dict")
+        if not gcode_dict:
+            return
+
+        # get gcode list for the active build plate
+        active_build_plate_id = Application.getInstance().getBuildPlateModel().activeBuildPlate
+        gcode_list = gcode_dict[active_build_plate_id]
+        if not gcode_list:
+            return
+
+        if ";POSTPROCESSED" not in gcode_list[0]:
+            for script in self._script_list:
+                try:
+                    gcode_list = script.execute(gcode_list)
+                except Exception:
+                    Logger.logException("e", "Exception in post-processing script.")
+            if len(self._script_list):  # Add comment to g-code if any changes were made.
+                gcode_list[0] += ";POSTPROCESSED\n"
+            gcode_dict[active_build_plate_id] = gcode_list
+            setattr(scene, "gcode_dict", gcode_dict)
+        else:
+            Logger.log("e", "Already post processed")
 
     @pyqtSlot(int)
     def setSelectedScriptIndex(self, index):
