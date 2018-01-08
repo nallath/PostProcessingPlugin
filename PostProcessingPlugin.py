@@ -58,13 +58,21 @@ class PostProcessingPlugin(QObject, Extension):
             gcode_list = getattr(scene, "gcode_list")
             if gcode_list:
                 if ";POSTPROCESSED" not in gcode_list[0]:
+                    result = {}
                     for script in self._script_list:
                         try:
-                            gcode_list = script.execute(gcode_list)
+                            if isinstance(gcode_list, dict):
+                                dictlist = []
+                                for key, value in gcode_list.items():
+                                    for item in value:
+                                        dictlist.append(item)
+                                    temp_result = script.execute(dictlist)
+                                    temp_result[0] += ";POSTPROCESSED\n" # Add comment to g-code if any changes were made.
+                                    result[key] = temp_result
                         except Exception:
                             Logger.logException("e", "Exception in post-processing script.")
-                    if len(self._script_list):  # Add comment to g-code if any changes were made.
-                        gcode_list[0] += ";POSTPROCESSED\n"
+                    if len(self._script_list):
+                        gcode_list = result
                     setattr(scene, "gcode_list", gcode_list)
                 else:
                     Logger.log("e", "Already post processed")
@@ -194,4 +202,5 @@ class PostProcessingPlugin(QObject, Extension):
     def _propertyChanged(self):
         global_container_stack = Application.getInstance().getGlobalContainerStack()
         global_container_stack.propertyChanged.emit("post_processing_plugin", "value")
+
 
