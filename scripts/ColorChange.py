@@ -23,7 +23,7 @@ class ColorChange(Script):
                     "description": "At what layer should color change occur. This will be before the layer starts printing. Specify multiple color changes with a comma.",
                     "unit": "",
                     "type": "str",
-                    "default_value": 1
+                    "default_value": "1"
                 },
 
                 "initial_retract":
